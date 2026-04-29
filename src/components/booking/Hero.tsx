@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-antipasto.jpg";
 import { LOCATION } from "@/lib/location";
 
@@ -47,6 +48,13 @@ const Hero = ({ onStart }: HeroProps) => {
           >
             Plan Your Event
           </motion.button>
+
+          <Link
+            to="/spaces"
+            className="block mt-5 text-[11px] tracking-[0.3em] uppercase text-card/70 hover:text-card font-body underline-offset-4 hover:underline transition-colors"
+          >
+            View Spaces & Floor Plan
+          </Link>
 
           <p className="mt-10 text-[11px] tracking-[0.25em] uppercase text-card/60 font-body">
             {LOCATION.addressShort}
