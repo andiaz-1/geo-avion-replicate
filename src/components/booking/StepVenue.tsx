@@ -60,8 +60,19 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
       {/* Interactive floor plan */}
       <div className="mb-8">
         <FloorPlan
-          highlightVenue={data.wantsPrivateRoom ? null : data.venue}
+          highlightVenue={
+            data.wantsPrivateRoom && data.venue === "Main Room" ? null
+            : data.wantsPrivateRoom ? "Entire VIP Room"
+            : data.venue
+          }
           onSelect={(venueId) => {
+            // Entire VIP Room → toggles the private room buyout option
+            if (venueId === "Entire VIP Room") {
+              if (adultCount <= 66) {
+                onChange({ venue: "VIP Room Back", wantsPrivateRoom: true });
+              }
+              return;
+            }
             const v = venueId as Exclude<BookingData["venue"], "">;
             if ((availableIds as string[]).includes(v)) {
               onChange({ venue: v, wantsPrivateRoom: false });
