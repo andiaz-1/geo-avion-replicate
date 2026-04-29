@@ -1,5 +1,6 @@
 export interface BookingData {
   venue: "Main Room" | "VIP Room Front" | "VIP Room Back" | "";
+  vipBackLayout: "one-line" | "two-lines" | "u-shape" | "";
   decideLater: boolean;
   wantsPrivateRoom: boolean;
   date: Date | undefined;
@@ -33,6 +34,7 @@ export interface BookingData {
 
 export const initialBookingData: BookingData = {
   venue: "",
+  vipBackLayout: "",
   decideLater: false,
   wantsPrivateRoom: false,
   date: undefined,
