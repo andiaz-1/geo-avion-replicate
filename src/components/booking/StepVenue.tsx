@@ -6,6 +6,8 @@ import { AlertCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import venueMainRoom from "@/assets/venue-main-room.jpg";
 import venueVipRoom from "@/assets/venue-vip-room.jpg";
+import vipBackOneLine from "@/assets/weston-vip-back-one-line.jpg";
+import vipBackTwoLines from "@/assets/weston-vip-back-two-lines.jpg";
 import FloorPlan from "./FloorPlan";
 
 interface StepVenueProps {
@@ -176,6 +178,73 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
               <p>Entire VIP Room (66) · Main Dining (75) · Full Buyout (141)</p>
             </div>
           </motion.button>
+        </motion.div>
+      )}
+
+      {/* VIP Back layout chooser */}
+      {data.venue === "VIP Room Back" && !data.wantsPrivateRoom && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mt-10"
+        >
+          <div className="text-center mb-6">
+            <p className="text-xs font-body tracking-[0.3em] uppercase text-muted-foreground mb-2">
+              Choose your table layout
+            </p>
+            <h3 className="font-heading text-xl font-medium text-foreground">
+              How would you like the VIP Back arranged?
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              {
+                id: "one-line" as const,
+                label: "One Long Table",
+                description: "A single banquet line — best for conversation across the whole party.",
+                image: vipBackOneLine,
+              },
+              {
+                id: "two-lines" as const,
+                label: "Two Parallel Tables",
+                description: "Two long tables side by side — ideal for larger groups or split seating.",
+                image: vipBackTwoLines,
+              },
+            ].map((layout) => {
+              const isSelected = data.vipBackLayout === layout.id;
+              return (
+                <motion.button
+                  key={layout.id}
+                  whileHover={{ y: -2 }}
+                  onClick={() => onChange({ vipBackLayout: layout.id })}
+                  className={cn(
+                    "border rounded-sm overflow-hidden text-left transition-all duration-300",
+                    isSelected
+                      ? "border-primary ring-2 ring-primary/30"
+                      : "border-border hover:border-foreground/30"
+                  )}
+                >
+                  <img
+                    src={layout.image}
+                    alt={layout.label}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4 bg-card">
+                    <h4 className="font-heading text-base font-medium text-foreground">
+                      {layout.label}
+                    </h4>
+                    <p className="mt-1 text-xs text-muted-foreground font-body leading-relaxed">
+                      {layout.description}
+                    </p>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-center text-[11px] text-muted-foreground font-body italic">
+            U-shape is also available — mention it in special requests if preferred.
+          </p>
         </motion.div>
       )}
 
