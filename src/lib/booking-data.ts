@@ -90,7 +90,7 @@ export function getAvailableVenues(guestCount: number) {
 
 export const venues = [
   { id: "VIP Room Front" as const, name: "VIP Room (Front)", capacity: "Max 24 seated", description: "Intimate private section of the VIP Room" },
-  { id: "VIP Room Back" as const, name: "VIP Room (Back, with TV)", capacity: "Max 42 seated", description: "Larger private section with TV, ideal for presentations" },
+  { id: "VIP Room Back" as const, name: "VIP Room (Back, with TV)", capacity: "Max 42 seated", description: "Larger private section with TV — U-shaped or long tables available" },
   { id: "Main Room" as const, name: "Main Dining (Semi-Private)", capacity: "Max 75 seated", description: "Semi-private main dining area" },
 ];
 
@@ -319,7 +319,7 @@ export const openBarSelections = {
 };
 
 export const addonPrices = {
-  tablecloths: { price: 60, label: "White Tablecloths", description: "$60 (availability permitting)" },
+  tablecloths: { price: 0, label: "White Tablecloths", description: "Based on availability, request in advance" },
   avSpeaker: { price: 150, label: "JBL Speaker + 2 Microphones", description: "$150" },
   liveMusic: { price: 300, label: "Live Music", description: "Starts at $300" },
   ownMusician: { price: 0, label: "I will bring my own musician", description: "No charge" },
