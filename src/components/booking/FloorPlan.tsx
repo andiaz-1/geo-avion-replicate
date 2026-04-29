@@ -60,7 +60,7 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
           Hover a room to highlight
         </p>
       </div>
-      <div className="relative bg-[#f5efe4]">
+      <div className="relative bg-card">
         <img
           src={floorplan}
           alt="Salumeria 104 Weston floor plan"
