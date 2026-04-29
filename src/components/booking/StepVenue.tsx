@@ -166,7 +166,15 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
       )}
 
       <p className="mt-6 text-center text-xs text-muted-foreground font-body italic">
-        Note: The VIP Room is located at the back of the restaurant, with the Back section featuring a TV for presentations.
+        Note: The VIP Room is located at the back of the restaurant, with the Back section featuring a TV for presentations.{" "}
+        <a
+          href="/spaces"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-4 hover:text-foreground"
+        >
+          See full layouts & floor plan →
+        </a>
       </p>
 
       <div className="mt-10 flex justify-center gap-4">
