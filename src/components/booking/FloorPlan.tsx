@@ -38,6 +38,15 @@ const AREAS: Area[] = [
     labelY: 57,
   },
   {
+    id: "Entire VIP Room",
+    label: "Entire VIP Room (Front + Back)",
+    capacity: "Up to 66 · private · F&B minimum",
+    // Wraps both VIP sections — drawn UNDER individual rooms so individual rooms still take priority on hover
+    points: "8,13 40,13 40,70 8,70",
+    labelX: 24,
+    labelY: 41,
+  },
+  {
     id: "Main Room",
     label: "Main Dining Room",
     capacity: "Up to 75 · semi-private or buyout",
