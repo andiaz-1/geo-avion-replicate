@@ -60,8 +60,8 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
         <FloorPlan
           highlightVenue={data.wantsPrivateRoom ? null : data.venue}
           onSelect={(venueId) => {
-            if (availableIds.includes(venueId)) {
-              onChange({ venue: venueId, wantsPrivateRoom: false });
+            if (availableIds.includes(venueId as BookingData["venue"])) {
+              onChange({ venue: venueId as BookingData["venue"], wantsPrivateRoom: false });
             }
           }}
         />
