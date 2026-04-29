@@ -38,6 +38,15 @@ const AREAS: Area[] = [
     labelY: 57,
   },
   {
+    id: "Entire VIP Room",
+    label: "Entire VIP Room (Front + Back)",
+    capacity: "Up to 66 · private · F&B minimum",
+    // Wraps both VIP sections — drawn UNDER individual rooms so individual rooms still take priority on hover
+    points: "8,13 40,13 40,70 8,70",
+    labelX: 24,
+    labelY: 41,
+  },
+  {
     id: "Main Room",
     label: "Main Dining Room",
     capacity: "Up to 75 · semi-private or buyout",
@@ -72,23 +81,32 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
           preserveAspectRatio="none"
           className="absolute inset-0 w-full h-full"
         >
-          {AREAS.map((area) => {
-            const isActive = active === area.id;
-            return (
-              <polygon
-                key={area.id}
-                points={area.points}
-                onMouseEnter={() => setHovered(area.id)}
-                onMouseLeave={() => setHovered(null)}
-                onClick={() => onSelect?.(area.id)}
-                className={`cursor-pointer transition-all duration-200 ${
-                  isActive ? "fill-primary/40 stroke-primary" : "fill-transparent stroke-transparent hover:fill-primary/20"
-                }`}
-                strokeWidth={0.4}
-                vectorEffect="non-scaling-stroke"
-              />
-            );
-          })}
+          {/* Render "Entire VIP Room" first so individual VIP areas overlay on top for hover priority */}
+          {[...AREAS]
+            .sort((a, b) => (a.id === "Entire VIP Room" ? -1 : b.id === "Entire VIP Room" ? 1 : 0))
+            .map((area) => {
+              const isActive = active === area.id;
+              const isWrapper = area.id === "Entire VIP Room";
+              return (
+                <polygon
+                  key={area.id}
+                  points={area.points}
+                  onMouseEnter={() => setHovered(area.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={() => onSelect?.(area.id)}
+                  className={`cursor-pointer transition-all duration-200 ${
+                    isActive
+                      ? isWrapper
+                        ? "fill-primary/25 stroke-primary"
+                        : "fill-primary/40 stroke-primary"
+                      : "fill-transparent stroke-transparent hover:fill-primary/15"
+                  }`}
+                  strokeWidth={isWrapper ? 0.6 : 0.4}
+                  strokeDasharray={isWrapper ? "1.5 1" : undefined}
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })}
         </svg>
 
         {/* Floating label */}
@@ -110,7 +128,7 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
         )}
       </div>
       {/* Legend */}
-      <div className="grid grid-cols-3 gap-px bg-border text-center text-[10px] font-body">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border text-center text-[10px] font-body">
         {AREAS.map((area) => {
           const isActive = active === area.id;
           return (
