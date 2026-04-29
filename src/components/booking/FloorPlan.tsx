@@ -60,7 +60,7 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
           Hover a room to highlight
         </p>
       </div>
-      <div className="relative bg-[#f5efe4]">
+      <div className="relative bg-card">
         <img
           src={floorplan}
           alt="Salumeria 104 Weston floor plan"
@@ -128,6 +128,11 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
             </button>
           );
         })}
+      </div>
+      <div className="px-4 py-3 border-t border-border bg-muted/30">
+        <p className="text-[11px] font-body text-muted-foreground italic leading-relaxed text-center">
+          The <span className="text-foreground font-medium not-italic">VIP Room</span> is one continuous space — we divide the <span className="text-foreground font-medium not-italic">Front</span> and <span className="text-foreground font-medium not-italic">Back</span> sections with a curtain for privacy, or open it fully for groups up to 66.
+        </p>
       </div>
     </div>
   );
