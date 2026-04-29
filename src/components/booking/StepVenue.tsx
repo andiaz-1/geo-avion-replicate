@@ -6,6 +6,7 @@ import { AlertCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import venueMainRoom from "@/assets/venue-main-room.jpg";
 import venueVipRoom from "@/assets/venue-vip-room.jpg";
+import FloorPlan from "./FloorPlan";
 
 interface StepVenueProps {
   data: BookingData;
@@ -52,6 +53,18 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
         <p className="mt-3 text-sm text-muted-foreground font-body">
           Based on your party of {data.guestCount}, the following spaces are available:
         </p>
+      </div>
+
+      {/* Interactive floor plan */}
+      <div className="mb-8">
+        <FloorPlan
+          highlightVenue={data.wantsPrivateRoom ? null : data.venue}
+          onSelect={(venueId) => {
+            if (availableIds.includes(venueId)) {
+              onChange({ venue: venueId, wantsPrivateRoom: false });
+            }
+          }}
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -166,15 +179,7 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
       )}
 
       <p className="mt-6 text-center text-xs text-muted-foreground font-body italic">
-        Note: The VIP Room is located at the back of the restaurant, with the Back section featuring a TV for presentations.{" "}
-        <a
-          href="/spaces"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-4 hover:text-foreground"
-        >
-          See full layouts & floor plan →
-        </a>
+        Note: The VIP Room is at the back of the restaurant; the Back section features a TV for presentations.
       </p>
 
       <div className="mt-10 flex justify-center gap-4">
