@@ -14,7 +14,7 @@ const Hero = ({ onStart }: HeroProps) => {
       <div className="absolute inset-0">
         <img
           src={heroImage}
-          alt="Italian antipasto spread"
+          alt="VIP private dining room set for an event"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-foreground/60" />
