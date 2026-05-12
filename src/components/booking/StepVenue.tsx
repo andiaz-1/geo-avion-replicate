@@ -314,7 +314,7 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
             {data.wantsPrivateRoom && (
               <li className="flex gap-2">
                 <span className="text-primary">•</span>
-                <span>A <span className="font-medium text-foreground">$1,500 food &amp; beverage minimum</span> applies.</span>
+                <span>Food &amp; beverage <span className="font-medium text-foreground">starts at $1,500</span> for the entire VIP Room.</span>
               </li>
             )}
           </ul>
