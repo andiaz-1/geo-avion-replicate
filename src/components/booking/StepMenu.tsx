@@ -274,24 +274,24 @@ const StepMenu = ({ data, onChange, onNext, onBack }: StepMenuProps) => {
                   >
                     {isMenuSelected && !data.decideLater ? "Selected" : "Select"}
                   </button>
-                  {menu.courses && (
-                    <button
-                      onClick={() => onChange({
-                        menu: menu.id,
-                        courseChoice: "",
-                        menuSelections: {},
-                        decideLater: true,
-                      })}
-                      className={cn(
-                        "text-xs px-3 py-2 transition-all duration-300 rounded-sm tracking-widest uppercase font-body font-medium",
-                        isMenuSelected && data.decideLater
-                          ? "bg-primary text-primary-foreground"
-                          : "ghost-button-primary"
-                      )}
-                    >
-                      {isMenuSelected && data.decideLater ? "✓ Selections Later" : "Make Selections Later"}
-                    </button>
-                  )}
+                {menu.courses && menu.id !== "Classico" && (
+                  <button
+                    onClick={() => onChange({
+                      menu: menu.id,
+                      courseChoice: "",
+                      menuSelections: {},
+                      decideLater: true,
+                    })}
+                    className={cn(
+                      "text-xs px-3 py-2 transition-all duration-300 rounded-sm tracking-widest uppercase font-body font-medium",
+                      isMenuSelected && data.decideLater
+                        ? "bg-primary text-primary-foreground"
+                        : "ghost-button-primary"
+                    )}
+                  >
+                    {isMenuSelected && data.decideLater ? "✓ Selections Later" : "Make Selections Later"}
+                  </button>
+                )}
                 </div>
               </div>
             </motion.div>
