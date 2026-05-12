@@ -55,6 +55,13 @@ const spaces = [
 
 const galleryImages = [
   { src: vipPresentation, caption: "VIP Back — long table with TV presentation setup" },
+  { src: vipLongTableSet, caption: "VIP Front — single long table set for an intimate dinner" },
+  { src: vipTwoTablesSet, caption: "VIP Back — two parallel long tables ready for a private event" },
+  { src: vipTwoLongTables, caption: "VIP Back — two long tables set with TV for presentations" },
+  { src: vipTvPresentationSetup, caption: "VIP Back — long banquet table with TV slide setup" },
+  { src: vipUShape, caption: "VIP Back — U-shaped table arrangement with TV" },
+  { src: vipPresentationDinner, caption: "VIP Back — corporate dinner with live presentation" },
+  { src: vipValentinesGroup, caption: "VIP Back — group celebration (Valentine's themed)" },
   { src: vipCocktail, caption: "VIP Front — cocktail reception" },
   { src: vipFront, caption: "VIP Front — banquet seating along the windows" },
   { src: vipReception, caption: "VIP Room — welcome & check-in setup" },
