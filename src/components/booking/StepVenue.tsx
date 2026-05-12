@@ -6,6 +6,7 @@ import { AlertCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import vipBackOneLine from "@/assets/weston-vip-back-one-line.jpg";
 import vipBackTwoLines from "@/assets/weston-vip-back-two-lines.jpg";
+import vipUShape from "@/assets/weston-vip-u-shape.jpg";
 import FloorPlan from "./FloorPlan";
 
 interface StepVenueProps {
@@ -240,7 +241,7 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
               How would you like the VIP Back arranged?
             </h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               {
                 id: "one-line" as const,
@@ -253,6 +254,12 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
                 label: "Two Parallel Tables",
                 description: "Two long tables side by side — ideal for larger groups or split seating.",
                 image: vipBackTwoLines,
+              },
+              {
+                id: "u-shape" as const,
+                label: "U-Shape",
+                description: "Open U-shape arrangement — great for presentations and group discussion.",
+                image: vipUShape,
               },
             ].map((layout) => {
               const isSelected = data.vipBackLayout === layout.id;
@@ -285,9 +292,6 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
               );
             })}
           </div>
-          <p className="mt-3 text-center text-[11px] text-muted-foreground font-body italic">
-            U-shape is also available — mention it in special requests if preferred.
-          </p>
         </motion.div>
       )}
 
