@@ -30,6 +30,7 @@ export interface BookingData {
   phone: string;
   company: string;
   specialRequests: string;
+  isPharmaEvent: boolean;
 }
 
 export const initialBookingData: BookingData = {
