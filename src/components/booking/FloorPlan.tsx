@@ -81,6 +81,15 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
           preserveAspectRatio="none"
           className="absolute inset-0 w-full h-full"
         >
+          <defs>
+            <filter id="room-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="0.6" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
           {/* Render "Entire VIP Room" first so individual VIP areas overlay on top for hover priority */}
           {[...AREAS]
             .sort((a, b) => (a.id === "Entire VIP Room" ? -1 : b.id === "Entire VIP Room" ? 1 : 0))
@@ -94,16 +103,18 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
                   onMouseEnter={() => setHovered(area.id)}
                   onMouseLeave={() => setHovered(null)}
                   onClick={() => onSelect?.(area.id)}
-                  className={`cursor-pointer transition-all duration-200 ${
+                  filter={isActive ? "url(#room-glow)" : undefined}
+                  className={`cursor-pointer transition-all duration-300 ease-out ${
                     isActive
                       ? isWrapper
-                        ? "fill-primary/25 stroke-primary"
-                        : "fill-primary/40 stroke-primary"
-                      : "fill-transparent stroke-transparent hover:fill-primary/15"
+                        ? "fill-primary/20 stroke-primary"
+                        : "fill-primary/35 stroke-primary"
+                      : "fill-transparent stroke-transparent hover:fill-primary/20 hover:stroke-primary/70"
                   }`}
-                  strokeWidth={isWrapper ? 0.6 : 0.4}
+                  strokeWidth={isWrapper ? 0.7 : 0.5}
                   strokeDasharray={isWrapper ? "1.5 1" : undefined}
                   vectorEffect="non-scaling-stroke"
+                  style={{ transformOrigin: "center", transformBox: "fill-box" }}
                 />
               );
             })}
@@ -112,17 +123,19 @@ const FloorPlan = ({ highlightVenue, onSelect }: FloorPlanProps) => {
         {/* Floating label */}
         {activeArea && (
           <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="pointer-events-none absolute bg-foreground text-background px-3 py-2 rounded-sm shadow-lg text-center"
+            key={activeArea.id}
+            initial={{ opacity: 0, y: 6, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="pointer-events-none absolute bg-foreground text-background px-3.5 py-2 rounded-sm shadow-xl ring-1 ring-primary/40 text-center"
             style={{
               left: `${activeArea.labelX}%`,
               top: `${activeArea.labelY}%`,
               transform: "translate(-50%, -50%)",
-              minWidth: "140px",
+              minWidth: "150px",
             }}
           >
-            <p className="font-heading text-xs font-medium leading-tight">{activeArea.label}</p>
+            <p className="font-heading text-xs font-medium leading-tight tracking-wide">{activeArea.label}</p>
             <p className="text-[10px] font-body opacity-80 mt-0.5">{activeArea.capacity}</p>
           </motion.div>
         )}
