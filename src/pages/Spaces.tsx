@@ -14,6 +14,7 @@ import vipTvPresentationSetup from "@/assets/weston-vip-tv-presentation-setup.jp
 import vipUShape from "@/assets/weston-vip-u-shape.jpg";
 import vipValentinesGroup from "@/assets/weston-vip-valentines-group.jpg";
 import vipPresentationDinner from "@/assets/weston-vip-presentation-dinner.jpg";
+import vipSquareTableValentines from "@/assets/weston-vip-square-table-valentines.jpg";
 
 const spaces = [
   {
@@ -62,6 +63,7 @@ const galleryImages = [
   { src: vipUShape, caption: "VIP Back — U-shaped table arrangement with TV" },
   { src: vipPresentationDinner, caption: "VIP Back — corporate dinner with live presentation" },
   { src: vipValentinesGroup, caption: "VIP Back — table in a square shape (Valentine's group celebration)" },
+  { src: vipSquareTableValentines, caption: "VIP Back — table in a square shape set for a Valentine's celebration" },
   { src: vipCocktail, caption: "VIP Front — cocktail reception" },
   { src: vipFront, caption: "VIP Front — banquet seating along the windows" },
   { src: vipReception, caption: "VIP Room — welcome & check-in setup" },
