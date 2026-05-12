@@ -185,9 +185,9 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
             </button>
           </div>
 
-          {/* Note for 10 or fewer guests */}
+          {/* Note for fewer than 8 guests */}
           <AnimatePresence>
-            {data.guestCount <= 10 && (
+            {data.guestCount < 8 && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -197,7 +197,7 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
               >
                 <div className="border border-primary/20 bg-primary/5 rounded-sm p-4 mt-2">
                   <p className="text-sm font-body text-foreground">
-                    For parties of 10 or fewer, please make a reservation directly on our website:
+                    For parties of fewer than 8, please make a reservation directly on our website:
                   </p>
                   <a
                     href={LOCATION.smallPartyReservationUrl}
@@ -212,9 +212,9 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
             )}
           </AnimatePresence>
 
-          {/* Note for 10-15 guests */}
+          {/* Pharma / medical event check for 8-15 */}
           <AnimatePresence>
-            {data.guestCount > 10 && data.guestCount <= 15 && (
+            {isSmallGroup && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -222,16 +222,45 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <div className="border border-accent/30 bg-accent/5 rounded-sm p-4 mt-2">
-                  <p className="text-sm font-body text-foreground">
-                    This booking tool is for set menu events. If you'd prefer à la carte dining for your group, please contact the restaurant directly:
+                <div className="border border-accent/30 bg-accent/5 rounded-sm p-4 mt-2 space-y-3">
+                  <p className="text-xs font-body text-foreground/80">
+                    Groups of 8–15 can book through this tool when it's a pharma or medical event.
                   </p>
-                  <a
-                    href={`tel:${LOCATION.restaurantPhoneTel}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-body font-medium text-primary hover:underline mt-2"
+                  <button
+                    onClick={() => onChange({ isPharmaEvent: !data.isPharmaEvent })}
+                    className="flex items-start gap-3 w-full text-left"
                   >
-                    <Phone className="h-3.5 w-3.5" /> {LOCATION.restaurantPhone}
-                  </a>
+                    <span
+                      className={cn(
+                        "mt-0.5 w-5 h-5 flex items-center justify-center border rounded-sm transition-colors flex-shrink-0",
+                        data.isPharmaEvent
+                          ? "bg-primary border-primary text-primary-foreground"
+                          : "border-border bg-card"
+                      )}
+                    >
+                      {data.isPharmaEvent && (
+                        <svg viewBox="0 0 12 12" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M2 6l3 3 5-6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </span>
+                    <span className="text-sm font-body text-foreground">
+                      This is a pharma or medical event
+                    </span>
+                  </button>
+                  {!data.isPharmaEvent && (
+                    <div className="pt-2 border-t border-border/50">
+                      <p className="text-xs font-body text-muted-foreground">
+                        Otherwise, for à la carte dining for your group, please contact the restaurant directly:
+                      </p>
+                      <a
+                        href={`tel:${LOCATION.restaurantPhoneTel}`}
+                        className="inline-flex items-center gap-1.5 text-sm font-body font-medium text-primary hover:underline mt-2"
+                      >
+                        <Phone className="h-3.5 w-3.5" /> {LOCATION.restaurantPhone}
+                      </a>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
