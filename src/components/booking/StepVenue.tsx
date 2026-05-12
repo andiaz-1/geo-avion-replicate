@@ -4,8 +4,6 @@ import { cn } from "@/lib/utils";
 import { BookingData, getAvailableVenues, venues as allVenues } from "@/lib/booking-data";
 import { AlertCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import venueMainRoom from "@/assets/venue-main-room.jpg";
-import venueVipRoom from "@/assets/venue-vip-room.jpg";
 import vipBackOneLine from "@/assets/weston-vip-back-one-line.jpg";
 import vipBackTwoLines from "@/assets/weston-vip-back-two-lines.jpg";
 import FloorPlan from "./FloorPlan";
@@ -17,11 +15,8 @@ interface StepVenueProps {
   onBack: () => void;
 }
 
-const venueImages: Record<string, string> = {
-  "Main Room": venueMainRoom,
-  "VIP Room Front": venueVipRoom,
-  "VIP Room Back": venueVipRoom,
-};
+// Venue photos intentionally omitted here — Weston-specific imagery lives on the /spaces gallery.
+const venueImages: Record<string, string> = {};
 
 const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
   const isMobile = useIsMobile();
