@@ -22,12 +22,16 @@ const venueImages: Record<string, string> = {};
 const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
   const isMobile = useIsMobile();
   const available = getAvailableVenues(data.guestCount);
-  const availableIds = available.map((v) => v.id);
+  // Pharma/medical events need the TV — restrict to VIP Room Back (or full VIP buyout)
+  const availableIds = (data.isPharmaEvent
+    ? available.filter((v) => v.id === "VIP Room Back")
+    : available
+  ).map((v) => v.id);
   const adultCount = data.guestCount - (data.hasKids ? data.kidsCount : 0);
-  const showPrivateOption = adultCount > 25;
+  const showPrivateOption = !data.isPharmaEvent && adultCount > 25;
 
   // Reset venue if no longer available
-  if (data.venue && !availableIds.includes(data.venue)) {
+  if (data.venue && !availableIds.includes(data.venue) && !data.wantsPrivateRoom) {
     onChange({ venue: "" });
   }
 
@@ -144,7 +148,9 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
                 <p className="mt-2 text-xs text-muted-foreground/70 font-body">{venue.description}</p>
                 {!isAvailable && (
                   <p className="mt-2 text-xs text-destructive font-body italic">
-                    Too many guests
+                    {data.isPharmaEvent && venue.id !== "VIP Room Back"
+                      ? "Requires VIP Back (TV)"
+                      : "Too many guests"}
                   </p>
                 )}
               </motion.button>
