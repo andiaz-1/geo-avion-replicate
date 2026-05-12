@@ -311,10 +311,12 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
               <span className="text-primary">•</span>
               <span>One of our <span className="font-medium text-foreground">set menus</span> must be selected to confirm the booking.</span>
             </li>
-            <li className="flex gap-2">
-              <span className="text-primary">•</span>
-              <span>A <span className="font-medium text-foreground">$1,500 food &amp; beverage minimum</span> applies.</span>
-            </li>
+            {data.wantsPrivateRoom && (
+              <li className="flex gap-2">
+                <span className="text-primary">•</span>
+                <span>A <span className="font-medium text-foreground">$1,500 food &amp; beverage minimum</span> applies.</span>
+              </li>
+            )}
           </ul>
         </motion.div>
       )}
