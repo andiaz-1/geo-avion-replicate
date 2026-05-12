@@ -48,11 +48,12 @@ const AREAS: Area[] = [
   },
   {
     id: "Main Room",
-    label: "Main Dining Room",
+    label: "Main Dining & Bar",
     capacity: "Up to 75 · semi-private or buyout",
-    points: "50,15 95,15 95,85 50,85",
-    labelX: 72,
-    labelY: 50,
+    // L-shape wrapping the bar (right) and main dining (bottom)
+    points: "55,15 95,15 95,82 40,82 40,68 55,68",
+    labelX: 78,
+    labelY: 48,
   },
 ];
 
