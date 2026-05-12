@@ -65,6 +65,7 @@ export const initialBookingData: BookingData = {
   phone: "",
   company: "",
   specialRequests: "",
+  isPharmaEvent: false,
 };
 
 export const KIDS_MENU_PRICE = 45;
