@@ -6,6 +6,7 @@ import { AlertCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import vipBackOneLine from "@/assets/weston-vip-back-one-line.jpg";
 import vipBackTwoLines from "@/assets/weston-vip-back-two-lines.jpg";
+import vipUShape from "@/assets/weston-vip-u-shape.jpg";
 import FloorPlan from "./FloorPlan";
 
 interface StepVenueProps {
