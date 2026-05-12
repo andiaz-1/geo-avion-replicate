@@ -296,30 +296,39 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
       </p>
 
       {/* VIP requirements notice */}
-      {(data.wantsPrivateRoom || data.venue === "VIP Room Front" || data.venue === "VIP Room Back") && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="mt-6 mx-auto max-w-xl border border-border bg-card rounded-sm p-5"
-        >
-          <p className="text-[11px] font-body tracking-[0.25em] uppercase text-muted-foreground mb-3 text-center">
-            VIP Room Requirements
-          </p>
-          <ul className="space-y-2 text-xs text-foreground/80 font-body">
-            <li className="flex gap-2">
-              <span className="text-primary">•</span>
-              <span>One of our <span className="font-medium text-foreground">set menus</span> must be selected to confirm the booking.</span>
-            </li>
-            {data.wantsPrivateRoom && (
+      {(() => {
+        const isEntireVip =
+          data.wantsPrivateRoom &&
+          (data.venue === "VIP Room Back" || data.venue === "VIP Room Front");
+        const isVipSection =
+          !data.wantsPrivateRoom &&
+          (data.venue === "VIP Room Front" || data.venue === "VIP Room Back");
+        if (!isEntireVip && !isVipSection) return null;
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mt-6 mx-auto max-w-xl border border-border bg-card rounded-sm p-5"
+          >
+            <p className="text-[11px] font-body tracking-[0.25em] uppercase text-muted-foreground mb-3 text-center">
+              VIP Room Requirements
+            </p>
+            <ul className="space-y-2 text-xs text-foreground/80 font-body">
               <li className="flex gap-2">
                 <span className="text-primary">•</span>
-                <span>Food &amp; beverage <span className="font-medium text-foreground">starts at $1,500</span> for the entire VIP Room.</span>
+                <span>One of our <span className="font-medium text-foreground">set menus</span> must be selected to confirm the booking.</span>
               </li>
-            )}
-          </ul>
-        </motion.div>
-      )}
+              {isEntireVip && (
+                <li className="flex gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Food &amp; beverage <span className="font-medium text-foreground">starts at $1,500</span> for the entire VIP Room.</span>
+                </li>
+              )}
+            </ul>
+          </motion.div>
+        );
+      })()}
 
       <div className="mt-10 flex justify-center gap-4">
         <button onClick={onBack} className="ghost-button">Back</button>
