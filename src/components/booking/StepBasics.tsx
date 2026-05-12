@@ -267,28 +267,30 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
           </AnimatePresence>
         </div>
 
-        {/* Kids Question */}
-        <div>
-          <label className="block text-xs font-body tracking-[0.2em] uppercase text-muted-foreground mb-2">
-            Will there be children? <span className="normal-case tracking-normal">(Ages 3–12)</span>
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            {([true, false] as const).map((val) => (
-              <button
-                key={String(val)}
-                onClick={() => handleKidsToggle(val)}
-                className={cn(
-                  "border rounded-sm px-4 py-3 text-sm font-body transition-all duration-300",
-                  data.hasKids === val
-                    ? "border-primary bg-primary/5 text-foreground font-medium"
-                    : "border-border bg-card text-muted-foreground hover:border-foreground/30"
-                )}
-              >
-                {val ? "Yes" : "No"}
-              </button>
-            ))}
+        {/* Kids Question — hidden for pharma/medical events */}
+        {!data.isPharmaEvent && (
+          <div>
+            <label className="block text-xs font-body tracking-[0.2em] uppercase text-muted-foreground mb-2">
+              Will there be children? <span className="normal-case tracking-normal">(Ages 3–12)</span>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {([true, false] as const).map((val) => (
+                <button
+                  key={String(val)}
+                  onClick={() => handleKidsToggle(val)}
+                  className={cn(
+                    "border rounded-sm px-4 py-3 text-sm font-body transition-all duration-300",
+                    data.hasKids === val
+                      ? "border-primary bg-primary/5 text-foreground font-medium"
+                      : "border-border bg-card text-muted-foreground hover:border-foreground/30"
+                  )}
+                >
+                  {val ? "Yes" : "No"}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Kids Count */}
         <AnimatePresence>
