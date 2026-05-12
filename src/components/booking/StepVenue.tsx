@@ -148,7 +148,9 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
                 <p className="mt-2 text-xs text-muted-foreground/70 font-body">{venue.description}</p>
                 {!isAvailable && (
                   <p className="mt-2 text-xs text-destructive font-body italic">
-                    Too many guests
+                    {data.isPharmaEvent && venue.id !== "VIP Room Back"
+                      ? "Requires VIP Back (TV)"
+                      : "Too many guests"}
                   </p>
                 )}
               </motion.button>
