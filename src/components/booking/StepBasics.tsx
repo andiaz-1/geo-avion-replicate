@@ -227,7 +227,10 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
                     Groups of 8–15 can book through this tool when it's a pharma or medical event.
                   </p>
                   <button
-                    onClick={() => onChange({ isPharmaEvent: !data.isPharmaEvent })}
+                    onClick={() => {
+                      const next = !data.isPharmaEvent;
+                      onChange(next ? { isPharmaEvent: true, hasKids: false, kidsCount: 0 } : { isPharmaEvent: false });
+                    }}
                     className="flex items-start gap-3 w-full text-left"
                   >
                     <span
