@@ -32,13 +32,15 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
   };
 
   const maxKids = Math.max(0, data.guestCount - 1);
-  const isValid = data.date && data.time && data.guestCount >= 1 && data.guestCount > 10;
-  const isSmallGroup = data.guestCount >= 11 && data.guestCount <= 15;
+  const isSmallGroup = data.guestCount >= 8 && data.guestCount <= 15;
+  const canPharmaBook = isSmallGroup && data.isPharmaEvent;
+  const isValid = !!(data.date && data.time && (data.guestCount >= 16 || canPharmaBook));
 
   const missingBasics: string[] = [];
   if (!data.date) missingBasics.push("a date");
   if (!data.time) missingBasics.push("a time");
-  if (data.guestCount <= 10) missingBasics.push("a party of at least 11 guests");
+  if (data.guestCount < 8) missingBasics.push("a party of at least 8 guests");
+  else if (isSmallGroup && !data.isPharmaEvent) missingBasics.push("the pharma / medical event confirmation");
 
   return (
     <motion.div
