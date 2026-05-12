@@ -7,6 +7,13 @@ import vipCocktail from "@/assets/weston-vip-cocktail.jpg";
 import vipFront from "@/assets/weston-vip-front.jpg";
 import vipReception from "@/assets/weston-vip-reception.jpg";
 import vipEntrance from "@/assets/weston-vip-entrance.jpg";
+import vipLongTableSet from "@/assets/weston-vip-long-table-set.jpg";
+import vipTwoTablesSet from "@/assets/weston-vip-two-tables-set.jpg";
+import vipTwoLongTables from "@/assets/weston-vip-two-long-tables.jpg";
+import vipTvPresentationSetup from "@/assets/weston-vip-tv-presentation-setup.jpg";
+import vipUShape from "@/assets/weston-vip-u-shape.jpg";
+import vipValentinesGroup from "@/assets/weston-vip-valentines-group.jpg";
+import vipPresentationDinner from "@/assets/weston-vip-presentation-dinner.jpg";
 
 const spaces = [
   {
