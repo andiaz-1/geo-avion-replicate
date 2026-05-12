@@ -40,17 +40,54 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
       transition={{ duration: 0.4 }}
       className="max-w-2xl mx-auto"
     >
-      <div className="text-center mb-10">
-        <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
-          Step 2
-        </p>
-        <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
-          Select Your Setting
-        </h2>
-        <p className="mt-3 text-sm text-muted-foreground font-body">
-          Based on your party of {data.guestCount}, the following spaces are available:
-        </p>
-      </div>
+      {(() => {
+        const guests = data.guestCount;
+        let recommendedId: BookingData["venue"] | "Entire VIP Room" | null = null;
+        let recommendationLabel = "";
+        if (guests >= 16 && guests <= 20) {
+          recommendedId = "VIP Room Front";
+          recommendationLabel = "VIP Room — Front";
+        } else if (guests > 20 && guests <= 42) {
+          recommendedId = "VIP Room Back";
+          recommendationLabel = "VIP Room — Back";
+        } else if (guests > 42) {
+          recommendedId = "Entire VIP Room";
+          recommendationLabel = "Entire VIP Room";
+        }
+        return (
+          <>
+            <div className="text-center mb-6">
+              <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
+                Step 2
+              </p>
+              <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
+                Select Your Setting
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground font-body">
+                Based on your party of {guests}, the following spaces are available:
+              </p>
+            </div>
+            {recommendedId && (
+              <div className="mb-8 mx-auto max-w-xl border border-primary/40 bg-primary/5 rounded-sm p-5 text-center">
+                <p className="text-[11px] font-body tracking-[0.25em] uppercase text-primary/80">
+                  Our Recommendation
+                </p>
+                <p className="mt-2 font-heading text-lg text-foreground">
+                  {recommendationLabel}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground font-body">
+                  {guests >= 16 && guests <= 20 && "Best for groups of 16–20 guests."}
+                  {guests > 20 && guests <= 42 && "Best for groups of more than 20 guests."}
+                  {guests > 42 && "Recommended for full privacy or larger parties."}
+                </p>
+                <p className="mt-2 text-[11px] text-muted-foreground/80 font-body italic">
+                  If you'd like full privacy at any group size, choose the Entire VIP Room.
+                </p>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* Interactive floor plan */}
       <div className="mb-8">
