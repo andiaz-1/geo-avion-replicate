@@ -30,6 +30,7 @@ export interface BookingData {
   phone: string;
   company: string;
   specialRequests: string;
+  isPharmaEvent: boolean;
 }
 
 export const initialBookingData: BookingData = {
@@ -64,6 +65,7 @@ export const initialBookingData: BookingData = {
   phone: "",
   company: "",
   specialRequests: "",
+  isPharmaEvent: false,
 };
 
 export const KIDS_MENU_PRICE = 45;
