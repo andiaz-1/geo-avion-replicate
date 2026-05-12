@@ -61,7 +61,7 @@ const galleryImages = [
   { src: vipTvPresentationSetup, caption: "VIP Back — long banquet table with TV slide setup" },
   { src: vipUShape, caption: "VIP Back — U-shaped table arrangement with TV" },
   { src: vipPresentationDinner, caption: "VIP Back — corporate dinner with live presentation" },
-  { src: vipValentinesGroup, caption: "VIP Back — group celebration (Valentine's themed)" },
+  { src: vipValentinesGroup, caption: "VIP Back — table in a square shape (Valentine's group celebration)" },
   { src: vipCocktail, caption: "VIP Front — cocktail reception" },
   { src: vipFront, caption: "VIP Front — banquet seating along the windows" },
   { src: vipReception, caption: "VIP Room — welcome & check-in setup" },
