@@ -295,6 +295,30 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
         Note: The VIP Room is at the back of the restaurant; the Back section features a TV for presentations.
       </p>
 
+      {/* VIP requirements notice */}
+      {(data.wantsPrivateRoom || data.venue === "VIP Room Front" || data.venue === "VIP Room Back") && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-6 mx-auto max-w-xl border border-border bg-card rounded-sm p-5"
+        >
+          <p className="text-[11px] font-body tracking-[0.25em] uppercase text-muted-foreground mb-3 text-center">
+            VIP Room Requirements
+          </p>
+          <ul className="space-y-2 text-xs text-foreground/80 font-body">
+            <li className="flex gap-2">
+              <span className="text-primary">•</span>
+              <span>One of our <span className="font-medium text-foreground">set menus</span> must be selected to confirm the booking.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-primary">•</span>
+              <span>A <span className="font-medium text-foreground">$1,500 food &amp; beverage minimum</span> applies.</span>
+            </li>
+          </ul>
+        </motion.div>
+      )}
+
       <div className="mt-10 flex justify-center gap-4">
         <button onClick={onBack} className="ghost-button">Back</button>
         <button
