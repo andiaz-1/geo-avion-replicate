@@ -197,7 +197,7 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
         </AnimatePresence>
       )}
 
-      {/* Private Room Option */}
+      {/* Private Room Option (non-pharma) */}
       {showPrivateOption && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -227,6 +227,37 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
             <div className="mt-4 space-y-1 text-xs text-muted-foreground/70 font-body italic">
               <p>Buyout options available:</p>
               <p>Entire VIP Room (66) · Main Dining (75) · Full Buyout (141)</p>
+            </div>
+          </motion.button>
+        </motion.div>
+      )}
+
+      {/* Pharma Event — Entire VIP Room option */}
+      {showPharmaVipOption && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="mt-6"
+        >
+          <motion.button
+            whileHover={{ y: -2 }}
+            onClick={() => onChange({ venue: "VIP Room Back", wantsPrivateRoom: true })}
+            className={cn(
+              "w-full border rounded-sm p-8 text-center transition-all duration-300",
+              data.wantsPrivateRoom && data.venue === "VIP Room Back"
+                ? "border-primary bg-primary/5"
+                : "border-border bg-card hover:border-foreground/30"
+            )}
+          >
+            <h3 className="font-heading text-lg font-medium text-foreground">
+              Entire VIP Room (Front + Back)
+            </h3>
+            <p className="text-xs text-muted-foreground font-body mt-2">
+              Private buyout of both VIP sections for your pharma event (up to 66 guests)
+            </p>
+            <div className="mt-4 space-y-1 text-xs text-muted-foreground/80 font-body">
+              <p className="font-medium text-foreground/70">F&B minimum required:</p>
+              <p>Starting at $1,500</p>
             </div>
           </motion.button>
         </motion.div>
