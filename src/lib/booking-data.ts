@@ -368,7 +368,7 @@ export function calculateQuote(data: BookingData) {
 
   const subtotal = guestSubtotal + addonsTotal;
   const serviceCharge = Math.round(subtotal * 0.23 * 100) / 100;
-  const salesTax = Math.round(subtotal * 0.08 * 100) / 100;
+  const salesTax = Math.round(subtotal * 0.07 * 100) / 100;
   const grandTotal = Math.round((subtotal + serviceCharge + salesTax) * 100) / 100;
   const isConsumption = data.beverageStrategy === "consumption";
   const perPersonTotal = menuPerPerson + barPerPerson + steakSupplement;
