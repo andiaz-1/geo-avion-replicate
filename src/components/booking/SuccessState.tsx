@@ -25,13 +25,7 @@ const SuccessState = () => {
           className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto"
           style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
         >
-          I'm {LOCATION.coordinator.name.split(" ")[0]}, {LOCATION.coordinator.title} at {LOCATION.brand} {LOCATION.city}. I'll review your details, check availability and reach out within 12 hours ({LOCATION.coordinator.officeHours}) to finalize your reservation.
-        </p>
-        <p
-          className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto mt-4"
-          style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
-        >
-          You'll also receive an automated confirmation email shortly — <strong className="font-semibold text-foreground">please check your spam folder</strong>.
+          I'm {LOCATION.coordinator.name.split(" ")[0]}, {LOCATION.coordinator.title} at {LOCATION.brand} {LOCATION.city}. I just sent you an email — <strong className="font-semibold text-foreground">please check your spam folder</strong>.
         </p>
 
         <div className="w-16 h-[1px] bg-border mx-auto mt-8 mb-6" />
