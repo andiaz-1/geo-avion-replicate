@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     const response = await fetch(LEAD_FORM_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lead: leadPayload }),
+      body: JSON.stringify({ form_data: { lead: leadPayload } }),
     });
 
     const responseText = await response.text();
