@@ -6,11 +6,9 @@ const corsHeaders = {
 const LEAD_FORM_URL =
   "https://api.tripleseat.com/ts/dynamic_leads.js?dynamic_lead_form_id=2861&public_key=7c23362edd97408759b10c76f7f9701a2a7c5881";
 
-// NOTE: Weston location/room IDs — these must be provided by the Tripleseat admin
-// for Salumeria 104 Weston. Until provided, leads are still created against the
-// Graspa Group account but without location/room routing. The form text (party
-// request #42882) is the public lead form for Weston at graspagroup.tripleseat.com.
-const TRIPLESEAT_LOCATION_ID: number | undefined = undefined; // TODO: set Weston location_id
+const DYNAMIC_LEAD_FORM_ID = "2861";
+const PUBLIC_KEY = "7c23362edd97408759b10c76f7f9701a2a7c5881";
+const TRIPLESEAT_LOCATION_ID = "31934";
 const ROOM_IDS: Record<string, number> = {
   // "Main Room": 0,
   // "VIP Room Front": 0,
@@ -47,26 +45,28 @@ Deno.serve(async (req) => {
       roomId = ROOM_IDS[venue];
     }
 
-    const leadPayload: Record<string, any> = {
-      first_name: firstName || "",
-      last_name: lastName || "",
-      email_address: email || "",
-      phone_number: phone || "",
-    };
-    if (company) leadPayload.company = company;
-    if (eventDate) leadPayload.event_date = eventDate;
-    if (eventTime) leadPayload.start_time = eventTime;
-    if (guestCount) leadPayload.guest_count = String(guestCount);
-    if (additionalInfo) leadPayload.additional_information = additionalInfo;
-    if (TRIPLESEAT_LOCATION_ID) leadPayload.location_id = TRIPLESEAT_LOCATION_ID;
-    if (roomId) leadPayload.room_id = roomId;
+    const formData = new FormData();
+    formData.append("dynamic_lead_form_id", DYNAMIC_LEAD_FORM_ID);
+    formData.append("public_key", PUBLIC_KEY);
+    formData.append("form_data[first_name]", firstName || "");
+    formData.append("form_data[last_name]", lastName || "");
+    formData.append("form_data[email]", email || "");
+    formData.append("form_data[phone]", phone || "");
+    formData.append("form_data[location_id]", TRIPLESEAT_LOCATION_ID);
+    formData.append("form_data[event_style]", "onpremise");
+    formData.append("form_data[contact_preference]", "Email");
+    if (company) formData.append("form_data[company]", company);
+    if (eventDate) formData.append("form_data[event_date]", eventDate);
+    if (eventTime) formData.append("form_data[start_time]", eventTime);
+    if (guestCount) formData.append("form_data[guest_count]", String(guestCount));
+    if (additionalInfo) formData.append("form_data[additional_information]", additionalInfo);
+    if (roomId) formData.append("form_data[room_id]", String(roomId));
 
     console.log("Submitting Weston lead to Tripleseat Lead Form API");
 
     const response = await fetch(LEAD_FORM_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ form_data: { lead: leadPayload } }),
+      body: formData,
     });
 
     const responseText = await response.text();
