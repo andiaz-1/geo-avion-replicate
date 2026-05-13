@@ -68,7 +68,7 @@ function buildAdditionalInfo(data: BookingData): string {
   }
 
   lines.push("");
-  lines.push(`Estimated Total: $${quote.grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (incl. 23% service + 8% tax)`);
+  lines.push(`Estimated Total: $${quote.grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (incl. 23% service + 7% tax)`);
 
   return lines.join("\n");
 }
