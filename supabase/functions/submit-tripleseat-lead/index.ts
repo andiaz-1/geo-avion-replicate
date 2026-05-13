@@ -63,15 +63,10 @@ Deno.serve(async (req) => {
 
     console.log("Submitting Weston lead to Tripleseat Lead Form API");
 
-    const formData = new URLSearchParams();
-    for (const [key, value] of Object.entries(leadPayload)) {
-      formData.append(`lead[${key}]`, String(value));
-    }
-
     const response = await fetch(LEAD_FORM_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData.toString(),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ form_data: { lead: leadPayload } }),
     });
 
     const responseText = await response.text();
