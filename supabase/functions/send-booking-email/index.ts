@@ -115,7 +115,11 @@ Deno.serve(async (req) => {
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) {
-      throw new Error("Email service is not configured yet (missing RESEND_API_KEY).");
+      console.warn("RESEND_API_KEY not set — skipping email notification (lead still routes to Tripleseat).");
+      return new Response(
+        JSON.stringify({ success: true, skipped: true, reason: "email_not_configured" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const res = await fetch("https://api.resend.com/emails", {
