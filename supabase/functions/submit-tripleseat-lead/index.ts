@@ -4,7 +4,7 @@ const corsHeaders = {
 };
 
 const LEAD_FORM_URL =
-  "https://api.tripleseat.com/v1/leads/create.js?public_key=7c23362edd97408759b10c76f7f9701a2a7c5881";
+  "https://api.tripleseat.com/ts/dynamic_leads.js?dynamic_lead_form_id=2861&public_key=7c23362edd97408759b10c76f7f9701a2a7c5881";
 
 // NOTE: Weston location/room IDs — these must be provided by the Tripleseat admin
 // for Salumeria 104 Weston. Until provided, leads are still created against the
