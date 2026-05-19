@@ -264,6 +264,36 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
         </motion.div>
       )}
 
+      {/* Small-party Entire VIP Room buyout option */}
+      {showSmallVipBuyoutOption && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="mt-6"
+        >
+          <motion.button
+            whileHover={{ y: -2 }}
+            onClick={() => onChange({ venue: "VIP Room Back", wantsPrivateRoom: true })}
+            className={cn(
+              "w-full border rounded-sm p-8 text-center transition-all duration-300",
+              data.wantsPrivateRoom && data.venue === "VIP Room Back"
+                ? "border-primary bg-primary/5"
+                : "border-border bg-card hover:border-foreground/30"
+            )}
+          >
+            <h3 className="font-heading text-lg font-medium text-foreground">
+              Entire VIP Room Buyout
+            </h3>
+            <p className="text-xs text-muted-foreground font-body mt-2">
+              Reserve the full VIP Room (Front + Back) privately for your group.
+            </p>
+            <p className="mt-4 text-xs text-muted-foreground/80 font-body italic">
+              Subject to a food &amp; beverage minimum to be determined by the coordinator.
+            </p>
+          </motion.button>
+        </motion.div>
+      )}
+
       {/* VIP Back layout chooser */}
       {data.venue === "VIP Room Back" && !data.wantsPrivateRoom && (
         <motion.div
