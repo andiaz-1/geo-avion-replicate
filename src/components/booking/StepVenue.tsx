@@ -30,6 +30,7 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
   const adultCount = data.guestCount - (data.hasKids ? data.kidsCount : 0);
   const showPrivateOption = !data.isPharmaEvent && adultCount > 25;
   const showPharmaVipOption = data.isPharmaEvent && adultCount <= 66;
+  const showSmallVipBuyoutOption = !data.isPharmaEvent && adultCount <= 25;
 
   // Reset venue if no longer available
   if (data.venue && !availableIds.includes(data.venue) && !data.wantsPrivateRoom) {
