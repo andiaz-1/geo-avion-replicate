@@ -30,6 +30,7 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
   const adultCount = data.guestCount - (data.hasKids ? data.kidsCount : 0);
   const showPrivateOption = !data.isPharmaEvent && adultCount > 25;
   const showPharmaVipOption = data.isPharmaEvent && adultCount <= 66;
+  const showSmallVipBuyoutOption = !data.isPharmaEvent && adultCount <= 25;
 
   // Reset venue if no longer available
   if (data.venue && !availableIds.includes(data.venue) && !data.wantsPrivateRoom) {
@@ -259,6 +260,36 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
               <p className="font-medium text-foreground/70">F&B minimum required:</p>
               <p>Starting at $1,500</p>
             </div>
+          </motion.button>
+        </motion.div>
+      )}
+
+      {/* Small-party Entire VIP Room buyout option */}
+      {showSmallVipBuyoutOption && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="mt-6"
+        >
+          <motion.button
+            whileHover={{ y: -2 }}
+            onClick={() => onChange({ venue: "VIP Room Back", wantsPrivateRoom: true })}
+            className={cn(
+              "w-full border rounded-sm p-8 text-center transition-all duration-300",
+              data.wantsPrivateRoom && data.venue === "VIP Room Back"
+                ? "border-primary bg-primary/5"
+                : "border-border bg-card hover:border-foreground/30"
+            )}
+          >
+            <h3 className="font-heading text-lg font-medium text-foreground">
+              Entire VIP Room Buyout
+            </h3>
+            <p className="text-xs text-muted-foreground font-body mt-2">
+              Reserve the full VIP Room (Front + Back) privately for your group.
+            </p>
+            <p className="mt-4 text-xs text-muted-foreground/80 font-body italic">
+              Subject to a food &amp; beverage minimum to be determined by the coordinator.
+            </p>
           </motion.button>
         </motion.div>
       )}
