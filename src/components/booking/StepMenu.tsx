@@ -185,9 +185,6 @@ const StepMenu = ({ data, onChange, onNext, onBack }: StepMenuProps) => {
       className="max-w-4xl mx-auto"
     >
       <div className="text-center mb-10">
-        <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
-          Step 3
-        </p>
         <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
           Culinary & Beverage Selection
         </h2>
