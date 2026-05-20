@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { BookingData, getAvailableVenues } from "@/lib/booking-data";
+import { BookingData } from "@/lib/booking-data";
 import { AlertCircle, ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import vipBackOneLine from "@/assets/weston-vip-back-one-line.jpg";
