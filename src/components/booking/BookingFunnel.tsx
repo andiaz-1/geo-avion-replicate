@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -95,6 +95,14 @@ const BookingFunnel = () => {
       default: return "basics";
     }
   }, [currentStep]);
+
+  // Track each funnel step as a virtual pageview so we can see drop-off in analytics.
+  useEffect(() => {
+    const path = submitted ? "/book/success" : `/book/step-${currentStep}-${stepName}`;
+    try {
+      window.history.replaceState({ ...(window.history.state ?? {}), virtualStep: path }, "", path);
+    } catch {}
+  }, [currentStep, stepName, submitted]);
 
   const handleNext = () => setCurrentStep((s) => s + 1);
   const handleBack = () => setCurrentStep((s) => Math.max(1, s - 1));
