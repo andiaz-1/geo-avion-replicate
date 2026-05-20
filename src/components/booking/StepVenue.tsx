@@ -52,7 +52,7 @@ const SMALL_GROUP_CARDS: SpaceCard[] = [
   {
     id: "entire-vip",
     name: "Entire VIP Room",
-    capacity: "Up to 66 seated · private buyout",
+    capacity: "Up to 66 seated",
     description: "Full buyout of both VIP sections (Front + Back).",
     minGuests: 5,
     maxGuests: 66,
