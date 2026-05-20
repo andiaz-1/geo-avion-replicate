@@ -86,9 +86,6 @@ const StepAddons = ({ data, onChange, onNext, onBack }: StepAddonsProps) => {
       className="max-w-xl mx-auto"
     >
       <div className="text-center mb-10">
-        <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
-          Step 4
-        </p>
         <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
           Event Enhancements
         </h2>
