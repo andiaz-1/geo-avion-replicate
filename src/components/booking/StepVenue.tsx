@@ -82,7 +82,7 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
       return adultCount <= 66;
     }
     if (data.isPharmaEvent) return card.venue === "VIP Room Back";
-    return availableIds.includes(card.venue);
+    return (availableIds as string[]).includes(card.venue as string);
   };
 
   const isCardSelected = (card: SpaceCard) => {
