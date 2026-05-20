@@ -27,11 +27,6 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
     setTimeOpen(false);
   };
 
-  const handleKidsToggle = (hasKids: boolean) => {
-    onChange({ hasKids, kidsCount: hasKids ? data.kidsCount || 1 : 0 });
-  };
-
-  const maxKids = Math.max(0, data.guestCount - 1);
   const isSmallGroup = data.guestCount >= 8 && data.guestCount <= 15;
   const canPharmaBook = isSmallGroup && data.isPharmaEvent;
   const isValid = !!(data.date && data.time && (data.guestCount >= 16 || canPharmaBook));
