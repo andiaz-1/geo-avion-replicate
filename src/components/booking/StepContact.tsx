@@ -206,7 +206,7 @@ const StepContact = ({ data, onChange, onSubmit, onBack, submitting }: StepConta
       <div className="mt-10 flex justify-center gap-4">
         <button onClick={onBack} className="ghost-button" disabled={submitting}>Back</button>
         <button onClick={handleSubmit} className="filled-button-primary" disabled={submitting}>
-          {submitting ? "Submitting…" : "Request Booking"}
+          {submitting ? "Submitting…" : "See Availability"}
         </button>
       </div>
     </motion.div>
