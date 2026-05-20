@@ -100,8 +100,7 @@ const BookingFunnel = () => {
   useEffect(() => {
     const path = submitted ? "/book/success" : `/book/step-${currentStep}-${stepName}`;
     try {
-      window.history.replaceState(null, "", path);
-      window.dispatchEvent(new Event("popstate"));
+      window.history.replaceState({ ...(window.history.state ?? {}), virtualStep: path }, "", path);
     } catch {}
   }, [currentStep, stepName, submitted]);
 
