@@ -42,9 +42,6 @@ const StepContact = ({ data, onChange, onSubmit, onBack, submitting }: StepConta
       className="max-w-xl mx-auto"
     >
       <div className="text-center mb-10">
-        <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
-          Final Step
-        </p>
         <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
           Quote Summary & Contact
         </h2>

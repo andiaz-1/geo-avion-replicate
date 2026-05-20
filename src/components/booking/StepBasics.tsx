@@ -27,11 +27,6 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
     setTimeOpen(false);
   };
 
-  const handleKidsToggle = (hasKids: boolean) => {
-    onChange({ hasKids, kidsCount: hasKids ? data.kidsCount || 1 : 0 });
-  };
-
-  const maxKids = Math.max(0, data.guestCount - 1);
   const isSmallGroup = data.guestCount >= 8 && data.guestCount <= 15;
   const canPharmaBook = isSmallGroup && data.isPharmaEvent;
   const isValid = !!(data.date && data.time && (data.guestCount >= 16 || canPharmaBook));
@@ -51,9 +46,6 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
       className="max-w-xl mx-auto"
     >
       <div className="text-center mb-10">
-        <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
-          Step 1
-        </p>
         <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
           Begin Your Italian Celebration
         </h2>
@@ -270,90 +262,7 @@ const StepBasics = ({ data, onChange, onNext }: StepBasicsProps) => {
           </AnimatePresence>
         </div>
 
-        {/* Kids Question — hidden for pharma/medical events */}
-        {!data.isPharmaEvent && (
-          <div>
-            <label className="block text-xs font-body tracking-[0.2em] uppercase text-muted-foreground mb-2">
-              Will there be children? <span className="normal-case tracking-normal">(Ages 3–12)</span>
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              {([true, false] as const).map((val) => (
-                <button
-                  key={String(val)}
-                  onClick={() => handleKidsToggle(val)}
-                  className={cn(
-                    "border rounded-sm px-4 py-3 text-sm font-body transition-all duration-300",
-                    data.hasKids === val
-                      ? "border-primary bg-primary/5 text-foreground font-medium"
-                      : "border-border bg-card text-muted-foreground hover:border-foreground/30"
-                  )}
-                >
-                  {val ? "Yes" : "No"}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Kids Count */}
-        <AnimatePresence>
-          {data.hasKids && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <label className="block text-xs font-body tracking-[0.2em] uppercase text-muted-foreground mb-2">
-                How many children?
-              </label>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => {
-                    const count = Math.max(1, data.kidsCount - 1);
-                    onChange({ kidsCount: count });
-                  }}
-                  disabled={data.kidsCount <= 1}
-                  className={cn(
-                    "w-10 h-10 flex items-center justify-center border rounded-sm transition-all duration-200",
-                    data.kidsCount <= 1
-                      ? "border-border/50 text-muted-foreground/30 cursor-not-allowed"
-                      : "border-border text-foreground hover:border-primary hover:text-primary"
-                  )}
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="font-heading text-3xl text-foreground min-w-[3ch] text-center tabular-nums">
-                  {data.kidsCount}
-                </span>
-                <button
-                  onClick={() => {
-                    const count = Math.min(maxKids, data.kidsCount + 1);
-                    onChange({ kidsCount: count });
-                  }}
-                  disabled={data.kidsCount >= maxKids}
-                  className={cn(
-                    "w-10 h-10 flex items-center justify-center border rounded-sm transition-all duration-200",
-                    data.kidsCount >= maxKids
-                      ? "border-border/50 text-muted-foreground/30 cursor-not-allowed"
-                      : "border-border text-foreground hover:border-primary hover:text-primary"
-                  )}
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-              <p className="text-xs text-muted-foreground font-body mt-2 italic">
-                Children's menu is a flat $45 per child, regardless of menu selection.
-              </p>
-              {data.kidsCount > 0 && (
-                <p className="text-xs text-foreground/70 font-body mt-1">
-                  {data.guestCount - data.kidsCount} adults · {data.kidsCount} children
-                </p>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Kids question moved to the Menu step where pricing is relevant */}
       </div>
 
       <div className="mt-10 text-center">

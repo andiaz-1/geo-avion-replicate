@@ -64,9 +64,6 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
         return (
           <>
             <div className="text-center mb-6">
-              <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
-                Step 2
-              </p>
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
                 Select Your Setting
               </h2>

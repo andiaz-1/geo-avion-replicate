@@ -185,9 +185,6 @@ const StepMenu = ({ data, onChange, onNext, onBack }: StepMenuProps) => {
       className="max-w-4xl mx-auto"
     >
       <div className="text-center mb-10">
-        <p className="text-sm font-body tracking-[0.3em] uppercase text-muted-foreground mb-3">
-          Step 3
-        </p>
         <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
           Culinary & Beverage Selection
         </h2>
@@ -197,6 +194,90 @@ const StepMenu = ({ data, onChange, onNext, onBack }: StepMenuProps) => {
           </p>
         )}
       </div>
+
+      {/* Kids question — moved here from Step 1 because pricing is contextual to the menu */}
+      {!data.isPharmaEvent && (
+        <div className="max-w-xl mx-auto mb-10 border border-border bg-card/50 rounded-sm p-5">
+          <label className="block text-xs font-body tracking-[0.2em] uppercase text-muted-foreground mb-3">
+            Will there be children? <span className="normal-case tracking-normal">(Ages 3–12)</span>
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            {([true, false] as const).map((val) => (
+              <button
+                key={String(val)}
+                onClick={() => onChange({ hasKids: val, kidsCount: val ? data.kidsCount || 1 : 0 })}
+                className={cn(
+                  "border rounded-sm px-4 py-3 text-sm font-body transition-all duration-300",
+                  data.hasKids === val
+                    ? "border-primary bg-primary/5 text-foreground font-medium"
+                    : "border-border bg-card text-muted-foreground hover:border-foreground/30"
+                )}
+              >
+                {val ? "Yes" : "No"}
+              </button>
+            ))}
+          </div>
+
+          <AnimatePresence>
+            {data.hasKids && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-5 mt-2">
+                  <label className="block text-xs font-body tracking-[0.2em] uppercase text-muted-foreground mb-2">
+                    How many children?
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => onChange({ kidsCount: Math.max(1, data.kidsCount - 1) })}
+                      disabled={data.kidsCount <= 1}
+                      className={cn(
+                        "w-10 h-10 flex items-center justify-center border rounded-sm transition-all duration-200",
+                        data.kidsCount <= 1
+                          ? "border-border/50 text-muted-foreground/30 cursor-not-allowed"
+                          : "border-border text-foreground hover:border-primary hover:text-primary"
+                      )}
+                    >
+                      −
+                    </button>
+                    <span className="font-heading text-3xl text-foreground min-w-[3ch] text-center tabular-nums">
+                      {data.kidsCount}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const max = Math.max(0, data.guestCount - 1);
+                        onChange({ kidsCount: Math.min(max, data.kidsCount + 1) });
+                      }}
+                      disabled={data.kidsCount >= Math.max(0, data.guestCount - 1)}
+                      className={cn(
+                        "w-10 h-10 flex items-center justify-center border rounded-sm transition-all duration-200",
+                        data.kidsCount >= Math.max(0, data.guestCount - 1)
+                          ? "border-border/50 text-muted-foreground/30 cursor-not-allowed"
+                          : "border-border text-foreground hover:border-primary hover:text-primary"
+                      )}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-body mt-2 italic">
+                    Children's menu is a flat ${KIDS_MENU_PRICE} per child, regardless of menu selection.
+                  </p>
+                  {data.kidsCount > 0 && (
+                    <p className="text-xs text-foreground/70 font-body mt-1">
+                      {data.guestCount - data.kidsCount} adults · {data.kidsCount} children
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
 
       {/* Menu Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
