@@ -229,12 +229,12 @@ const StepMenu = ({ data, onChange, onNext, onBack }: StepMenuProps) => {
                 {menu.courses ? (
                   <div className="mt-3 space-y-4">
                     {menu.courses.map((course) => (
-                    <CourseSelection
+                      <CourseSelection
                         key={course.name}
                         course={course}
                         selections={data.menuSelections[course.name] || []}
                         onToggle={handleToggleItem}
-                        isSelected={isMenuSelected && !data.decideLater}
+                        isSelected={false}
                       />
                     ))}
                   </div>
@@ -262,36 +262,18 @@ const StepMenu = ({ data, onChange, onNext, onBack }: StepMenuProps) => {
                     onClick={() => onChange({
                       menu: menu.id,
                       courseChoice: "",
-                      menuSelections: data.menu === menu.id ? data.menuSelections : {},
-                      decideLater: false,
-                    })}
-                    className={cn(
-                      "text-xs px-3 py-2 transition-all duration-300 rounded-sm tracking-widest uppercase font-body font-medium",
-                      isMenuSelected && !data.decideLater
-                        ? "bg-primary text-primary-foreground"
-                        : "ghost-button-primary"
-                    )}
-                  >
-                    {isMenuSelected && !data.decideLater ? "Selected" : "Select"}
-                  </button>
-                {menu.courses && menu.id !== "Classico" && (
-                  <button
-                    onClick={() => onChange({
-                      menu: menu.id,
-                      courseChoice: "",
                       menuSelections: {},
                       decideLater: true,
                     })}
                     className={cn(
                       "text-xs px-3 py-2 transition-all duration-300 rounded-sm tracking-widest uppercase font-body font-medium",
-                      isMenuSelected && data.decideLater
+                      isMenuSelected
                         ? "bg-primary text-primary-foreground"
                         : "ghost-button-primary"
                     )}
                   >
-                    {isMenuSelected && data.decideLater ? "✓ Selections Later" : "Make Selections Later"}
+                    {isMenuSelected ? "Selected" : "Select"}
                   </button>
-                )}
                 </div>
               </div>
             </motion.div>
