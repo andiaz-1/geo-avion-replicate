@@ -1,9 +1,9 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { BookingData, getAvailableVenues, venues as allVenues } from "@/lib/booking-data";
-import { AlertCircle } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { BookingData, getAvailableVenues } from "@/lib/booking-data";
+import { AlertCircle, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import vipBackOneLine from "@/assets/weston-vip-back-one-line.jpg";
 import vipBackTwoLines from "@/assets/weston-vip-back-two-lines.jpg";
 import vipUShape from "@/assets/weston-vip-u-shape.jpg";
@@ -16,28 +16,87 @@ interface StepVenueProps {
   onBack: () => void;
 }
 
-// Venue photos intentionally omitted here — Weston-specific imagery lives on the /spaces gallery.
-const venueImages: Record<string, string> = {};
+type SpaceCard = {
+  id: "vip-front" | "vip-back" | "main" | "entire-vip";
+  name: string;
+  capacity: string;
+  description: string;
+  maxGuests: number;
+  venue: BookingData["venue"];
+  wantsPrivateRoom: boolean;
+};
+
+const SPACE_CARDS: SpaceCard[] = [
+  {
+    id: "vip-front",
+    name: "VIP Room — Front",
+    capacity: "Up to 24 seated",
+    description: "Intimate private section of the VIP Room.",
+    maxGuests: 24,
+    venue: "VIP Room Front",
+    wantsPrivateRoom: false,
+  },
+  {
+    id: "vip-back",
+    name: "VIP Room — Back",
+    capacity: "Up to 42 seated",
+    description: "Larger private section with a TV for presentations.",
+    maxGuests: 42,
+    venue: "VIP Room Back",
+    wantsPrivateRoom: false,
+  },
+  {
+    id: "main",
+    name: "Main Dining",
+    capacity: "Up to 75 seated",
+    description: "Semi-private main dining area in the heart of the restaurant.",
+    maxGuests: 75,
+    venue: "Main Room",
+    wantsPrivateRoom: false,
+  },
+  {
+    id: "entire-vip",
+    name: "Entire VIP Room",
+    capacity: "Up to 66 seated · private buyout",
+    description: "Full buyout of both VIP sections (Front + Back). F&B minimum from $1,500.",
+    maxGuests: 66,
+    venue: "VIP Room Back",
+    wantsPrivateRoom: true,
+  },
+];
 
 const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
-  const isMobile = useIsMobile();
+  const [floorPlanOpen, setFloorPlanOpen] = useState(false);
   const available = getAvailableVenues(data.guestCount);
-  // Pharma/medical events need the TV — restrict to VIP Room Back (or full VIP buyout)
   const availableIds = (data.isPharmaEvent
     ? available.filter((v) => v.id === "VIP Room Back")
     : available
   ).map((v) => v.id);
   const adultCount = data.guestCount - (data.hasKids ? data.kidsCount : 0);
   const showPrivateOption = !data.isPharmaEvent && adultCount > 25;
-  const showPharmaVipOption = data.isPharmaEvent && adultCount <= 66;
-  const showSmallVipBuyoutOption = !data.isPharmaEvent && adultCount >= 8 && adultCount <= 66;
 
-  // Reset venue if no longer available
-  if (data.venue && !availableIds.includes(data.venue) && !data.wantsPrivateRoom) {
-    onChange({ venue: "" });
-  }
+  const isCardAvailable = (card: SpaceCard) => {
+    if (data.guestCount > card.maxGuests) return false;
+    if (card.id === "entire-vip") {
+      // Entire VIP buyout available for everyone within capacity (covers pharma + small-party + general buyout)
+      return adultCount <= 66;
+    }
+    if (data.isPharmaEvent) return card.venue === "VIP Room Back";
+    return (availableIds as string[]).includes(card.venue as string);
+  };
 
-  const selectedVenueHasImage = data.venue && venueImages[data.venue];
+  const isCardSelected = (card: SpaceCard) => {
+    if (card.id === "entire-vip") {
+      return data.wantsPrivateRoom && data.venue === "VIP Room Back" && !showPrivateOption
+        ? true
+        : data.wantsPrivateRoom && data.venue === "VIP Room Back";
+    }
+    return !data.wantsPrivateRoom && data.venue === card.venue;
+  };
+
+  const selectCard = (card: SpaceCard) => {
+    onChange({ venue: card.venue, wantsPrivateRoom: card.wantsPrivateRoom });
+  };
 
   return (
     <motion.div
@@ -45,157 +104,94 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
-      className="max-w-2xl mx-auto"
+      className="max-w-3xl mx-auto"
     >
-      {(() => {
-        const guests = data.guestCount;
-        let recommendedId: BookingData["venue"] | "Entire VIP Room" | null = null;
-        let recommendationLabel = "";
-        if (guests >= 16 && guests <= 20) {
-          recommendedId = "VIP Room Front";
-          recommendationLabel = "VIP Room — Front";
-        } else if (guests > 20 && guests <= 42) {
-          recommendedId = "VIP Room Back";
-          recommendationLabel = "VIP Room — Back";
-        } else if (guests > 42) {
-          recommendedId = "Entire VIP Room";
-          recommendationLabel = "Entire VIP Room";
-        }
-        return (
-          <>
-            <div className="text-center mb-6">
-              <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
-                Select Your Setting
-              </h2>
-              <p className="mt-3 text-sm text-muted-foreground font-body">
-                Based on your party of {guests}, the following spaces are available:
-              </p>
-            </div>
-            {recommendedId && (
-              <div className="mb-8 mx-auto max-w-xl border border-primary/40 bg-primary/5 rounded-sm p-5 text-center">
-                <p className="text-[11px] font-body tracking-[0.25em] uppercase text-primary/80">
-                  Our Recommendation
-                </p>
-                <p className="mt-2 font-heading text-lg text-foreground">
-                  {recommendationLabel}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground font-body">
-                  {guests >= 16 && guests <= 20 && "Best for groups of 16–20 guests."}
-                  {guests > 20 && guests <= 42 && "Best for groups of more than 20 guests."}
-                  {guests > 42 && "Recommended for full privacy or larger parties."}
-                </p>
-                <p className="mt-2 text-[11px] text-muted-foreground/80 font-body italic">
-                  If you'd like full privacy at any group size, choose the Entire VIP Room.
-                </p>
-              </div>
-            )}
-          </>
-        );
-      })()}
-
-      {/* Interactive floor plan */}
-      <div className="mb-8">
-        <FloorPlan
-          highlightVenue={
-            data.wantsPrivateRoom && data.venue === "Main Room" ? null
-            : data.wantsPrivateRoom ? "Entire VIP Room"
-            : data.venue
-          }
-          onSelect={(venueId) => {
-            // Entire VIP Room → toggles the private room buyout option
-            if (venueId === "Entire VIP Room") {
-              if (adultCount <= 66) {
-                onChange({ venue: "VIP Room Back", wantsPrivateRoom: true });
-              }
-              return;
-            }
-            const v = venueId as Exclude<BookingData["venue"], "">;
-            if ((availableIds as string[]).includes(v)) {
-              onChange({ venue: v, wantsPrivateRoom: false });
-            }
-          }}
-        />
+      <div className="text-center mb-8">
+        <h2 className="font-heading text-3xl md:text-4xl font-medium text-foreground">
+          Select Your Setting
+        </h2>
+        <p className="mt-3 text-sm text-muted-foreground font-body">
+          Based on your party of {data.guestCount}, choose the space that fits best.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {allVenues.map((venue) => {
-          const isAvailable = availableIds.includes(venue.id);
-          const isSelected = isAvailable && data.venue === venue.id && !data.wantsPrivateRoom;
+      {/* 4 space cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {SPACE_CARDS.map((card) => {
+          const isAvailable = isCardAvailable(card);
+          const isSelected = isAvailable && isCardSelected(card);
           return (
-            <Fragment key={venue.id}>
-              <motion.button
-                whileHover={isAvailable ? { y: -2 } : undefined}
-                onClick={() => isAvailable && onChange({ venue: venue.id, wantsPrivateRoom: false })}
-                disabled={!isAvailable}
-                className={cn(
-                  "border rounded-sm p-8 text-center transition-all duration-300 relative",
-                  !isAvailable && "opacity-40 cursor-not-allowed",
-                  isSelected
-                    ? "border-primary bg-primary/5"
-                    : isAvailable
-                    ? "border-border bg-card hover:border-foreground/30"
-                    : "border-border bg-card"
-                )}
-              >
-                {!isAvailable && (
-                  <div className="absolute top-2 right-2">
-                    <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                )}
-                <h3 className="font-heading text-lg font-medium text-foreground">{venue.name}</h3>
-                <p className="mt-1 text-xs text-muted-foreground font-body">{venue.capacity}</p>
-                <p className="mt-2 text-xs text-muted-foreground/70 font-body">{venue.description}</p>
-                {!isAvailable && (
-                  <p className="mt-2 text-xs text-destructive font-body italic">
-                    {data.isPharmaEvent && venue.id !== "VIP Room Back"
-                      ? "Requires VIP Back (TV)"
-                      : "Too many guests"}
-                  </p>
-                )}
-              </motion.button>
-              {/* Mobile: show venue image right below selected card */}
-              {isMobile && isSelected && venueImages[venue.id] && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="overflow-hidden rounded-sm"
-                >
-                  <img
-                    src={venueImages[venue.id]}
-                    alt={`${venue.name} dining area`}
-                    className="w-full h-48 object-cover rounded-sm"
-                  />
-                </motion.div>
+            <motion.button
+              key={card.id}
+              whileHover={isAvailable ? { y: -2 } : undefined}
+              onClick={() => isAvailable && selectCard(card)}
+              disabled={!isAvailable}
+              className={cn(
+                "border rounded-sm p-6 text-left transition-all duration-300 relative",
+                !isAvailable && "opacity-40 cursor-not-allowed",
+                isSelected
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : isAvailable
+                  ? "border-border bg-card hover:border-foreground/30"
+                  : "border-border bg-card"
               )}
-            </Fragment>
+            >
+              {!isAvailable && (
+                <div className="absolute top-2 right-2">
+                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                </div>
+              )}
+              <h3 className="font-heading text-lg font-medium text-foreground">{card.name}</h3>
+              <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground font-body">
+                {card.capacity}
+              </p>
+              <p className="mt-3 text-sm text-muted-foreground font-body leading-relaxed">
+                {card.description}
+              </p>
+              {!isAvailable && (
+                <p className="mt-3 text-xs text-destructive font-body italic">
+                  {data.isPharmaEvent && card.venue !== "VIP Room Back"
+                    ? "Requires VIP Back (TV)"
+                    : "Exceeds capacity for your party"}
+                </p>
+              )}
+            </motion.button>
           );
         })}
       </div>
 
-      {/* Desktop: Venue Photo after grid */}
-      {!isMobile && (
-        <AnimatePresence>
-          {selectedVenueHasImage && !data.wantsPrivateRoom && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.4 }}
-              className="mt-6 overflow-hidden rounded-sm"
-            >
-              <img
-                src={venueImages[data.venue as string]}
-                alt={`${data.venue} dining area`}
-                className="w-full h-48 object-cover rounded-sm"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
+      {/* Collapsible Floor Plan */}
+      <div className="mt-6">
+        <Collapsible open={floorPlanOpen} onOpenChange={setFloorPlanOpen}>
+          <CollapsibleTrigger className="w-full flex items-center justify-center gap-2 border border-border rounded-sm py-3 px-4 text-sm font-body text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors">
+            <span>{floorPlanOpen ? "Hide the full floor plan" : "See the full floor plan"}</span>
+            <ChevronDown className={cn("h-4 w-4 transition-transform", floorPlanOpen && "rotate-180")} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-4">
+            <FloorPlan
+              highlightVenue={
+                data.wantsPrivateRoom && data.venue === "Main Room" ? null
+                : data.wantsPrivateRoom ? "Entire VIP Room"
+                : data.venue
+              }
+              onSelect={(venueId) => {
+                if (venueId === "Entire VIP Room") {
+                  if (adultCount <= 66) {
+                    onChange({ venue: "VIP Room Back", wantsPrivateRoom: true });
+                  }
+                  return;
+                }
+                const v = venueId as Exclude<BookingData["venue"], "">;
+                if ((availableIds as string[]).includes(v)) {
+                  onChange({ venue: v, wantsPrivateRoom: false });
+                }
+              }}
+            />
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
 
-      {/* Private Room Option (non-pharma) */}
+      {/* Full restaurant buyout (non-pharma, larger parties) */}
       {showPrivateOption && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -207,13 +203,13 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
             onClick={() => onChange({ venue: "Main Room", wantsPrivateRoom: true })}
             className={cn(
               "w-full border rounded-sm p-8 text-center transition-all duration-300",
-              data.wantsPrivateRoom
+              data.wantsPrivateRoom && data.venue === "Main Room"
                 ? "border-primary bg-primary/5"
                 : "border-border bg-card hover:border-foreground/30"
             )}
           >
             <h3 className="font-heading text-lg font-medium text-foreground">
-              Private Event / Full Buyout
+              Private Event / Full Restaurant Buyout
             </h3>
             <p className="text-xs text-muted-foreground font-body mt-2">
               Exclusive use of the restaurant for your event (up to 141 guests)
@@ -222,71 +218,6 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
               <p className="font-medium text-foreground/70">F&B minimums required (low season):</p>
               <p>Lunch starting at $2,500 · Dinner starting at $3,500</p>
             </div>
-            <div className="mt-4 space-y-1 text-xs text-muted-foreground/70 font-body italic">
-              <p>Buyout options available:</p>
-              <p>Entire VIP Room (66) · Main Dining (75) · Full Buyout (141)</p>
-            </div>
-          </motion.button>
-        </motion.div>
-      )}
-
-      {/* Pharma Event — Entire VIP Room option */}
-      {showPharmaVipOption && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="mt-6"
-        >
-          <motion.button
-            whileHover={{ y: -2 }}
-            onClick={() => onChange({ venue: "VIP Room Back", wantsPrivateRoom: true })}
-            className={cn(
-              "w-full border rounded-sm p-8 text-center transition-all duration-300",
-              data.wantsPrivateRoom && data.venue === "VIP Room Back"
-                ? "border-primary bg-primary/5"
-                : "border-border bg-card hover:border-foreground/30"
-            )}
-          >
-            <h3 className="font-heading text-lg font-medium text-foreground">
-              Entire VIP Room (Front + Back)
-            </h3>
-            <p className="text-xs text-muted-foreground font-body mt-2">
-              Private buyout of both VIP sections for your pharma event (up to 66 guests)
-            </p>
-            <div className="mt-4 space-y-1 text-xs text-muted-foreground/80 font-body">
-              <p className="font-medium text-foreground/70">F&B minimum required:</p>
-              <p>Starting at $1,500</p>
-            </div>
-          </motion.button>
-        </motion.div>
-      )}
-
-      {/* Small-party Entire VIP Room buyout option */}
-      {showSmallVipBuyoutOption && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="mt-6"
-        >
-          <motion.button
-            whileHover={{ y: -2 }}
-            onClick={() => onChange({ venue: "VIP Room Back", wantsPrivateRoom: true })}
-            className={cn(
-              "w-full border rounded-sm p-8 text-center transition-all duration-300",
-              data.wantsPrivateRoom && data.venue === "VIP Room Back"
-                ? "border-primary bg-primary/5"
-                : "border-border bg-card hover:border-foreground/30"
-            )}
-          >
-            <h3 className="font-heading text-lg font-medium text-foreground">
-              Entire VIP Room Buyout
-            </h3>
-            <p className="text-xs text-muted-foreground font-body mt-2">
-              Reserve the full VIP Room (Front + Back) privately for your group.
-            </p>
-            <p className="mt-4 text-xs text-muted-foreground/80 font-body italic">
-              Subject to a food &amp; beverage minimum to be determined by the coordinator.
-            </p>
           </motion.button>
         </motion.div>
       )}
@@ -360,10 +291,6 @@ const StepVenue = ({ data, onChange, onNext, onBack }: StepVenueProps) => {
           </div>
         </motion.div>
       )}
-
-      <p className="mt-6 text-center text-xs text-muted-foreground font-body italic">
-        Note: The VIP Room is at the back of the restaurant; the Back section features a TV for presentations.
-      </p>
 
       {/* VIP requirements notice */}
       {(() => {
