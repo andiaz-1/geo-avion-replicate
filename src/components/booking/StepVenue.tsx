@@ -82,7 +82,6 @@ const LARGE_GROUP_CARDS: SpaceCard[] = [
     maxGuests: 141,
     venue: "Main Room",
     wantsPrivateRoom: true,
-    extra: "F&B minimums (low season): Lunch from $2,500 · Dinner from $3,500.",
   },
 ];
 
