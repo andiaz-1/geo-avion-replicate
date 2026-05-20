@@ -96,6 +96,15 @@ const BookingFunnel = () => {
     }
   }, [currentStep]);
 
+  // Track each funnel step as a virtual pageview so we can see drop-off in analytics.
+  useEffect(() => {
+    const path = submitted ? "/book/success" : `/book/step-${currentStep}-${stepName}`;
+    try {
+      window.history.replaceState(null, "", path);
+      window.dispatchEvent(new Event("popstate"));
+    } catch {}
+  }, [currentStep, stepName, submitted]);
+
   const handleNext = () => setCurrentStep((s) => s + 1);
   const handleBack = () => setCurrentStep((s) => Math.max(1, s - 1));
 
