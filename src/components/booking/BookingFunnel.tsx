@@ -82,6 +82,7 @@ const BookingFunnel = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [portalUrl, setPortalUrl] = useState<string | null>(null);
 
   const totalSteps = 5;
 
@@ -179,19 +180,20 @@ const BookingFunnel = () => {
         quote: { subtotal: quote.subtotal, serviceCharge: quote.serviceCharge, salesTax: quote.salesTax, grandTotal: quote.grandTotal, isConsumption: quote.isConsumption, menuPerPerson: quote.menuPerPerson, barPerPerson: quote.barPerPerson },
       };
 
-      const [tripleseatResult, emailResult, eventResult] = await Promise.allSettled([
-        supabase.functions.invoke("submit-tripleseat-lead", { body: tripleseatPayload }),
-        supabase.functions.invoke("send-booking-email", { body: emailPayload }),
+      // We are the CRM now — create-event is the source of truth (also auto-generates the contract).
+      // send-booking-email is best-effort notification only; tripleseat is no longer wired up here.
+      const [eventResult, emailResult] = await Promise.allSettled([
         supabase.functions.invoke("create-event", { body: eventPayload }),
+        supabase.functions.invoke("send-booking-email", { body: emailPayload }),
       ]);
-      if (eventResult.status === "rejected") console.warn("create-event failed:", eventResult.reason);
 
-      if (tripleseatResult.status === "rejected") throw tripleseatResult.reason;
-      if (tripleseatResult.status === "fulfilled") {
-        const { data: result, error } = tripleseatResult.value;
-        if (error) throw error;
-        if (result && !result.success) throw new Error(result.error || "Submission failed");
-      }
+      if (eventResult.status === "rejected") throw eventResult.reason;
+      const { data: eventData, error: eventError } = eventResult.value;
+      if (eventError) throw eventError;
+      if (eventData && eventData.success === false) throw new Error(eventData.error || "Could not save your booking");
+
+      if (eventData?.portalUrl) setPortalUrl(eventData.portalUrl);
+      else if (eventData?.portalToken) setPortalUrl(`${window.location.origin}/portal/${eventData.portalToken}`);
 
       if (emailResult.status === "rejected") {
         console.warn("Email notification failed:", emailResult.reason);
@@ -210,7 +212,7 @@ const BookingFunnel = () => {
     return (
       <div className="min-h-screen bg-background">
         <div className="px-4 py-12 md:py-20">
-          <SuccessState />
+          <SuccessState portalUrl={portalUrl} />
         </div>
       </div>
     );

@@ -7,8 +7,43 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
+const ADDON_LABELS: Record<string, string> = {
+  tablecloths: 'White Tablecloths ($60)',
+  avSpeaker: 'JBL Speaker + 2 Mics ($150)',
+  liveMusic: 'Live Music (from $300)',
+  ownMusician: 'Bringing own musician',
+};
+
+function buildContractContent(event: any) {
+  const q = event.quote || {};
+  const addons = Object.entries(event.addons || {}).filter(([, v]) => v).map(([k]) => ADDON_LABELS[k] || k);
+  return {
+    client: event.full_name,
+    email: event.email,
+    eventDate: event.event_date,
+    eventTime: event.event_time,
+    location: 'Salumeria 104 Weston — 1370 Weston Rd, Weston, FL 33326',
+    guestCount: event.guest_count,
+    menuTier: event.menu_tier,
+    courseChoice: event.course_choice,
+    selections: event.menu_selections || {},
+    beverage: event.beverage_strategy === 'open-bar'
+      ? `Open Bar — ${event.bar_type} (${event.bar_duration})`
+      : event.beverage_strategy === 'consumption' ? 'Beverages on consumption' : '—',
+    addons,
+    pricing: {
+      subtotal: q.subtotal || 0,
+      serviceCharge: q.serviceCharge || 0,
+      salesTax: q.salesTax || 0,
+      grandTotal: q.grandTotal || 0,
+    },
+    paymentTerms: 'Payment is due at the end of your event. Your credit card on file is not charged until the day of the event.',
+    cancellationPolicy: '[INSERT CANCELLATION POLICY HERE]',
+  };
+}
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
@@ -46,10 +81,18 @@ Deno.serve(async (req) => {
     const { data: event, error } = await admin.from('events').insert(row).select().single();
     if (error) throw error;
 
+    // Auto-generate the contract from their selections — we are the CRM now.
+    const contractContent = buildContractContent(event);
+    await admin.from('contracts').insert({ event_id: event.id, content: contractContent });
+    await admin.from('events').update({
+      status: 'contract_sent',
+      contract_sent_at: new Date().toISOString(),
+    }).eq('id', event.id);
+
     await admin.from('admin_notifications').insert({
       event_id: event.id,
       kind: 'new_lead',
-      message: `New lead: ${event.full_name} — ${event.guest_count} guests on ${event.event_date || 'TBD'}`,
+      message: `New lead + contract ready: ${event.full_name} — ${event.guest_count} guests on ${event.event_date || 'TBD'}`,
     });
 
     const origin = req.headers.get('origin') || '';

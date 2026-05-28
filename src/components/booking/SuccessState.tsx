@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import { LOCATION } from "@/lib/location";
 
-const SuccessState = () => {
+interface SuccessStateProps {
+  portalUrl?: string | null;
+}
+
+const SuccessState = ({ portalUrl }: SuccessStateProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -25,8 +29,35 @@ const SuccessState = () => {
           className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto"
           style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
         >
-          I'm {LOCATION.coordinator.name.split(" ")[0]}, {LOCATION.coordinator.title} at {LOCATION.brand} {LOCATION.city}. I just sent you an email — <strong className="font-semibold text-foreground">please check your spam folder</strong>.
+          I'm {LOCATION.coordinator.name.split(" ")[0]}, {LOCATION.coordinator.title} at {LOCATION.brand} {LOCATION.city}. Your contract has been drafted from your selections — review, sign, and add your card on file in your private guest portal below.
         </p>
+
+        {portalUrl && (
+          <>
+            <div className="w-16 h-[1px] bg-border mx-auto mt-8 mb-6" />
+            <div className="space-y-4 max-w-md mx-auto">
+              <p
+                className="text-xs tracking-[0.2em] uppercase text-muted-foreground"
+                style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+              >
+                Next Step
+              </p>
+              <a
+                href={portalUrl}
+                className="inline-block bg-primary text-primary-foreground px-8 py-4 text-sm tracking-[0.2em] uppercase hover:opacity-90 transition-opacity"
+                style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+              >
+                Review &amp; Sign Your Contract →
+              </a>
+              <p
+                className="text-xs text-muted-foreground italic"
+                style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+              >
+                We also emailed this secure link to you — please check spam.
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="w-16 h-[1px] bg-border mx-auto mt-8 mb-6" />
 
