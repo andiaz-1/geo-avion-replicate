@@ -82,7 +82,8 @@ Deno.serve(async (req) => {
         const { data: pub } = admin.storage.from('menu-headers').getPublicUrl(path);
         storedValue = pub.publicUrl;
       }
-      await admin.from('menu_headers').upsert({ event_id: event.id, header_type: headerType, value: storedValue }, { onConflict: 'event_id' });
+      await admin.from('menu_headers').delete().eq('event_id', event.id);
+      await admin.from('menu_headers').insert({ event_id: event.id, header_type: headerType, value: storedValue });
       await admin.from('events').update({ menu_header_at: new Date().toISOString() }).eq('id', event.id);
       await admin.from('admin_notifications').insert({ event_id: event.id, kind: 'menu_header', message: `Menu header submitted (${headerType}) for ${event.full_name}` });
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
