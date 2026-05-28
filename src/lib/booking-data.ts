@@ -65,6 +65,7 @@ export const initialBookingData: BookingData = {
   email: "",
   phone: "",
   company: "",
+  eventName: "",
   specialRequests: "",
   isPharmaEvent: false,
 };
