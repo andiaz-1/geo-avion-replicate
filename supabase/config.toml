@@ -1,1 +1,7 @@
 project_id = "fdjmorzojuuiwpgmetmg"
+
+[functions.create-event]
+verify_jwt = false
+
+[functions.portal]
+verify_jwt = false
