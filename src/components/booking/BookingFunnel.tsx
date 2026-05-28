@@ -160,11 +160,27 @@ const BookingFunnel = () => {
           isConsumption: quote.isConsumption,
         },
       };
+      const adultCount = data.guestCount - (data.hasKids ? data.kidsCount : 0);
+      const eventPayload = {
+        fullName: data.fullName, email: data.email, phone: data.phone, company: data.company,
+        eventDate: data.date ? format(data.date, "yyyy-MM-dd") : null,
+        time: data.time, isLunch: quote.isLunch,
+        guestCount: data.guestCount, adultCount, kidsCount: data.hasKids ? data.kidsCount : 0,
+        wantsPrivateRoom: data.wantsPrivateRoom,
+        menu: data.menu, courseChoice: data.courseChoice,
+        menuSelections: data.menuSelections, decideLater: data.decideLater,
+        beverageStrategy: data.beverageStrategy, barType: data.barType, barDuration: data.barDuration,
+        addons: data.addons, allergens: data.allergens, specialRequests: data.specialRequests,
+        bringingCake: data.bringingCake, bringingDecor: data.bringingDecor,
+        quote: { subtotal: quote.subtotal, serviceCharge: quote.serviceCharge, salesTax: quote.salesTax, grandTotal: quote.grandTotal, isConsumption: quote.isConsumption, menuPerPerson: quote.menuPerPerson, barPerPerson: quote.barPerPerson },
+      };
 
-      const [tripleseatResult, emailResult] = await Promise.allSettled([
+      const [tripleseatResult, emailResult, eventResult] = await Promise.allSettled([
         supabase.functions.invoke("submit-tripleseat-lead", { body: tripleseatPayload }),
         supabase.functions.invoke("send-booking-email", { body: emailPayload }),
+        supabase.functions.invoke("create-event", { body: eventPayload }),
       ]);
+      if (eventResult.status === "rejected") console.warn("create-event failed:", eventResult.reason);
 
       if (tripleseatResult.status === "rejected") throw tripleseatResult.reason;
       if (tripleseatResult.status === "fulfilled") {
