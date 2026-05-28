@@ -82,6 +82,7 @@ const BookingFunnel = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [portalUrl, setPortalUrl] = useState<string | null>(null);
 
   const totalSteps = 5;
 
