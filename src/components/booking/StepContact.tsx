@@ -170,6 +170,7 @@ const StepContact = ({ data, onChange, onSubmit, onBack, submitting }: StepConta
           { key: "email", label: "Email", type: "email" },
           { key: "phone", label: "Phone", type: "tel" },
           { key: "company", label: "Company Name (Optional)", type: "text" },
+          { key: "eventName", label: "Nature of Event / Event Name", type: "text" },
         ].map((field) => (
           <div key={field.key}>
             <label className="block text-xs font-body tracking-[0.2em] uppercase text-muted-foreground mb-2">
