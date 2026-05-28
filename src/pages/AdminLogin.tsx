@@ -9,8 +9,6 @@ import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 export default function AdminLogin() {
   const { session, isAdmin, loading } = useAdminAuth();
-export default function AdminLogin() {
-  const { session, isAdmin, loading } = useAdminAuth();
   const [mode, setMode] = useState<"signin" | "create">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
