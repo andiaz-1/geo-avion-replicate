@@ -29,6 +29,7 @@ export interface BookingData {
   email: string;
   phone: string;
   company: string;
+  eventName: string;
   specialRequests: string;
   isPharmaEvent: boolean;
 }
