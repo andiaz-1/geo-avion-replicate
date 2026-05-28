@@ -29,6 +29,7 @@ export interface BookingData {
   email: string;
   phone: string;
   company: string;
+  eventName: string;
   specialRequests: string;
   isPharmaEvent: boolean;
 }
@@ -64,6 +65,7 @@ export const initialBookingData: BookingData = {
   email: "",
   phone: "",
   company: "",
+  eventName: "",
   specialRequests: "",
   isPharmaEvent: false,
 };

@@ -63,6 +63,10 @@ function buildAdditionalInfo(data: BookingData): string {
     lines.push(`Allergies/Dietary: ${data.allergens}`);
   }
 
+  if (data.eventName) {
+    lines.push(`Event Name/Nature: ${data.eventName}`);
+  }
+
   if (data.specialRequests) {
     lines.push(`Special Requests: ${data.specialRequests}`);
   }
@@ -170,7 +174,7 @@ const BookingFunnel = () => {
         menu: data.menu, courseChoice: data.courseChoice,
         menuSelections: data.menuSelections, decideLater: data.decideLater,
         beverageStrategy: data.beverageStrategy, barType: data.barType, barDuration: data.barDuration,
-        addons: data.addons, allergens: data.allergens, specialRequests: data.specialRequests,
+        addons: data.addons, allergens: data.allergens, specialRequests: [data.eventName ? `Event Name/Nature: ${data.eventName}` : null, data.specialRequests].filter(Boolean).join("\n\n"),
         bringingCake: data.bringingCake, bringingDecor: data.bringingDecor,
         quote: { subtotal: quote.subtotal, serviceCharge: quote.serviceCharge, salesTax: quote.salesTax, grandTotal: quote.grandTotal, isConsumption: quote.isConsumption, menuPerPerson: quote.menuPerPerson, barPerPerson: quote.barPerPerson },
       };
