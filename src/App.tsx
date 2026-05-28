@@ -4,9 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import Index from "./pages/Index.tsx";
 import Spaces from "./pages/Spaces.tsx";
 import NotFound from "./pages/NotFound.tsx";
-
+import Admin from "./pages/Admin.tsx";
+import AdminLogin from "./pages/AdminLogin.tsx";
+import Portal from "./pages/Portal.tsx";
 const queryClient = new QueryClient();
 
 const App = () => (
