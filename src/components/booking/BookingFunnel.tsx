@@ -63,6 +63,10 @@ function buildAdditionalInfo(data: BookingData): string {
     lines.push(`Allergies/Dietary: ${data.allergens}`);
   }
 
+  if (data.eventName) {
+    lines.push(`Event Name/Nature: ${data.eventName}`);
+  }
+
   if (data.specialRequests) {
     lines.push(`Special Requests: ${data.specialRequests}`);
   }
