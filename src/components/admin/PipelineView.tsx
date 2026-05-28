@@ -25,7 +25,7 @@ export default function PipelineView({ events, onSelect, onChange }: { events: a
   }, [events]);
 
   const move = async (id: string, status: string) => {
-    const { error } = await supabase.from("events").update({ status }).eq("id", id);
+    const { error } = await supabase.from("events").update({ status: status as any }).eq("id", id);
     if (error) return toast.error(error.message);
     onChange();
   };
