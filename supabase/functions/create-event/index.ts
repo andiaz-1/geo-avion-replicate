@@ -46,10 +46,18 @@ Deno.serve(async (req) => {
     const { data: event, error } = await admin.from('events').insert(row).select().single();
     if (error) throw error;
 
+    // Auto-generate the contract from their selections — we are the CRM now.
+    const contractContent = buildContractContent(event);
+    await admin.from('contracts').insert({ event_id: event.id, content: contractContent });
+    await admin.from('events').update({
+      status: 'contract_sent',
+      contract_sent_at: new Date().toISOString(),
+    }).eq('id', event.id);
+
     await admin.from('admin_notifications').insert({
       event_id: event.id,
       kind: 'new_lead',
-      message: `New lead: ${event.full_name} — ${event.guest_count} guests on ${event.event_date || 'TBD'}`,
+      message: `New lead + contract ready: ${event.full_name} — ${event.guest_count} guests on ${event.event_date || 'TBD'}`,
     });
 
     const origin = req.headers.get('origin') || '';
