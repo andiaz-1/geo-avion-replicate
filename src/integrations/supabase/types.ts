@@ -14,16 +14,312 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_notifications: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          kind: string
+          message: string
+          read: boolean
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          kind: string
+          message: string
+          read?: boolean
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          kind?: string
+          message?: string
+          read?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contracts: {
+        Row: {
+          content: Json
+          created_at: string
+          event_id: string
+          id: string
+          signature_type: string | null
+          signature_value: string | null
+          signed_at: string | null
+          signer_name: string | null
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          event_id: string
+          id?: string
+          signature_type?: string | null
+          signature_value?: string | null
+          signed_at?: string | null
+          signer_name?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          event_id?: string
+          id?: string
+          signature_type?: string | null
+          signature_value?: string | null
+          signed_at?: string | null
+          signer_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          addons: Json | null
+          adult_count: number
+          allergens: string | null
+          bar_duration: string | null
+          bar_type: string | null
+          beverage_strategy: string | null
+          bringing_cake: boolean | null
+          bringing_decor: boolean | null
+          company: string | null
+          contract_sent_at: string | null
+          contract_signed_at: string | null
+          course_choice: string | null
+          created_at: string
+          decide_later: boolean | null
+          email: string
+          event_date: string | null
+          event_time: string | null
+          full_name: string
+          guest_count: number
+          id: string
+          internal_notes: string | null
+          is_lunch: boolean | null
+          kids_count: number
+          menu_header_at: string | null
+          menu_selections: Json | null
+          menu_tier: string | null
+          payment_auth_at: string | null
+          phone: string | null
+          portal_token: string
+          quote: Json | null
+          special_requests: string | null
+          status: Database["public"]["Enums"]["event_status"]
+          updated_at: string
+          venue: string | null
+          wants_private_room: boolean | null
+        }
+        Insert: {
+          addons?: Json | null
+          adult_count?: number
+          allergens?: string | null
+          bar_duration?: string | null
+          bar_type?: string | null
+          beverage_strategy?: string | null
+          bringing_cake?: boolean | null
+          bringing_decor?: boolean | null
+          company?: string | null
+          contract_sent_at?: string | null
+          contract_signed_at?: string | null
+          course_choice?: string | null
+          created_at?: string
+          decide_later?: boolean | null
+          email: string
+          event_date?: string | null
+          event_time?: string | null
+          full_name: string
+          guest_count?: number
+          id?: string
+          internal_notes?: string | null
+          is_lunch?: boolean | null
+          kids_count?: number
+          menu_header_at?: string | null
+          menu_selections?: Json | null
+          menu_tier?: string | null
+          payment_auth_at?: string | null
+          phone?: string | null
+          portal_token?: string
+          quote?: Json | null
+          special_requests?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          updated_at?: string
+          venue?: string | null
+          wants_private_room?: boolean | null
+        }
+        Update: {
+          addons?: Json | null
+          adult_count?: number
+          allergens?: string | null
+          bar_duration?: string | null
+          bar_type?: string | null
+          beverage_strategy?: string | null
+          bringing_cake?: boolean | null
+          bringing_decor?: boolean | null
+          company?: string | null
+          contract_sent_at?: string | null
+          contract_signed_at?: string | null
+          course_choice?: string | null
+          created_at?: string
+          decide_later?: boolean | null
+          email?: string
+          event_date?: string | null
+          event_time?: string | null
+          full_name?: string
+          guest_count?: number
+          id?: string
+          internal_notes?: string | null
+          is_lunch?: boolean | null
+          kids_count?: number
+          menu_header_at?: string | null
+          menu_selections?: Json | null
+          menu_tier?: string | null
+          payment_auth_at?: string | null
+          phone?: string | null
+          portal_token?: string
+          quote?: Json | null
+          special_requests?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          updated_at?: string
+          venue?: string | null
+          wants_private_room?: boolean | null
+        }
+        Relationships: []
+      }
+      menu_headers: {
+        Row: {
+          created_at: string
+          event_id: string
+          header_type: string
+          id: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          header_type: string
+          id?: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          header_type?: string
+          id?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_headers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_authorizations: {
+        Row: {
+          card_last4: string
+          cardholder_name: string
+          created_at: string
+          event_id: string
+          exp_month: string
+          exp_year: string
+          id: string
+          status: string
+        }
+        Insert: {
+          card_last4: string
+          cardholder_name: string
+          created_at?: string
+          event_id: string
+          exp_month: string
+          exp_year: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          card_last4?: string
+          cardholder_name?: string
+          created_at?: string
+          event_id?: string
+          exp_month?: string
+          exp_year?: string
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_authorizations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
+      event_status:
+        | "new_lead"
+        | "quote_sent"
+        | "contract_sent"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +446,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+      event_status: [
+        "new_lead",
+        "quote_sent",
+        "contract_sent",
+        "confirmed",
+        "completed",
+        "cancelled",
+      ],
+    },
   },
 } as const
