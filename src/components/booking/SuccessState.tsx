@@ -3,9 +3,14 @@ import { LOCATION } from "@/lib/location";
 
 interface SuccessStateProps {
   portalUrl?: string | null;
+  firstName?: string;
+  eventDate?: string;
 }
 
-const SuccessState = ({ portalUrl }: SuccessStateProps) => {
+const SuccessState = ({ firstName, eventDate }: SuccessStateProps) => {
+  const name = (firstName || "").trim();
+  const serif = 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif';
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -22,74 +27,47 @@ const SuccessState = ({ portalUrl }: SuccessStateProps) => {
           className="text-5xl md:text-6xl font-medium text-foreground italic"
           style={{ fontFamily: '"Eleventh", "Market Deco", Georgia, serif' }}
         >
-          GRAZIE!
+          GRAZIE{name ? `, ${name}` : ""}!
         </h2>
         <div className="w-16 h-[1px] bg-primary mx-auto mt-6 mb-6" />
         <p
           className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto"
-          style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+          style={{ fontFamily: serif }}
         >
-          I'm {LOCATION.coordinator.name.split(" ")[0]}, {LOCATION.coordinator.title} at {LOCATION.brand} {LOCATION.city}. Your contract has been drafted from your selections — review, sign, and add your card on file in your private guest portal below.
+          I'm {LOCATION.coordinator.name.split(" ")[0]}, your {LOCATION.coordinator.title.toLowerCase()} at {LOCATION.brand} {LOCATION.city}. I've received your request{eventDate ? ` for ${eventDate}` : ""} and I'm personally reviewing availability for you. I'll confirm and unlock your booking portal within 2 hours.
         </p>
-
-        {portalUrl && (
-          <>
-            <div className="w-16 h-[1px] bg-border mx-auto mt-8 mb-6" />
-            <div className="space-y-4 max-w-md mx-auto">
-              <p
-                className="text-xs tracking-[0.2em] uppercase text-muted-foreground"
-                style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
-              >
-                Next Step
-              </p>
-              <a
-                href={portalUrl}
-                className="inline-block bg-primary text-primary-foreground px-8 py-4 text-sm tracking-[0.2em] uppercase hover:opacity-90 transition-opacity"
-                style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
-              >
-                Review &amp; Sign Your Contract →
-              </a>
-              <p
-                className="text-xs text-muted-foreground italic"
-                style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
-              >
-                We also emailed this secure link to you — please check spam.
-              </p>
-            </div>
-          </>
-        )}
 
         <div className="w-16 h-[1px] bg-border mx-auto mt-8 mb-6" />
 
         <div className="space-y-4 max-w-md mx-auto">
           <p
             className="text-base md:text-lg text-foreground leading-relaxed"
-            style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+            style={{ fontFamily: serif }}
           >
-            Did you know we also create <span className="italic">customized menus</span> at no extra cost?
+            In the meantime — did you know we create <span className="italic">customized printed menus with your logo</span> at no extra cost?
           </p>
           <a
             href={LOCATION.menuCustomizationUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block text-sm tracking-[0.2em] uppercase text-primary hover:underline"
-            style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+            style={{ fontFamily: serif }}
           >
             See Customization Examples →
           </a>
 
           <p
             className="text-base md:text-lg text-foreground leading-relaxed pt-4"
-            style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+            style={{ fontFamily: serif }}
           >
-            Loved by our guests — leave us a review on Google.
+            Loved by our guests — <span className="italic">4.8 ★ on Google</span>
           </p>
           <a
             href={LOCATION.googleReviewsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block text-sm tracking-[0.2em] uppercase text-primary hover:underline"
-            style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+            style={{ fontFamily: serif }}
           >
             Read Our Reviews →
           </a>
@@ -99,7 +77,7 @@ const SuccessState = ({ portalUrl }: SuccessStateProps) => {
 
         <div
           className="space-y-1 text-sm text-muted-foreground"
-          style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
+          style={{ fontFamily: serif }}
         >
           <p className="text-foreground font-medium">{LOCATION.brand} · {LOCATION.city}</p>
           <p>{LOCATION.addressLine}</p>
@@ -113,13 +91,6 @@ const SuccessState = ({ portalUrl }: SuccessStateProps) => {
             </a>
           </p>
         </div>
-
-        <p
-          className="text-sm text-muted-foreground mt-8 tracking-[0.15em] uppercase"
-          style={{ fontFamily: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif' }}
-        >
-          We look forward to hosting you
-        </p>
       </motion.div>
     </motion.div>
   );
