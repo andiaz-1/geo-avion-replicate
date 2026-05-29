@@ -235,6 +235,7 @@ export type Database = {
           adult_count: number
           allergens: string | null
           antipasti_selections: string[] | null
+          area: string | null
           bar_duration: string | null
           bar_type: string | null
           beverage_package: string | null
@@ -296,6 +297,7 @@ export type Database = {
           adult_count?: number
           allergens?: string | null
           antipasti_selections?: string[] | null
+          area?: string | null
           bar_duration?: string | null
           bar_type?: string | null
           beverage_package?: string | null
@@ -357,6 +359,7 @@ export type Database = {
           adult_count?: number
           allergens?: string | null
           antipasti_selections?: string[] | null
+          area?: string | null
           bar_duration?: string | null
           bar_type?: string | null
           beverage_package?: string | null
