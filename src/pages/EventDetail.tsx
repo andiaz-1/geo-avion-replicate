@@ -222,10 +222,12 @@ export default function EventDetail() {
   // Local state for financial extras (auto-save on blur)
   const [fnbMin, setFnbMin] = useState("");
   const [deposit, setDeposit] = useState("");
+  const [venueFee, setVenueFee] = useState("");
   useEffect(() => {
     if (event) {
       setFnbMin(event.fnb_minimum ? String(event.fnb_minimum) : "");
       setDeposit(event.deposit_amount ? String(event.deposit_amount) : "");
+      setVenueFee(event.venue_fee ? String(event.venue_fee) : "");
     }
   }, [event]);
 
