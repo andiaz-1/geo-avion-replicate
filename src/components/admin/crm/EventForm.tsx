@@ -15,6 +15,7 @@ import {
   ADDONS,
   LOCATIONS,
   EVENT_TYPES,
+  areasFor,
   calculateAdminQuote,
 } from "@/lib/crm-data";
 
