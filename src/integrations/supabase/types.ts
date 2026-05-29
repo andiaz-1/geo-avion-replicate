@@ -90,25 +90,174 @@ export type Database = {
           },
         ]
       }
+      discussion_messages: {
+        Row: {
+          author_name: string | null
+          body: string
+          created_at: string
+          discussion_id: string
+          event_id: string
+          id: string
+        }
+        Insert: {
+          author_name?: string | null
+          body: string
+          created_at?: string
+          discussion_id: string
+          event_id: string
+          id?: string
+        }
+        Update: {
+          author_name?: string | null
+          body?: string
+          created_at?: string
+          discussion_id?: string
+          event_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_messages_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "discussions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discussion_messages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discussions: {
+        Row: {
+          author_name: string | null
+          created_at: string
+          event_id: string
+          id: string
+          message_count: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_name?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          message_count?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          message_count?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_contacts: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          email_1: string | null
+          email_2: string | null
+          event_id: string
+          first_name: string
+          id: string
+          is_main: boolean | null
+          last_name: string | null
+          phone: string | null
+          position: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          email_1?: string | null
+          email_2?: string | null
+          event_id: string
+          first_name: string
+          id?: string
+          is_main?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          email_1?: string | null
+          email_2?: string | null
+          event_id?: string
+          first_name?: string
+          id?: string
+          is_main?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_contacts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           addons: Json | null
           adult_count: number
           allergens: string | null
+          antipasti_selections: string[] | null
           bar_duration: string | null
           bar_type: string | null
+          beverage_package: string | null
           beverage_strategy: string | null
           bringing_cake: boolean | null
           bringing_decor: boolean | null
+          cc_auth_date: string | null
+          cc_auth_status: string | null
+          cc_last_four: string | null
+          children_attending: boolean | null
+          client_first_name: string | null
+          client_last_name: string | null
           company: string | null
           contract_sent_at: string | null
           contract_signed_at: string | null
+          contract_status: string | null
           course_choice: string | null
           created_at: string
           decide_later: boolean | null
+          deposit_amount: number | null
+          dessert_selections: string[] | null
           email: string
+          entree_selections: string[] | null
+          estimated_total: number | null
           event_date: string | null
+          event_name: string | null
           event_time: string | null
+          event_type: string | null
+          fnb_minimum: number | null
           full_name: string
           guest_count: number
           id: string
@@ -116,14 +265,22 @@ export type Database = {
           is_lunch: boolean | null
           kids_count: number
           menu_header_at: string | null
+          menu_header_file: string | null
+          menu_header_text: string | null
+          menu_header_type: string | null
           menu_selections: Json | null
           menu_tier: string | null
+          notes: string | null
           payment_auth_at: string | null
           phone: string | null
           portal_token: string
           quote: Json | null
+          service_charge: number | null
+          signature_name: string | null
           special_requests: string | null
           status: Database["public"]["Enums"]["event_status"]
+          subtotal: number | null
+          tax_amount: number | null
           updated_at: string
           venue: string | null
           wants_private_room: boolean | null
@@ -132,20 +289,36 @@ export type Database = {
           addons?: Json | null
           adult_count?: number
           allergens?: string | null
+          antipasti_selections?: string[] | null
           bar_duration?: string | null
           bar_type?: string | null
+          beverage_package?: string | null
           beverage_strategy?: string | null
           bringing_cake?: boolean | null
           bringing_decor?: boolean | null
+          cc_auth_date?: string | null
+          cc_auth_status?: string | null
+          cc_last_four?: string | null
+          children_attending?: boolean | null
+          client_first_name?: string | null
+          client_last_name?: string | null
           company?: string | null
           contract_sent_at?: string | null
           contract_signed_at?: string | null
+          contract_status?: string | null
           course_choice?: string | null
           created_at?: string
           decide_later?: boolean | null
+          deposit_amount?: number | null
+          dessert_selections?: string[] | null
           email: string
+          entree_selections?: string[] | null
+          estimated_total?: number | null
           event_date?: string | null
+          event_name?: string | null
           event_time?: string | null
+          event_type?: string | null
+          fnb_minimum?: number | null
           full_name: string
           guest_count?: number
           id?: string
@@ -153,14 +326,22 @@ export type Database = {
           is_lunch?: boolean | null
           kids_count?: number
           menu_header_at?: string | null
+          menu_header_file?: string | null
+          menu_header_text?: string | null
+          menu_header_type?: string | null
           menu_selections?: Json | null
           menu_tier?: string | null
+          notes?: string | null
           payment_auth_at?: string | null
           phone?: string | null
           portal_token?: string
           quote?: Json | null
+          service_charge?: number | null
+          signature_name?: string | null
           special_requests?: string | null
           status?: Database["public"]["Enums"]["event_status"]
+          subtotal?: number | null
+          tax_amount?: number | null
           updated_at?: string
           venue?: string | null
           wants_private_room?: boolean | null
@@ -169,20 +350,36 @@ export type Database = {
           addons?: Json | null
           adult_count?: number
           allergens?: string | null
+          antipasti_selections?: string[] | null
           bar_duration?: string | null
           bar_type?: string | null
+          beverage_package?: string | null
           beverage_strategy?: string | null
           bringing_cake?: boolean | null
           bringing_decor?: boolean | null
+          cc_auth_date?: string | null
+          cc_auth_status?: string | null
+          cc_last_four?: string | null
+          children_attending?: boolean | null
+          client_first_name?: string | null
+          client_last_name?: string | null
           company?: string | null
           contract_sent_at?: string | null
           contract_signed_at?: string | null
+          contract_status?: string | null
           course_choice?: string | null
           created_at?: string
           decide_later?: boolean | null
+          deposit_amount?: number | null
+          dessert_selections?: string[] | null
           email?: string
+          entree_selections?: string[] | null
+          estimated_total?: number | null
           event_date?: string | null
+          event_name?: string | null
           event_time?: string | null
+          event_type?: string | null
+          fnb_minimum?: number | null
           full_name?: string
           guest_count?: number
           id?: string
@@ -190,14 +387,22 @@ export type Database = {
           is_lunch?: boolean | null
           kids_count?: number
           menu_header_at?: string | null
+          menu_header_file?: string | null
+          menu_header_text?: string | null
+          menu_header_type?: string | null
           menu_selections?: Json | null
           menu_tier?: string | null
+          notes?: string | null
           payment_auth_at?: string | null
           phone?: string | null
           portal_token?: string
           quote?: Json | null
+          service_charge?: number | null
+          signature_name?: string | null
           special_requests?: string | null
           status?: Database["public"]["Enums"]["event_status"]
+          subtotal?: number | null
+          tax_amount?: number | null
           updated_at?: string
           venue?: string | null
           wants_private_room?: boolean | null

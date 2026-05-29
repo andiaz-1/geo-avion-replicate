@@ -1,28 +1,26 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import CalendarView from "@/components/admin/CalendarView";
-import PipelineView from "@/components/admin/PipelineView";
-import RemindersView from "@/components/admin/RemindersView";
-import EventDrawer from "@/components/admin/EventDrawer";
-import { Bell } from "lucide-react";
-
-export type AdminEvent = any;
+import { Bell, Plus } from "lucide-react";
+import StatsBar from "@/components/admin/crm/StatsBar";
+import PipelineBoard from "@/components/admin/crm/PipelineBoard";
+import CalendarBoard from "@/components/admin/crm/CalendarBoard";
+import ListBoard from "@/components/admin/crm/ListBoard";
+import RemindersBoard from "@/components/admin/crm/RemindersBoard";
 
 export default function Admin() {
   const { session, isAdmin, loading } = useAdminAuth();
-  const [events, setEvents] = useState<AdminEvent[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [notifs, setNotifs] = useState<any[]>([]);
-  const [selected, setSelected] = useState<AdminEvent | null>(null);
   const nav = useNavigate();
 
   const refresh = async () => {
     const { data } = await supabase.from("events").select("*").order("event_date", { ascending: true });
     setEvents(data || []);
-    const { data: ns } = await supabase.from("admin_notifications").select("*").eq("read", false).order("created_at", { ascending: false }).limit(20);
+    const { data: ns } = await supabase.from("admin_notifications").select("*").eq("read", false).limit(20);
     setNotifs(ns || []);
   };
 
@@ -44,42 +42,43 @@ export default function Admin() {
           <p className="text-xs text-muted-foreground">Salumeria 104 Weston</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <Button variant="ghost" size="sm" onClick={markAllRead}>
-              <Bell className="h-4 w-4 mr-2" />
-              {notifs.length} new
-            </Button>
-          </div>
-          <Button variant="outline" size="sm" onClick={async () => { await supabase.auth.signOut(); nav("/admin/login"); }}>Sign out</Button>
+          <Button variant="ghost" size="sm" onClick={markAllRead}>
+            <Bell className="h-4 w-4 mr-2" />
+            {notifs.length} new
+          </Button>
+          <Button asChild size="sm">
+            <Link to="/admin/events/new"><Plus className="h-4 w-4 mr-1" />New Event</Link>
+          </Button>
+          <Button variant="outline" size="sm" onClick={async () => { await supabase.auth.signOut(); nav("/admin/login"); }}>
+            Sign out
+          </Button>
         </div>
       </header>
 
-      {notifs.length > 0 && (
-        <div className="bg-secondary/10 border-b border-border px-6 py-2 text-sm text-foreground">
-          {notifs.slice(0, 3).map(n => <div key={n.id}>• {n.message}</div>)}
-        </div>
-      )}
+      <main className="p-6 space-y-6">
+        <StatsBar events={events} />
 
-      <main className="p-6">
-        <Tabs defaultValue="calendar">
+        <Tabs defaultValue="pipeline">
           <TabsList>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
             <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
+            <TabsTrigger value="list">List</TabsTrigger>
             <TabsTrigger value="reminders">Reminders</TabsTrigger>
           </TabsList>
-          <TabsContent value="calendar" className="mt-6">
-            <CalendarView events={events} onSelect={setSelected} />
-          </TabsContent>
           <TabsContent value="pipeline" className="mt-6">
-            <PipelineView events={events} onSelect={setSelected} onChange={refresh} />
+            <PipelineBoard events={events} onChange={refresh} />
+          </TabsContent>
+          <TabsContent value="calendar" className="mt-6">
+            <CalendarBoard events={events} />
+          </TabsContent>
+          <TabsContent value="list" className="mt-6">
+            <ListBoard events={events} />
           </TabsContent>
           <TabsContent value="reminders" className="mt-6">
-            <RemindersView events={events} onSelect={setSelected} />
+            <RemindersBoard events={events} />
           </TabsContent>
         </Tabs>
       </main>
-
-      {selected && <EventDrawer event={selected} onClose={() => setSelected(null)} onChange={() => { refresh(); }} />}
     </div>
   );
 }
