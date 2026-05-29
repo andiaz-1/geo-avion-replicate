@@ -281,6 +281,7 @@ export type Database = {
           payment_auth_at: string | null
           phone: string | null
           portal_token: string
+          portal_unlocked: boolean
           quote: Json | null
           service_charge: number | null
           signature_name: string | null
@@ -343,6 +344,7 @@ export type Database = {
           payment_auth_at?: string | null
           phone?: string | null
           portal_token?: string
+          portal_unlocked?: boolean
           quote?: Json | null
           service_charge?: number | null
           signature_name?: string | null
@@ -405,6 +407,7 @@ export type Database = {
           payment_auth_at?: string | null
           phone?: string | null
           portal_token?: string
+          portal_unlocked?: boolean
           quote?: Json | null
           service_charge?: number | null
           signature_name?: string | null

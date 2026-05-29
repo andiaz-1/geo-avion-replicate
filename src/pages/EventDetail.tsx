@@ -629,6 +629,33 @@ export default function EventDetail() {
                         </a>
                       </Button>
                     </div>
+                    <div
+                      className={`flex items-center justify-between gap-2 px-3 py-2 rounded border text-xs ${
+                        event.portal_unlocked
+                          ? "border-primary/30 bg-primary/5"
+                          : "border-secondary/40 bg-secondary/10"
+                      }`}
+                    >
+                      <div>
+                        <div className="font-medium text-foreground">
+                          {event.portal_unlocked ? "Portal unlocked" : "Portal locked (pending)"}
+                        </div>
+                        <div className="text-muted-foreground">
+                          {event.portal_unlocked
+                            ? "Client can proceed through contract, payment & menu."
+                            : "Client sees a holding screen with the quote only."}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={event.portal_unlocked ? "outline" : "default"}
+                        onClick={() =>
+                          updateEvent.mutate({ portal_unlocked: !event.portal_unlocked })
+                        }
+                      >
+                        {event.portal_unlocked ? "Lock" : "Unlock"}
+                      </Button>
+                    </div>
                   </>
                 )}
 
