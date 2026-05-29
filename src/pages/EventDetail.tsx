@@ -157,6 +157,68 @@ export default function EventDetail() {
     },
   });
 
+  const contractRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPdf = async () => {
+    if (!contractRef.current) return;
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      const filename = `contract-${event?.event_name || event?.full_name || "event"}.pdf`
+        .replace(/\s+/g, "-")
+        .toLowerCase();
+      await html2pdf()
+        .set({
+          margin: 10,
+          filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        })
+        .from(contractRef.current)
+        .save();
+    } catch (e) {
+      toast.error("Could not generate PDF");
+      console.error(e);
+    }
+  };
+
+  const buildContractEmailBody = () => {
+    const lines = [
+      `Hi,`,
+      ``,
+      `Please find the contract details for your upcoming event at Salumeria 104 below.`,
+      ``,
+      `Event: ${event?.event_name || event?.event_type || "Private Event"}`,
+      `Date: ${event?.event_date ? format(new Date(event.event_date + "T12:00:00"), "MMMM d, yyyy") : "TBD"}`,
+      `Time: ${event?.event_time || "TBD"}`,
+      `Guests: ${event?.guest_count ?? 0}`,
+      `Estimated Total: $${Number(event?.estimated_total || 0).toLocaleString()}`,
+      ``,
+      portalUrl ? `View & sign your contract here: ${portalUrl}` : ``,
+      ``,
+      `Thank you,`,
+      `Salumeria 104`,
+    ];
+    return lines.filter(Boolean).join("\n");
+  };
+
+  const handleSendToClient = () => {
+    if (!event?.email) {
+      toast.error("No client email on file");
+      return;
+    }
+    const subject = `Contract — ${event.event_name || event.event_type || "Your event"} at Salumeria 104`;
+    window.location.href = `mailto:${event.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(buildContractEmailBody())}`;
+  };
+
+  const handleSendToTeam = () => {
+    const to = window.prompt("Team member email address:");
+    if (!to) return;
+    const subject = `Contract — ${event?.event_name || event?.event_type || "Event"} (${event?.event_date || "TBD"})`;
+    const body = `Sharing the contract for an upcoming event.\n\n${buildContractEmailBody()}`;
+    window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
   // Local state for financial extras (auto-save on blur)
   const [fnbMin, setFnbMin] = useState("");
   const [deposit, setDeposit] = useState("");
