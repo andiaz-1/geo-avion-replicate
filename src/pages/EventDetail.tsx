@@ -378,17 +378,23 @@ export default function EventDetail() {
                     <strong>Beverage:</strong> {bev.label}
                   </p>
                 )}
-                {Array.isArray(event.addons) && event.addons.length > 0 && (
-                  <p>
-                    <strong>Add-ons:</strong>{" "}
-                    {event.addons
-                      .map(
-                        (a: string) =>
-                          ADDONS.find((x) => x.value === a)?.label || a
-                      )
-                      .join(", ")}
-                  </p>
-                )}
+                {(() => {
+                  const raw = event.addons;
+                  const list: string[] = Array.isArray(raw)
+                    ? raw
+                    : raw && typeof raw === "object"
+                    ? Object.keys(raw).filter((k) => (raw as Record<string, unknown>)[k])
+                    : [];
+                  if (list.length === 0) return null;
+                  return (
+                    <p>
+                      <strong>Add-ons:</strong>{" "}
+                      {list
+                        .map((a) => ADDONS.find((x) => x.value === a)?.label || a)
+                        .join(", ")}
+                    </p>
+                  );
+                })()}
               </div>
             </Card>
 
@@ -401,23 +407,19 @@ export default function EventDetail() {
               </p>
             </Card>
 
-            <Card
-              title="Discussions"
-              action={
-                <Button size="sm" className="bg-primary text-primary-foreground">
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Create New Discussion
-                </Button>
-              }
-            >
-              <div className="relative mb-3">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search guest discussions"
-                  className="pl-9"
-                />
-              </div>
-              <Discussions eventId={eventId!} />
-            </Card>
+            <Discussions
+              eventId={eventId!}
+              audience="client"
+              title="Client Discussion"
+              description="Conversations visible to the client through the portal."
+            />
+
+            <Discussions
+              eventId={eventId!}
+              audience="staff"
+              title="Staff Discussion"
+              description="Internal notes between staff — never shown to the client."
+            />
           </div>
 
           {/* RIGHT */}

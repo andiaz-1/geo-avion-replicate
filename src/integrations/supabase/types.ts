@@ -92,6 +92,7 @@ export type Database = {
       }
       discussion_messages: {
         Row: {
+          audience: string
           author_name: string | null
           body: string
           created_at: string
@@ -100,6 +101,7 @@ export type Database = {
           id: string
         }
         Insert: {
+          audience?: string
           author_name?: string | null
           body: string
           created_at?: string
@@ -108,6 +110,7 @@ export type Database = {
           id?: string
         }
         Update: {
+          audience?: string
           author_name?: string | null
           body?: string
           created_at?: string
@@ -134,6 +137,7 @@ export type Database = {
       }
       discussions: {
         Row: {
+          audience: string
           author_name: string | null
           created_at: string
           event_id: string
@@ -143,6 +147,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          audience?: string
           author_name?: string | null
           created_at?: string
           event_id: string
@@ -152,6 +157,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          audience?: string
           author_name?: string | null
           created_at?: string
           event_id?: string
