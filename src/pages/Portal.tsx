@@ -30,9 +30,11 @@ export default function Portal() {
   const [loading, setLoading] = useState(true);
   const [stage, setStage] = useState(0);
 
+  const isValidToken = !!token && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token);
+
   const refresh = async () => {
-    if (!token) return;
-    const { data: res, error } = await call("get", token);
+    if (!isValidToken) { setLoading(false); return; }
+    const { data: res, error } = await call("get", token!);
     if (error || !res?.event) { setLoading(false); return; }
     setData(res);
     const s = computeStage(res.event, res.contract, res.paymentAuth, res.menuHeader);
