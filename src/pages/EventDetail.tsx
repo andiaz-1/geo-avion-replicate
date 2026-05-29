@@ -222,10 +222,12 @@ export default function EventDetail() {
   // Local state for financial extras (auto-save on blur)
   const [fnbMin, setFnbMin] = useState("");
   const [deposit, setDeposit] = useState("");
+  const [venueFee, setVenueFee] = useState("");
   useEffect(() => {
     if (event) {
       setFnbMin(event.fnb_minimum ? String(event.fnb_minimum) : "");
       setDeposit(event.deposit_amount ? String(event.deposit_amount) : "");
+      setVenueFee(event.venue_fee ? String(event.venue_fee) : "");
     }
   }, [event]);
 
@@ -531,6 +533,18 @@ export default function EventDetail() {
                       onChange={(e) => setDeposit(e.target.value)}
                       onBlur={() =>
                         updateEvent.mutate({ deposit_amount: Number(deposit) || 0 })
+                      }
+                      placeholder="$0.00"
+                      className="w-28 text-right"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="text-sm text-muted-foreground">Venue Fee</label>
+                    <Input
+                      value={venueFee}
+                      onChange={(e) => setVenueFee(e.target.value)}
+                      onBlur={() =>
+                        updateEvent.mutate({ venue_fee: Number(venueFee) || 0 })
                       }
                       placeholder="$0.00"
                       className="w-28 text-right"

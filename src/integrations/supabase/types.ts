@@ -291,6 +291,7 @@ export type Database = {
           tax_amount: number | null
           updated_at: string
           venue: string | null
+          venue_fee: number | null
           wants_private_room: boolean | null
         }
         Insert: {
@@ -354,6 +355,7 @@ export type Database = {
           tax_amount?: number | null
           updated_at?: string
           venue?: string | null
+          venue_fee?: number | null
           wants_private_room?: boolean | null
         }
         Update: {
@@ -417,6 +419,7 @@ export type Database = {
           tax_amount?: number | null
           updated_at?: string
           venue?: string | null
+          venue_fee?: number | null
           wants_private_room?: boolean | null
         }
         Relationships: []
