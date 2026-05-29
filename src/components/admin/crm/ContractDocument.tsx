@@ -66,7 +66,15 @@ function SigLine({ label, value }: { label: string; value: React.ReactNode }) {
 export default function ContractDocument({ event }: { event: Event }) {
   const tier = event.menu_tier ? MENU_TIERS[event.menu_tier] : undefined;
   const bev = BEVERAGE_PACKAGES.find((b) => b.value === event.beverage_package);
-  const addonLabels = (event.addons || []).map((a) => ADDONS.find((x) => x.value === a)?.label || a);
+  const rawAddons = event.addons;
+  const addonsArr: string[] = Array.isArray(rawAddons)
+    ? (rawAddons as string[])
+    : rawAddons && typeof rawAddons === "object"
+    ? Object.keys(rawAddons as Record<string, unknown>).filter(
+        (k) => (rawAddons as Record<string, unknown>)[k],
+      )
+    : [];
+  const addonLabels = addonsArr.map((a) => ADDONS.find((x) => x.value === a)?.label || a);
   const signedAt = event.contract_signed_at || event.contract_signed_date;
 
   return (
