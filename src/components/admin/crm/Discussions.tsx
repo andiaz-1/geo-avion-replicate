@@ -43,12 +43,12 @@ export default function Discussions({
   const { data: discussions = [] } = useQuery({
     queryKey: ["discussions", eventId, audience],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("discussions")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const q: any = supabase.from("discussions");
+      const { data, error } = await q
         .select("*")
         .eq("event_id", eventId)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq("audience" as any, audience)
+        .eq("audience", audience)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data || []) as Discussion[];
