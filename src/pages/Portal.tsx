@@ -125,6 +125,24 @@ function ContractStage({ event, contract, token, onDone }: any) {
 
   if (!contract) return <Card><p className="text-muted-foreground">Your contract is being prepared. Please check back shortly.</p></Card>;
 
+  const startDraw = (e: any) => {
+    const cv = canvasRef.current!; const r = cv.getBoundingClientRect();
+    drawing.current = true;
+    const x = (e.touches?.[0]?.clientX ?? e.clientX) - r.left;
+    const y = (e.touches?.[0]?.clientY ?? e.clientY) - r.top;
+    const ctx = cv.getContext("2d")!; ctx.beginPath(); ctx.moveTo(x, y);
+  };
+  const moveDraw = (e: any) => {
+    if (!drawing.current) return; e.preventDefault();
+    const cv = canvasRef.current!; const r = cv.getBoundingClientRect();
+    const x = (e.touches?.[0]?.clientX ?? e.clientX) - r.left;
+    const y = (e.touches?.[0]?.clientY ?? e.clientY) - r.top;
+    const ctx = cv.getContext("2d")!; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#2c2c2c"; ctx.lineTo(x, y); ctx.stroke();
+  };
+  const endDraw = () => { drawing.current = false; };
+  const clearDraw = () => { const cv = canvasRef.current!; cv.getContext("2d")!.clearRect(0, 0, cv.width, cv.height); };
+
+
   const submit = async () => {
     if (!name) return toast.error("Please type your full name");
     let signatureValue: string;
