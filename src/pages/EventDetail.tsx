@@ -378,17 +378,23 @@ export default function EventDetail() {
                     <strong>Beverage:</strong> {bev.label}
                   </p>
                 )}
-                {Array.isArray(event.addons) && event.addons.length > 0 && (
-                  <p>
-                    <strong>Add-ons:</strong>{" "}
-                    {event.addons
-                      .map(
-                        (a: string) =>
-                          ADDONS.find((x) => x.value === a)?.label || a
-                      )
-                      .join(", ")}
-                  </p>
-                )}
+                {(() => {
+                  const raw = event.addons;
+                  const list: string[] = Array.isArray(raw)
+                    ? raw
+                    : raw && typeof raw === "object"
+                    ? Object.keys(raw).filter((k) => (raw as Record<string, unknown>)[k])
+                    : [];
+                  if (list.length === 0) return null;
+                  return (
+                    <p>
+                      <strong>Add-ons:</strong>{" "}
+                      {list
+                        .map((a) => ADDONS.find((x) => x.value === a)?.label || a)
+                        .join(", ")}
+                    </p>
+                  );
+                })()}
               </div>
             </Card>
 
