@@ -212,7 +212,11 @@ const BookingFunnel = () => {
     return (
       <div className="min-h-screen bg-background">
         <div className="px-4 py-12 md:py-20">
-          <SuccessState portalUrl={portalUrl} />
+          <SuccessState
+            portalUrl={portalUrl}
+            firstName={data.fullName.trim().split(/\s+/)[0]}
+            eventDate={data.date ? format(data.date, "MMMM d, yyyy") : undefined}
+          />
         </div>
       </div>
     );
