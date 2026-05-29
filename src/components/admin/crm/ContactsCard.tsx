@@ -206,19 +206,27 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
   });
 
   return (
-    <div className="bg-card border border-border rounded-sm p-6">
-      <h3 className="font-semibold mb-4">Contacts</h3>
+    <div className="bg-card border border-border rounded-md p-6">
+      <h3 className="font-semibold mb-4 text-foreground">Contacts</h3>
       <div className="space-y-3">
         {contacts.map((c, i) => (
           <div key={c.id}>
-            {i === 0 && <div className="text-xs uppercase text-muted-foreground mb-1">Main Contact</div>}
-            {i === 1 && <div className="text-xs uppercase text-muted-foreground mb-1 mt-3">Additional Contacts</div>}
+            {i === 0 && (
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                Main Contact
+              </div>
+            )}
+            {i === 1 && (
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 mt-4">
+                Additional Contacts
+              </div>
+            )}
             <ContactRow contact={c} eventId={eventId} onDelete={() => deleteContact.mutate(c.id)} />
           </div>
         ))}
 
         {adding && (
-          <div className="border border-border rounded-sm p-4 bg-muted/40 space-y-3">
+          <div className="border border-border rounded-md p-4 bg-muted/40 space-y-3">
             <ContactFields contact={newContact} onChange={setNewContact} />
             <div className="flex gap-2">
               <Button
@@ -243,7 +251,12 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
         )}
 
         {!adding && (
-          <Button variant="outline" size="sm" onClick={() => setAdding(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAdding(true)}
+            className="w-full border-dashed mt-2"
+          >
             <Plus className="w-4 h-4 mr-1" />
             {contacts.length === 0 ? "Add Main Contact" : "Add Another Contact"}
           </Button>
