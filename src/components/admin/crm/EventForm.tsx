@@ -148,7 +148,13 @@ export default function EventForm({ defaultValues = {}, onSubmit, isSubmitting }
     antipasti_selections: defaultValues.antipasti_selections || [],
     entree_selections: defaultValues.entree_selections || [],
     dessert_selections: defaultValues.dessert_selections || [],
-    addons: defaultValues.addons || [],
+    addons: Array.isArray(defaultValues.addons)
+      ? defaultValues.addons
+      : defaultValues.addons && typeof defaultValues.addons === "object"
+      ? Object.keys(defaultValues.addons as Record<string, unknown>).filter(
+          (k) => (defaultValues.addons as Record<string, unknown>)[k]
+        )
+      : [],
   });
 
   const set = <K extends keyof EventFormValues>(k: K, v: EventFormValues[K]) =>
