@@ -86,16 +86,17 @@ function ContactRow({ contact, eventId, onDelete }: { contact: Contact; eventId:
   });
 
   return (
-    <div className="border border-border rounded-sm p-4 bg-card">
+    <div className="border border-border rounded-md p-4 bg-card">
       <div className="flex items-start justify-between mb-2">
         <div>
-          <div className="font-medium text-foreground">
+          <div className="font-semibold text-foreground uppercase tracking-wide text-sm">
             {contact.first_name} {contact.last_name}
           </div>
-          {contact.position && (
-            <div className="text-xs text-muted-foreground">
+          {(contact.position || contact.company_name) && (
+            <div className="text-xs text-muted-foreground mt-0.5">
               {contact.position}
-              {contact.company_name ? ` · ${contact.company_name}` : ""}
+              {contact.position && contact.company_name ? " · " : ""}
+              {contact.company_name}
             </div>
           )}
         </div>
@@ -118,10 +119,25 @@ function ContactRow({ contact, eventId, onDelete }: { contact: Contact; eventId:
       </div>
 
       {!editing && (
-        <div className="space-y-0.5 text-sm text-muted-foreground">
-          {contact.phone && <div>📞 {contact.phone}</div>}
-          {contact.email_1 && <div>✉️ {contact.email_1}</div>}
-          {contact.email_2 && <div>✉️ {contact.email_2}</div>}
+        <div className="space-y-1 text-sm text-muted-foreground mt-2">
+          {contact.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5" />
+              <span>{contact.phone}</span>
+            </div>
+          )}
+          {contact.email_1 && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5" />
+              <span>{contact.email_1}</span>
+            </div>
+          )}
+          {contact.email_2 && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5" />
+              <span>{contact.email_2}</span>
+            </div>
+          )}
         </div>
       )}
 
