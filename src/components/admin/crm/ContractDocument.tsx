@@ -5,6 +5,7 @@ interface Event {
   client_first_name?: string | null;
   client_last_name?: string | null;
   full_name?: string | null;
+  company?: string | null;
   company_name?: string | null;
   event_date?: string | null;
   event_time?: string | null;
@@ -17,7 +18,7 @@ interface Event {
   entree_selections?: string[] | null;
   dessert_selections?: string[] | null;
   beverage_package?: string | null;
-  addons?: string[] | null;
+  addons?: unknown;
   subtotal?: number | null;
   service_charge?: number | null;
   tax_amount?: number | null;
