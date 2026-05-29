@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, Circle } from "lucide-react";
 import { toast } from "sonner";
+import ContractDocument from "@/components/admin/crm/ContractDocument";
 
 const COORDINATOR_EMAIL = "[INSERT EMAIL]";
 const STAGES = ["Quote", "Contract", "Payment Auth", "Menu Header", "Confirmed"];
