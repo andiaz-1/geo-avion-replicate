@@ -35,7 +35,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="crm-theme min-h-screen bg-background">
       <header className="border-b border-border bg-card px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Coordinator Dashboard</h1>

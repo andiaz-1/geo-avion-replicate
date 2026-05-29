@@ -63,7 +63,7 @@ export default function EventFormPage() {
   if (isEdit && isLoading) return <div className="p-10 text-muted-foreground">Loading event…</div>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="crm-theme min-h-screen bg-background">
       <div className="max-w-3xl mx-auto p-6">
         <Button variant="ghost" size="sm" asChild className="mb-4">
           <Link to={isEdit ? `/admin/events/${eventId}` : "/admin"}>

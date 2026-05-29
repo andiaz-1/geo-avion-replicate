@@ -89,6 +89,25 @@
   }
 }
 
+/* CRM theme — lilac + Montserrat, scoped to admin pages */
+.crm-theme {
+  --primary: 270 50% 62%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 270 50% 62%;
+  --accent: 270 60% 90%;
+  --accent-foreground: 270 50% 25%;
+  --secondary: 270 40% 95%;
+  --secondary-foreground: 270 50% 25%;
+  --sidebar-primary: 270 50% 62%;
+  --sidebar-ring: 270 50% 62%;
+  font-family: 'Montserrat', system-ui, sans-serif;
+}
+.crm-theme h1, .crm-theme h2, .crm-theme h3,
+.crm-theme h4, .crm-theme h5, .crm-theme h6,
+.crm-theme .font-display, .crm-theme .font-heading, .crm-theme .font-body {
+  font-family: 'Montserrat', system-ui, sans-serif !important;
+}
+
 @layer base {
   * {
     @apply border-border;

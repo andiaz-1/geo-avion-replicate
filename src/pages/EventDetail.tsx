@@ -94,7 +94,7 @@ export default function EventDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="crm-theme min-h-screen bg-background">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         <Button variant="ghost" size="sm" asChild>
           <Link to="/admin"><ArrowLeft className="w-4 h-4 mr-1" /> Back to Dashboard</Link>
