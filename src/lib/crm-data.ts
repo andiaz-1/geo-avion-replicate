@@ -132,19 +132,27 @@ export function calculateAdminQuote(data: QuoteFields): AdminQuote {
 }
 
 // Build a display name from any combination of name fields the DB may have.
-export function displayName(e: { client_first_name?: string | null; client_last_name?: string | null; full_name?: string | null }): string {
-  const composed = [e.client_first_name, e.client_last_name].filter(Boolean).join(" ").trim();
-  return composed || e.full_name || "Unnamed client";
+// Accepts any record — the event shape varies across booking funnel and admin form.
+type NameLike = Record<string, unknown>;
+const pick = (e: NameLike, k: string) => (typeof e[k] === "string" ? (e[k] as string) : null);
+
+export function displayName(e: NameLike): string {
+  const composed = [pick(e, "client_first_name"), pick(e, "client_last_name")].filter(Boolean).join(" ").trim();
+  return composed || pick(e, "full_name") || "Unnamed client";
 }
 
-export function firstName(e: { client_first_name?: string | null; full_name?: string | null }): string {
-  if (e.client_first_name) return e.client_first_name;
-  if (e.full_name) return e.full_name.trim().split(/\s+/)[0] || "";
+export function firstName(e: NameLike): string {
+  const f = pick(e, "client_first_name");
+  if (f) return f;
+  const full = pick(e, "full_name");
+  if (full) return full.trim().split(/\s+/)[0] || "";
   return "";
 }
 
-export function lastName(e: { client_last_name?: string | null; full_name?: string | null }): string {
-  if (e.client_last_name) return e.client_last_name;
-  if (e.full_name) return e.full_name.trim().split(/\s+/).slice(1).join(" ");
+export function lastName(e: NameLike): string {
+  const l = pick(e, "client_last_name");
+  if (l) return l;
+  const full = pick(e, "full_name");
+  if (full) return full.trim().split(/\s+/).slice(1).join(" ");
   return "";
 }
