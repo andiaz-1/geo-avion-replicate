@@ -4,11 +4,24 @@
 // without touching the public booking flow.
 
 export const LOCATIONS = [
-  { value: "Weston", label: "Weston" },
-  { value: "Midtown Miami", label: "Midtown Miami" },
-  { value: "Coral Gables", label: "Coral Gables" },
-  { value: "Atlantic Beach", label: "Atlantic Beach" },
+  { value: "Weston", label: "Salumeria 104 — Weston" },
+  { value: "Midtown Miami", label: "Salumeria 104 — Midtown Miami" },
+  { value: "Coral Gables", label: "Salumeria 104 — Coral Gables" },
+  { value: "Atlantic Beach", label: "Salumeria 104 — Atlantic Beach" },
 ] as const;
+
+// Selectable areas per restaurant. Edit these to match each venue's real layout.
+export const AREAS_BY_LOCATION: Record<string, string[]> = {
+  Weston: ["Main Dining Room", "Covered Patio (semi-private)", "Private Room", "Bar Area", "Full Buyout"],
+  "Midtown Miami": ["Main Dining Room", "Outdoor Terrace", "Private Room", "Bar Lounge", "Full Buyout"],
+  "Coral Gables": ["Main Dining Room", "Garden Patio", "Private Room", "Wine Room", "Full Buyout"],
+  "Atlantic Beach": ["Main Dining Room", "Beachfront Patio", "Private Room", "Bar Area", "Full Buyout"],
+};
+
+export function areasFor(location?: string | null): string[] {
+  if (!location) return [];
+  return AREAS_BY_LOCATION[location] || [];
+}
 
 export const EVENT_TYPES = [
   "Corporate Dinner",
