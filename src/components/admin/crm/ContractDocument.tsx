@@ -78,9 +78,12 @@ export default function ContractDocument({ event }: { event: Event }) {
   const signedAt = event.contract_signed_at || event.contract_signed_date;
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-card text-foreground text-sm leading-relaxed print:p-4">
+    <div
+      className="max-w-3xl mx-auto p-8 bg-card text-foreground text-sm leading-relaxed print:p-4"
+      style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+    >
       <div className="text-center mb-8 border-b border-border pb-6">
-        <h1 className="font-display text-2xl font-semibold text-primary">Salumeria 104</h1>
+        <h1 className="text-2xl font-semibold text-primary" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>Salumeria 104</h1>
         <p className="text-muted-foreground mt-1">Private Event Agreement</p>
       </div>
 
