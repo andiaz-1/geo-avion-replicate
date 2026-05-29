@@ -156,7 +156,7 @@ export default function ContractDocument({ event }: { event: Event }) {
         </Section>
 
         <div className="border-t border-border pt-6 mt-8">
-          <h3 className="font-display font-semibold mb-4">Agreement</h3>
+          <h3 className="font-semibold mb-4" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>Agreement</h3>
           <p className="mb-6">
             By signing below, I agree to the terms outlined in this contract and authorize Salumeria 104 to charge the card
             on file for the final event total.
@@ -166,7 +166,7 @@ export default function ContractDocument({ event }: { event: Event }) {
               label="Client Signature"
               value={
                 event.signature_name ? (
-                  <span className="font-display text-lg italic">{event.signature_name}</span>
+                  <span className="text-lg italic" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>{event.signature_name}</span>
                 ) : null
               }
             />
