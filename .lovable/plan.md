@@ -1,83 +1,71 @@
+# Port the Base44 CRM
 
-# Weston Coordinator Suite — Build Plan
+Goal: bring your Base44 CRM (Dashboard, EventDetail, EventForm, Contacts, Discussions, Contract printout) into this project, wired to Lovable Cloud. Booking funnel and client portal are left alone.
 
-The existing booking flow at `/book/*` will not be touched. Everything below is additive.
+## 1. Database changes (one migration)
 
-## 1. Backend (Lovable Cloud)
+**Extend `events` table** with the Base44 fields it doesn't have yet:
+- `event_name`, `event_type`, `event_time` (already exists), `location` (already exists)
+- `children_attending` (boolean)
+- `antipasti_selections`, `entree_selections`, `dessert_selections` (text[])
+- `beverage_package`, `addons` (already as jsonb — keep), `menu_header_type`, `menu_header_text`, `menu_header_file`
+- `subtotal`, `service_charge`, `tax_amount`, `estimated_total`, `fnb_minimum`, `deposit_amount` (numeric)
+- `contract_status`, `cc_auth_status`, `cc_last_four`, `cc_auth_date`, `signature_name`
+- `notes`
+- Map existing `status` → `booking_status` semantics; keep `status` enum but add `cancelled` if missing.
 
-New tables:
-- `events` — created automatically when a booking submission completes. Holds client info, event date/time, guest count, menu tier, dish selections (JSON), beverage package, add-ons, pricing snapshot, status (`new_lead | quote_sent | contract_sent | confirmed | completed | cancelled`), pipeline column, internal notes, portal token (uuid), coordinator notification flags.
-- `contracts` — one per event, stores generated contract data, signed status, signature (typed string or drawn PNG dataURL), signed_at, signer name, signer IP/user-agent.
-- `payment_authorizations` — cardholder name, last4, expiry, status. **Card number/CVV are NOT stored** — only last4 + a placeholder "authorized" flag (real tokenization would require Stripe; flagged as TODO with clear note).
-- `menu_headers` — type (`logo | phrase | standard`), value (text or storage path), submitted_at.
-- `admin_notifications` — in-app notifications for Julie (type, message, event_id, read).
-- `admin_users` — single coordinator account (email + hashed password handled by Lovable Auth).
+**New tables:**
+- `event_contacts` (event_id, first_name, last_name, phone, email_1, email_2, company_name, position, is_main)
+- `discussions` (event_id, title, author_name, message_count)
+- `discussion_messages` (discussion_id, event_id, body, author_name)
 
-Plus storage bucket `menu-headers` for logo uploads.
+All admin-only RLS (using existing `has_role(auth.uid(), 'admin')`). Proper GRANTs for `authenticated` + `service_role`.
 
-All client-portal reads/writes go through Edge Functions that validate the portal token — the portal is **not** authenticated, so RLS for portal-facing tables is locked down and access is mediated server-side.
+## 2. New CRM screens (under `/admin`)
 
-## 2. Admin Dashboard (`/admin`)
+Replace the current `/admin` page with a full CRM:
 
-- `/admin/login` — email + password (Lovable Auth, single admin role).
-- `/admin` — protected layout with three tabs:
-  - **Calendar** — month grid, color-coded blocks (amber/green/grey), click → event drawer.
-  - **Pipeline** — Kanban (5 columns), drag-and-drop via `@dnd-kit/core`, cards show name, date, guests, est. total, days-until.
-  - **Reminders** — list of automated flags (contract unsigned >48h, menu incomplete & ≤21d, CC auth missing & ≤14d, header missing & ≤10d) with "Send Nudge" button → triggers reminder email.
-- **Event drawer/page** — full client details, booking selections, step status (contract / CC auth / menu header), "Generate Contract" button, internal notes, "Copy portal link" button, in-app notification feed.
+```text
+/admin                       → Dashboard (4 tabs: Pipeline | Calendar | List | Reminders)
+/admin/events/new            → EventForm (create)
+/admin/events/:id            → EventDetail (cards + contacts + discussions + contract)
+/admin/events/:id/edit       → EventForm (edit)
+/admin/login                 → existing (kept)
+```
 
-## 3. Contract Generator
+Components added under `src/components/admin/crm/`:
+- `StatsBar`, `PipelineBoard`, `CalendarBoard`, `ListBoard`, `RemindersBoard`
+- `EventCard` (used by Pipeline)
+- `EventForm` (create/edit, with live quote preview)
+- `ContactsCard`, `Discussions`, `ContractDocument`
+- `EventDetailHeader`, `EventDetailCards`
 
-Edge function `generate-contract` builds a contract record from the event, including:
-- Client, date, time, Weston address, guest count
-- Selected menu tier + all dishes
-- Beverage package, add-ons
-- Itemized pricing: subtotal + 23% service charge + 8% sales tax + estimated total
-- Payment terms: "Payment is due at the end of your event. Your credit card on file is not charged until the day of the event."
-- `[INSERT CANCELLATION POLICY HERE]` placeholder
-- Sends contract link to client via email; client portal `/portal/:token` exposes the contract for review + e-signature.
+All using existing shadcn components + design tokens — no raw colors.
 
-## 4. Client Guest Portal (`/portal/:token`)
+## 3. Data layer
 
-Branded to match booking tool (cream bg, green/terracotta accents, same fonts).
-Horizontal stepper at top: **Quote → Contract → Payment Auth → Menu Header → Confirmed**.
+- All `base44.entities.X.{list,filter,get,create,update,delete}` calls → typed Supabase queries.
+- `Event.create` auto-generates `portal_token` (DB default already does this — keep).
+- Pipeline drag-drop updates `status` directly via Supabase mutation.
+- Reminders panel "Send Nudge" reuses your existing `send-reminder` edge function.
+- Reuse existing `MENU_TIERS`/addons from `src/lib/booking-data.ts` — no duplication. Add a small `src/lib/crm-data.ts` with `STATUS_COLORS`, `STATUS_LABELS`, `EVENT_TYPES`, `LOCATIONS`, and a `calculateAdminQuote()` helper (Base44's pricing for admin-created events).
 
-- **Quote** — itemized quote + "This looks right — proceed to contract."
-- **Contract** — render contract, e-signature pad (typed OR drawn via `react-signature-canvas`), submit → marks signed in admin.
-- **Payment Auth** — secure-looking form (cardholder/number/expiry/CVV). Shows non-charge message. **Note:** without Stripe this only records last4 + cardholder name; full PCI tokenization will need Stripe later — I'll flag this clearly in the UI as "secure pre-auth (Stripe integration recommended for production)".
-- **Menu Header** — three cards: upload logo (PNG/JPG → storage), type phrase, or use standard.
-- **Confirmed** — "You're all set!" + summary + Julie's contact (`[INSERT EMAIL]` placeholder).
+## 4. What I'm NOT doing
 
-## 5. Automated Reminder Emails
+- Not touching `/`, `/book/*`, `/spaces`, `/portal/:token`
+- Not porting `ClientPortal` (already covered by existing portal)
+- Not porting `QuoteBuilder`/`MenuHeader`/`ContractSign`/`PaymentAuth` portal components
+- Not porting Base44 login/auth — keeping existing admin auth
 
-- Edge function `send-reminder` invoked from "Send Nudge" buttons (manual) AND from `cron-reminders` running daily that scans events and sends due reminders.
-- Templates: contract-48h, menu-header-10d, cc-auth-14d, with the exact copy you provided.
-- Uses Lovable Email infrastructure (requires email domain — I'll prompt setup if not already configured).
+## 5. Open question
 
-## 6. Booking Flow Integration
+The Base44 `Event` model uses **separate fields** (`antipasti_selections`, etc.) while your booking funnel uses a `menu_selections` JSONB blob. I'll **store both** for now: the new admin form writes both, and the booking funnel keeps writing its blob. We can converge later. Sound good?
 
-A tiny hook at the existing booking-completion step:
-- On final submit, also call `create-event` edge function which inserts an `events` row pre-populated from the booking payload, generates a portal token, sends portal link email to client, and creates an `admin_notifications` row.
+## Order of execution
 
-The booking flow's existing behavior, UI, copy, and validation stay 100% unchanged.
-
-## Open items / placeholders
-
-- **Card processing**: real card tokenization requires Stripe. I'll build the UI + record last4 only, with a clear "Connect Stripe for production" note.
-- **Julie's email address**: `[INSERT EMAIL]` placeholder in portal + contract until you give it.
-- **Cancellation policy text**: `[INSERT CANCELLATION POLICY HERE]` placeholder in contract.
-- **Admin password**: I'll create the admin user via Lovable Auth — you'll set the password on first login.
-- **Email domain**: if not yet configured, I'll prompt you through the one-time setup before reminders can send.
-
-## Build order
-
-1. Database migrations + storage bucket
-2. Hook booking completion → create event + send portal link
-3. Admin auth + protected `/admin` layout
-4. Calendar / Pipeline / Reminders tabs + event drawer
-5. Contract generator + e-signature
-6. Guest portal `/portal/:token` (all 5 stages)
-7. Reminder email templates + nudge function + daily cron
-8. In-app notifications for Julie
-
-Confirm and I'll start with the migration.
+1. Run the migration (you'll approve it)
+2. Add `src/lib/crm-data.ts` + helpers
+3. Build CRM components
+4. Replace `src/pages/Admin.tsx` with the new dashboard
+5. Add `EventDetail` + `EventForm` pages and routes
+6. Smoke-test in preview, confirm RLS works for the admin
