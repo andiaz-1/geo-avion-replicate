@@ -538,6 +538,18 @@ export default function EventDetail() {
                       className="w-28 text-right"
                     />
                   </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="text-sm text-muted-foreground">Venue Fee</label>
+                    <Input
+                      value={venueFee}
+                      onChange={(e) => setVenueFee(e.target.value)}
+                      onBlur={() =>
+                        updateEvent.mutate({ venue_fee: Number(venueFee) || 0 })
+                      }
+                      placeholder="$0.00"
+                      className="w-28 text-right"
+                    />
+                  </div>
                 </div>
               </div>
             </Card>
