@@ -125,25 +125,6 @@ function ContractStage({ event, contract, token, onDone }: any) {
 
   if (!contract) return <Card><p className="text-muted-foreground">Your contract is being prepared. Please check back shortly.</p></Card>;
 
-  const c = contract.content || {};
-
-  const startDraw = (e: any) => {
-    const cv = canvasRef.current!; const r = cv.getBoundingClientRect();
-    drawing.current = true;
-    const x = (e.touches?.[0]?.clientX ?? e.clientX) - r.left;
-    const y = (e.touches?.[0]?.clientY ?? e.clientY) - r.top;
-    const ctx = cv.getContext("2d")!; ctx.beginPath(); ctx.moveTo(x, y);
-  };
-  const moveDraw = (e: any) => {
-    if (!drawing.current) return; e.preventDefault();
-    const cv = canvasRef.current!; const r = cv.getBoundingClientRect();
-    const x = (e.touches?.[0]?.clientX ?? e.clientX) - r.left;
-    const y = (e.touches?.[0]?.clientY ?? e.clientY) - r.top;
-    const ctx = cv.getContext("2d")!; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#2c2c2c"; ctx.lineTo(x, y); ctx.stroke();
-  };
-  const endDraw = () => { drawing.current = false; };
-  const clearDraw = () => { const cv = canvasRef.current!; cv.getContext("2d")!.clearRect(0, 0, cv.width, cv.height); };
-
   const submit = async () => {
     if (!name) return toast.error("Please type your full name");
     let signatureValue: string;
@@ -164,27 +145,8 @@ function ContractStage({ event, contract, token, onDone }: any) {
   return (
     <Card>
       <h2 className="text-xl font-semibold mb-4">Event contract</h2>
-      <div className="bg-muted/30 border border-border rounded-sm p-5 text-sm space-y-2 max-h-96 overflow-auto">
-        <p><strong>Client:</strong> {c.client}</p>
-        <p><strong>Date / Time:</strong> {c.eventDate} {c.eventTime}</p>
-        <p><strong>Location:</strong> {c.location}</p>
-        <p><strong>Guests:</strong> {c.guestCount}</p>
-        <p><strong>Menu:</strong> {c.menuTier} {c.courseChoice && `(${c.courseChoice})`}</p>
-        {c.selections && Object.keys(c.selections).length > 0 && (
-          <div><strong>Selections:</strong>
-            <ul className="list-disc ml-5">{Object.entries(c.selections).map(([k, items]: any) => items?.length ? <li key={k}>{k}: {items.join(", ")}</li> : null)}</ul>
-          </div>
-        )}
-        <p><strong>Beverage:</strong> {c.beverage}</p>
-        {c.addons?.length > 0 && <p><strong>Add-ons:</strong> {c.addons.join(", ")}</p>}
-        <div className="pt-2 border-t border-border">
-          <p>Subtotal: ${c.pricing?.subtotal?.toFixed(2)}</p>
-          <p>Service charge (23%): ${c.pricing?.serviceCharge?.toFixed(2)}</p>
-          <p>Sales tax (8%): ${c.pricing?.salesTax?.toFixed(2)}</p>
-          <p className="font-semibold">Estimated total: ${c.pricing?.grandTotal?.toFixed(2)}</p>
-        </div>
-        <p className="pt-2 italic">{c.paymentTerms}</p>
-        <p className="text-muted-foreground">Cancellation policy: {c.cancellationPolicy}</p>
+      <div className="border border-border rounded-sm max-h-[32rem] overflow-auto">
+        <ContractDocument event={event} />
       </div>
 
       {isSigned ? (
