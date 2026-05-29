@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Settings, Trash2 } from "lucide-react";
+import { Plus, Settings, Trash2, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,16 +86,17 @@ function ContactRow({ contact, eventId, onDelete }: { contact: Contact; eventId:
   });
 
   return (
-    <div className="border border-border rounded-sm p-4 bg-card">
+    <div className="border border-border rounded-md p-4 bg-card">
       <div className="flex items-start justify-between mb-2">
         <div>
-          <div className="font-medium text-foreground">
+          <div className="font-semibold text-foreground uppercase tracking-wide text-sm">
             {contact.first_name} {contact.last_name}
           </div>
-          {contact.position && (
-            <div className="text-xs text-muted-foreground">
+          {(contact.position || contact.company_name) && (
+            <div className="text-xs text-muted-foreground mt-0.5">
               {contact.position}
-              {contact.company_name ? ` · ${contact.company_name}` : ""}
+              {contact.position && contact.company_name ? " · " : ""}
+              {contact.company_name}
             </div>
           )}
         </div>
@@ -118,10 +119,25 @@ function ContactRow({ contact, eventId, onDelete }: { contact: Contact; eventId:
       </div>
 
       {!editing && (
-        <div className="space-y-0.5 text-sm text-muted-foreground">
-          {contact.phone && <div>📞 {contact.phone}</div>}
-          {contact.email_1 && <div>✉️ {contact.email_1}</div>}
-          {contact.email_2 && <div>✉️ {contact.email_2}</div>}
+        <div className="space-y-1 text-sm text-muted-foreground mt-2">
+          {contact.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5" />
+              <span>{contact.phone}</span>
+            </div>
+          )}
+          {contact.email_1 && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5" />
+              <span>{contact.email_1}</span>
+            </div>
+          )}
+          {contact.email_2 && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5" />
+              <span>{contact.email_2}</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -190,19 +206,27 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
   });
 
   return (
-    <div className="bg-card border border-border rounded-sm p-6">
-      <h3 className="font-semibold mb-4">Contacts</h3>
+    <div className="bg-card border border-border rounded-md p-6">
+      <h3 className="font-semibold mb-4 text-foreground">Contacts</h3>
       <div className="space-y-3">
         {contacts.map((c, i) => (
           <div key={c.id}>
-            {i === 0 && <div className="text-xs uppercase text-muted-foreground mb-1">Main Contact</div>}
-            {i === 1 && <div className="text-xs uppercase text-muted-foreground mb-1 mt-3">Additional Contacts</div>}
+            {i === 0 && (
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                Main Contact
+              </div>
+            )}
+            {i === 1 && (
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 mt-4">
+                Additional Contacts
+              </div>
+            )}
             <ContactRow contact={c} eventId={eventId} onDelete={() => deleteContact.mutate(c.id)} />
           </div>
         ))}
 
         {adding && (
-          <div className="border border-border rounded-sm p-4 bg-muted/40 space-y-3">
+          <div className="border border-border rounded-md p-4 bg-muted/40 space-y-3">
             <ContactFields contact={newContact} onChange={setNewContact} />
             <div className="flex gap-2">
               <Button
@@ -227,7 +251,12 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
         )}
 
         {!adding && (
-          <Button variant="outline" size="sm" onClick={() => setAdding(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAdding(true)}
+            className="w-full border-dashed mt-2"
+          >
             <Plus className="w-4 h-4 mr-1" />
             {contacts.length === 0 ? "Add Main Contact" : "Add Another Contact"}
           </Button>

@@ -84,24 +84,20 @@ function Card({
 
 function StatusStep({
   label,
-  active,
   done,
 }: {
   label: string;
-  active?: boolean;
   done?: boolean;
 }) {
   return (
     <div
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border whitespace-nowrap ${
         done
-          ? "bg-primary text-primary-foreground border-primary"
-          : active
-          ? "bg-primary/10 text-primary border-primary/30"
+          ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800"
           : "bg-muted text-muted-foreground border-border"
       }`}
     >
-      {done && <CheckCircle2 className="w-3 h-3" />}
+      {done ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3 opacity-50" />}
       {label}
     </div>
   );
@@ -268,7 +264,7 @@ export default function EventDetail() {
 
         {/* Status progress */}
         <div className="flex flex-wrap items-center gap-3">
-          <StatusStep label={STATUS_LABELS[event.status] || event.status} done={quoteSent} />
+          <StatusStep label={quoteSent ? "Quote sent" : "Quote: not sent"} done={quoteSent} />
           <div className="h-px w-6 bg-border" />
           <StatusStep
             label={contractSent ? "Contract sent" : "Contract: not sent"}
@@ -281,10 +277,29 @@ export default function EventDetail() {
           />
           <div className="h-px w-6 bg-border" />
           <StatusStep
-            label={menuMade ? "Menu selected" : "Menu selections: not made yet"}
+            label={menuMade ? "Menu selected" : "Menu: not selected"}
             done={menuMade}
           />
         </div>
+
+        {/* Reminder when client has completed contract + CC */}
+        {contractSent && ccSubmitted && (
+          <div className="flex items-start gap-3 rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 p-4">
+            <div className="text-amber-600 dark:text-amber-400 mt-0.5">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div className="text-sm">
+              <p className="font-semibold text-amber-900 dark:text-amber-200">
+                Reminder: Enter this booking in your preferred system
+              </p>
+              <p className="text-amber-800 dark:text-amber-300/90 mt-0.5">
+                The client has signed the contract and submitted their credit card authorization.
+                Don't forget to log this booking in your POS / reservation system (e.g. Toast,
+                OpenTable, Tripleseat) to keep everything in sync.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LEFT */}
