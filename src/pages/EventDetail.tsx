@@ -401,23 +401,19 @@ export default function EventDetail() {
               </p>
             </Card>
 
-            <Card
-              title="Discussions"
-              action={
-                <Button size="sm" className="bg-primary text-primary-foreground">
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Create New Discussion
-                </Button>
-              }
-            >
-              <div className="relative mb-3">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search guest discussions"
-                  className="pl-9"
-                />
-              </div>
-              <Discussions eventId={eventId!} />
-            </Card>
+            <Discussions
+              eventId={eventId!}
+              audience="client"
+              title="Client Discussion"
+              description="Conversations visible to the client through the portal."
+            />
+
+            <Discussions
+              eventId={eventId!}
+              audience="staff"
+              title="Staff Discussion"
+              description="Internal notes between staff — never shown to the client."
+            />
           </div>
 
           {/* RIGHT */}
