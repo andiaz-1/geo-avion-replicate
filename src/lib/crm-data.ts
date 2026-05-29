@@ -118,7 +118,13 @@ export function calculateAdminQuote(data: QuoteFields): AdminQuote {
   const bev = BEVERAGE_PACKAGES.find((b) => b.value === data.beverage_package);
   const bev_cost = bev ? bev.price * guests : 0;
 
-  const addon_cost = (data.addons || []).reduce((sum, a) => {
+  const raw = data.addons as unknown;
+  const addonsArr: string[] = Array.isArray(raw)
+    ? (raw as string[])
+    : raw && typeof raw === "object"
+    ? Object.keys(raw as Record<string, unknown>).filter((k) => (raw as Record<string, unknown>)[k])
+    : [];
+  const addon_cost = addonsArr.reduce((sum, a) => {
     const addon = ADDONS.find((x) => x.value === a);
     return sum + (addon?.price || 0);
   }, 0);
