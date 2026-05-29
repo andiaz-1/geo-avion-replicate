@@ -5,6 +5,7 @@ interface Event {
   client_first_name?: string | null;
   client_last_name?: string | null;
   full_name?: string | null;
+  company?: string | null;
   company_name?: string | null;
   event_date?: string | null;
   event_time?: string | null;
@@ -17,7 +18,7 @@ interface Event {
   entree_selections?: string[] | null;
   dessert_selections?: string[] | null;
   beverage_package?: string | null;
-  addons?: string[] | null;
+  addons?: unknown;
   subtotal?: number | null;
   service_charge?: number | null;
   tax_amount?: number | null;
@@ -65,7 +66,15 @@ function SigLine({ label, value }: { label: string; value: React.ReactNode }) {
 export default function ContractDocument({ event }: { event: Event }) {
   const tier = event.menu_tier ? MENU_TIERS[event.menu_tier] : undefined;
   const bev = BEVERAGE_PACKAGES.find((b) => b.value === event.beverage_package);
-  const addonLabels = (event.addons || []).map((a) => ADDONS.find((x) => x.value === a)?.label || a);
+  const rawAddons = event.addons;
+  const addonsArr: string[] = Array.isArray(rawAddons)
+    ? (rawAddons as string[])
+    : rawAddons && typeof rawAddons === "object"
+    ? Object.keys(rawAddons as Record<string, unknown>).filter(
+        (k) => (rawAddons as Record<string, unknown>)[k],
+      )
+    : [];
+  const addonLabels = addonsArr.map((a) => ADDONS.find((x) => x.value === a)?.label || a);
   const signedAt = event.contract_signed_at || event.contract_signed_date;
 
   return (
@@ -79,7 +88,9 @@ export default function ContractDocument({ event }: { event: Event }) {
         <Section title="Event Details">
           <div className="grid grid-cols-2 gap-x-8 gap-y-1">
             <Detail label="Client" value={displayName(event as never)} />
-            {event.company_name && <Detail label="Company" value={event.company_name} />}
+            {(event.company || event.company_name) && (
+              <Detail label="Company" value={event.company || event.company_name} />
+            )}
             <Detail
               label="Date"
               value={event.event_date ? format(new Date(event.event_date + "T12:00:00"), "MMMM d, yyyy") : "TBD"}
