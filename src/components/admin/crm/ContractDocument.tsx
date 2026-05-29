@@ -88,7 +88,9 @@ export default function ContractDocument({ event }: { event: Event }) {
         <Section title="Event Details">
           <div className="grid grid-cols-2 gap-x-8 gap-y-1">
             <Detail label="Client" value={displayName(event as never)} />
-            {event.company_name && <Detail label="Company" value={event.company_name} />}
+            {(event.company || event.company_name) && (
+              <Detail label="Company" value={event.company || event.company_name} />
+            )}
             <Detail
               label="Date"
               value={event.event_date ? format(new Date(event.event_date + "T12:00:00"), "MMMM d, yyyy") : "TBD"}
