@@ -50,6 +50,7 @@ export default function Portal() {
   if (!data) return <div className="min-h-screen bg-background flex items-center justify-center text-secondary">Invalid or expired link.</div>;
 
   const { event, contract, paymentAuth, menuHeader } = data;
+  const isLocked = event.portal_unlocked === false;
 
   return (
     <div className="min-h-screen bg-background">
@@ -61,26 +62,92 @@ export default function Portal() {
       </header>
 
       <div className="max-w-3xl mx-auto px-6 py-8">
-        {/* Stepper */}
-        <div className="flex items-center justify-between mb-10">
-          {STAGES.map((label, i) => (
-            <div key={label} className="flex-1 flex items-center">
-              <div className="flex flex-col items-center flex-1">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${i < stage ? "bg-primary border-primary text-primary-foreground" : i === stage ? "border-secondary text-secondary" : "border-border text-muted-foreground"}`}>
-                  {i < stage ? <Check className="h-4 w-4" /> : <Circle className="h-3 w-3 fill-current" />}
+        {isLocked ? (
+          <PendingState event={event} />
+        ) : (
+          <>
+            {/* Stepper */}
+            <div className="flex items-center justify-between mb-10">
+              {STAGES.map((label, i) => (
+                <div key={label} className="flex-1 flex items-center">
+                  <div className="flex flex-col items-center flex-1">
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${i < stage ? "bg-primary border-primary text-primary-foreground" : i === stage ? "border-secondary text-secondary" : "border-border text-muted-foreground"}`}>
+                      {i < stage ? <Check className="h-4 w-4" /> : <Circle className="h-3 w-3 fill-current" />}
+                    </div>
+                    <span className={`text-xs mt-2 text-center ${i <= stage ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
+                  </div>
+                  {i < STAGES.length - 1 && <div className={`h-px flex-1 ${i < stage ? "bg-primary" : "bg-border"}`} />}
                 </div>
-                <span className={`text-xs mt-2 text-center ${i <= stage ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
-              </div>
-              {i < STAGES.length - 1 && <div className={`h-px flex-1 ${i < stage ? "bg-primary" : "bg-border"}`} />}
+              ))}
             </div>
-          ))}
-        </div>
 
-        {stage === 0 && <QuoteStage event={event} onAdvance={() => setStage(1)} />}
-        {stage === 1 && <ContractStage event={event} contract={contract} token={token!} onDone={refresh} />}
-        {stage === 2 && <PaymentStage token={token!} onDone={refresh} />}
-        {stage === 3 && <MenuHeaderStage token={token!} onDone={refresh} />}
-        {stage === 4 && <ConfirmedStage event={event} />}
+            {stage === 0 && <QuoteStage event={event} onAdvance={() => setStage(1)} />}
+            {stage === 1 && <ContractStage event={event} contract={contract} token={token!} onDone={refresh} />}
+            {stage === 2 && <PaymentStage token={token!} onDone={refresh} />}
+            {stage === 3 && <MenuHeaderStage token={token!} onDone={refresh} />}
+            {stage === 4 && <ConfirmedStage event={event} />}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PendingState({ event }: any) {
+  const firstName = (event.client_first_name || event.full_name || "there").split(" ")[0];
+  const q = event.quote || {};
+  return (
+    <div className="space-y-6">
+      <Card>
+        <div className="text-center py-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-secondary/15 text-secondary mb-4">
+            <Circle className="h-6 w-6 fill-current animate-pulse" />
+          </div>
+          <h2 className="text-2xl font-['Market_Deco'] text-foreground mb-3">Hi {firstName} —</h2>
+          <p className="text-foreground max-w-lg mx-auto leading-relaxed">
+            Julie is reviewing your date. You'll receive an email the moment your portal is ready.
+          </p>
+          <p className="text-muted-foreground mt-3 text-sm max-w-lg mx-auto">
+            In the meantime, take a look at your quote summary below.
+          </p>
+        </div>
+      </Card>
+
+      <Card>
+        <h3 className="text-lg font-semibold mb-4">Your quote</h3>
+        <dl className="text-sm space-y-1.5">
+          <Row k="Event date" v={`${event.event_date || "—"} ${event.event_time ? `· ${event.event_time}` : ""}`} />
+          <Row k="Guests" v={String(event.guest_count)} />
+          <Row k="Menu" v={`${event.menu_tier || "—"}`} />
+          <Row k="Per person" v={q.menuPerPerson ? `$${q.menuPerPerson}` : "—"} />
+          <Row k="Beverage" v={event.beverage_strategy === "open-bar" ? `Open bar — ${event.bar_type} (${event.bar_duration})` : event.beverage_strategy === "consumption" ? "On consumption" : "—"} />
+          <div className="pt-3 border-t border-border mt-3" />
+          <Row k="Subtotal" v={`$${(q.subtotal || 0).toFixed(2)}`} />
+          <Row k="Service charge (23%)" v={`$${(q.serviceCharge || 0).toFixed(2)}`} />
+          <Row k="Sales tax (8%)" v={`$${(q.salesTax || 0).toFixed(2)}`} />
+          <Row k="Estimated total" v={`$${(q.grandTotal || 0).toFixed(2)}`} bold />
+        </dl>
+      </Card>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <a
+          href={MENU_EXAMPLES_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="block bg-card border border-border rounded-sm p-5 hover:border-primary transition-colors"
+        >
+          <h4 className="font-semibold mb-1">View menu examples</h4>
+          <p className="text-xs text-muted-foreground">See customized menus we've designed for past events.</p>
+        </a>
+        <a
+          href={GOOGLE_REVIEW_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="block bg-card border border-border rounded-sm p-5 hover:border-primary transition-colors"
+        >
+          <h4 className="font-semibold mb-1">Read our reviews</h4>
+          <p className="text-xs text-muted-foreground">Hear what other hosts have said on Google.</p>
+        </a>
       </div>
     </div>
   );
