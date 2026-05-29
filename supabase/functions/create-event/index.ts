@@ -75,6 +75,12 @@ Deno.serve(async (req) => {
       bringing_cake: !!body.bringingCake,
       bringing_decor: !!body.bringingDecor,
       quote: body.quote || {},
+      // Weekday submissions auto-unlock the portal. Weekend leads (Sat/Sun) stay
+      // locked so Julie can review the date before the client proceeds.
+      portal_unlocked: (() => {
+        const d = new Date().getDay(); // 0=Sun, 6=Sat
+        return d !== 0 && d !== 6;
+      })(),
     };
 
     const { data: event, error } = await admin.from('events').insert(row).select().single();
