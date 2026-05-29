@@ -5,9 +5,6 @@ import { displayName } from "@/lib/crm-data";
 
 interface EventLike {
   id: string;
-  client_first_name?: string | null;
-  client_last_name?: string | null;
-  full_name?: string | null;
   company_name?: string | null;
   company?: string | null;
   event_date?: string | null;
@@ -17,6 +14,7 @@ interface EventLike {
   event_type?: string | null;
   estimated_total?: number | null;
   quote?: { grandTotal?: number } | null;
+  [k: string]: unknown;
 }
 
 export default function EventCard({ event }: { event: EventLike }) {
