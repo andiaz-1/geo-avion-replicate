@@ -27,18 +27,23 @@ export default function EventFormPage() {
 
   const mutation = useMutation({
     mutationFn: async (data: EventFormValues) => {
+      const { company_name, location, ...rest } = data;
       const payload = {
-        ...data,
+        ...rest,
+        company: company_name,
+        venue: location,
         full_name: `${data.client_first_name} ${data.client_last_name}`.trim(),
       };
       if (isEdit) {
-        const { error } = await supabase.from("events").update(payload).eq("id", eventId!);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await supabase.from("events").update(payload as any).eq("id", eventId!);
         if (error) throw error;
         return { id: eventId! };
       }
       const { data: created, error } = await supabase
         .from("events")
-        .insert({ ...payload, status: "new_lead" as never })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert({ ...payload, status: "new_lead" } as any)
         .select("id")
         .single();
       if (error) throw error;
@@ -67,7 +72,7 @@ export default function EventFormPage() {
         </Button>
         <h1 className="font-display text-2xl font-semibold mb-6">{isEdit ? "Edit Event" : "New Event"}</h1>
         <EventForm
-          defaultValues={event || {}}
+          defaultValues={(event || {}) as Partial<EventFormValues>}
           onSubmit={(d) => mutation.mutate(d)}
           isSubmitting={mutation.isPending}
         />

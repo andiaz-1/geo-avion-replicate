@@ -43,7 +43,7 @@ export default function EventDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: event, isLoading } = useQuery({
+  const { data: eventData, isLoading } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async () => {
       const { data, error } = await supabase.from("events").select("*").eq("id", eventId!).single();
@@ -52,10 +52,13 @@ export default function EventDetail() {
     },
     enabled: !!eventId,
   });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const event = eventData as any;
 
   const updateEvent = useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      const { error } = await supabase.from("events").update(data).eq("id", eventId!);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await supabase.from("events").update(data as any).eq("id", eventId!);
       if (error) throw error;
     },
     onSuccess: () => {
