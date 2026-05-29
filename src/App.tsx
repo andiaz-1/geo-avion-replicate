@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound.tsx";
 import Admin from "./pages/Admin.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import Portal from "./pages/Portal.tsx";
+import EventDetail from "./pages/EventDetail.tsx";
+import EventFormPage from "./pages/EventFormPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,9 @@ const App = () => (
           <Route path="/spaces" element={<Spaces />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/events/new" element={<EventFormPage />} />
+          <Route path="/admin/events/:eventId" element={<EventDetail />} />
+          <Route path="/admin/events/:eventId/edit" element={<EventFormPage />} />
           <Route path="/portal/:token" element={<Portal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
