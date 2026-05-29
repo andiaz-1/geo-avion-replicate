@@ -31,7 +31,7 @@ interface Event {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="font-display font-semibold text-base mb-2">{title}</h3>
+      <h3 className="font-semibold text-base mb-2" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>{title}</h3>
       {children}
     </section>
   );
