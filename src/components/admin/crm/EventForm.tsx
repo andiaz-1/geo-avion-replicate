@@ -29,6 +29,7 @@ export interface EventFormValues {
   event_date: string;
   event_time: string;
   location: string;
+  area: string;
   guest_count: number;
   event_type: string;
   menu_tier: string;
