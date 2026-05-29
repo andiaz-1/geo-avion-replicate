@@ -62,6 +62,7 @@ const EMPTY: EventFormValues = {
   event_date: "",
   event_time: "",
   location: "",
+  area: "",
   guest_count: 0,
   event_type: "",
   menu_tier: "",
