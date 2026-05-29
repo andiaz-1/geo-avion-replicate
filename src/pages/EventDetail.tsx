@@ -84,24 +84,20 @@ function Card({
 
 function StatusStep({
   label,
-  active,
   done,
 }: {
   label: string;
-  active?: boolean;
   done?: boolean;
 }) {
   return (
     <div
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border whitespace-nowrap ${
         done
-          ? "bg-primary text-primary-foreground border-primary"
-          : active
-          ? "bg-primary/10 text-primary border-primary/30"
+          ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800"
           : "bg-muted text-muted-foreground border-border"
       }`}
     >
-      {done && <CheckCircle2 className="w-3 h-3" />}
+      {done ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3 opacity-50" />}
       {label}
     </div>
   );
