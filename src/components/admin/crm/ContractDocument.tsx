@@ -31,7 +31,7 @@ interface Event {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="font-display font-semibold text-base mb-2">{title}</h3>
+      <h3 className="font-semibold text-base mb-2" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>{title}</h3>
       {children}
     </section>
   );
@@ -78,9 +78,12 @@ export default function ContractDocument({ event }: { event: Event }) {
   const signedAt = event.contract_signed_at || event.contract_signed_date;
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-card text-foreground text-sm leading-relaxed print:p-4">
+    <div
+      className="max-w-3xl mx-auto p-8 bg-card text-foreground text-sm leading-relaxed print:p-4"
+      style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+    >
       <div className="text-center mb-8 border-b border-border pb-6">
-        <h1 className="font-display text-2xl font-semibold text-primary">Salumeria 104</h1>
+        <h1 className="text-2xl font-semibold text-primary" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>Salumeria 104</h1>
         <p className="text-muted-foreground mt-1">Private Event Agreement</p>
       </div>
 
@@ -153,7 +156,7 @@ export default function ContractDocument({ event }: { event: Event }) {
         </Section>
 
         <div className="border-t border-border pt-6 mt-8">
-          <h3 className="font-display font-semibold mb-4">Agreement</h3>
+          <h3 className="font-semibold mb-4" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>Agreement</h3>
           <p className="mb-6">
             By signing below, I agree to the terms outlined in this contract and authorize Salumeria 104 to charge the card
             on file for the final event total.
@@ -163,7 +166,7 @@ export default function ContractDocument({ event }: { event: Event }) {
               label="Client Signature"
               value={
                 event.signature_name ? (
-                  <span className="font-display text-lg italic">{event.signature_name}</span>
+                  <span className="text-lg italic" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>{event.signature_name}</span>
                 ) : null
               }
             />
