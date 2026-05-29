@@ -507,10 +507,38 @@ export default function EventDetail() {
                     <DialogHeader>
                       <DialogTitle>Event Contract</DialogTitle>
                     </DialogHeader>
-                    <ContractDocument event={event} />
-                    <div className="flex gap-2 justify-end mt-4">
-                      <Button onClick={() => window.print()} variant="outline">
-                        Print
+                    <div ref={contractRef}>
+                      <ContractDocument event={event} />
+                    </div>
+                    <div className="flex flex-wrap gap-2 justify-end mt-4 print:hidden">
+                      <Button
+                        onClick={() => window.print()}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Printer className="w-4 h-4 mr-1" /> Print
+                      </Button>
+                      <Button
+                        onClick={handleDownloadPdf}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Download className="w-4 h-4 mr-1" /> Download PDF
+                      </Button>
+                      <Button
+                        onClick={handleSendToClient}
+                        variant="outline"
+                        size="sm"
+                        disabled={!event.email}
+                      >
+                        <Mail className="w-4 h-4 mr-1" /> Send to Client
+                      </Button>
+                      <Button
+                        onClick={handleSendToTeam}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Users className="w-4 h-4 mr-1" /> Send to Team Member
                       </Button>
                     </div>
                   </DialogContent>
