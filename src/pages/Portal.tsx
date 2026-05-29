@@ -9,7 +9,9 @@ import { Check, Circle } from "lucide-react";
 import { toast } from "sonner";
 import ContractDocument from "@/components/admin/crm/ContractDocument";
 
-const COORDINATOR_EMAIL = "[INSERT EMAIL]";
+const COORDINATOR_EMAIL = "julie@salumeria104.com";
+const MENU_EXAMPLES_URL = "https://salumeria104.com/private-events#menus";
+const GOOGLE_REVIEW_URL = "https://g.page/r/salumeria104weston/review";
 const STAGES = ["Quote", "Contract", "Payment Auth", "Menu Header", "Confirmed"];
 
 function call(action: string, token: string, extra: any = {}) {
