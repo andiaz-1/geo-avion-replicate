@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { Search, MessageSquare, X } from "lucide-react";
+import { Search, MessageSquare, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,9 +17,22 @@ interface Discussion {
   message_count: number;
   created_at: string;
   updated_at: string;
+  audience?: string | null;
 }
 
-export default function Discussions({ eventId }: { eventId: string }) {
+interface DiscussionsProps {
+  eventId: string;
+  audience?: "client" | "staff";
+  title?: string;
+  description?: string;
+}
+
+export default function Discussions({
+  eventId,
+  audience = "client",
+  title = "Discussions",
+  description,
+}: DiscussionsProps) {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
@@ -28,12 +41,14 @@ export default function Discussions({ eventId }: { eventId: string }) {
   const [authorName, setAuthorName] = useState("");
 
   const { data: discussions = [] } = useQuery({
-    queryKey: ["discussions", eventId],
+    queryKey: ["discussions", eventId, audience],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("discussions")
         .select("*")
         .eq("event_id", eventId)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .eq("audience" as any, audience)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data || []) as Discussion[];
@@ -41,10 +56,19 @@ export default function Discussions({ eventId }: { eventId: string }) {
   });
 
   const createDiscussion = useMutation({
-    mutationFn: async ({ title, message, author }: { title: string; message: string; author: string }) => {
+    mutationFn: async ({
+      title,
+      message,
+      author,
+    }: {
+      title: string;
+      message: string;
+      author: string;
+    }) => {
       const { data: disc, error: e1 } = await supabase
         .from("discussions")
-        .insert({ event_id: eventId, title, author_name: author, message_count: 1 })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert({ event_id: eventId, title, author_name: author, message_count: 1, audience } as any)
         .select()
         .single();
       if (e1) throw e1;
@@ -53,11 +77,13 @@ export default function Discussions({ eventId }: { eventId: string }) {
         event_id: eventId,
         body: message,
         author_name: author,
-      });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        audience,
+      } as any);
       if (e2) throw e2;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["discussions", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["discussions", eventId, audience] });
       setShowCreate(false);
       setNewTitle("");
       setNewMessage("");
@@ -74,18 +100,22 @@ export default function Discussions({ eventId }: { eventId: string }) {
   );
 
   return (
-    <div className="bg-card border border-border rounded-sm p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold">Discussions</h3>
-        <Button size="sm" onClick={() => setShowCreate(true)}>
+    <div className="bg-card border border-border rounded-md p-5">
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="font-semibold text-foreground">{title}</h3>
+        <Button size="sm" className="bg-primary text-primary-foreground" onClick={() => setShowCreate(true)}>
+          <Plus className="w-3.5 h-3.5 mr-1" />
           Create New Discussion
         </Button>
       </div>
+      {description && (
+        <p className="text-xs text-muted-foreground mb-3">{description}</p>
+      )}
 
       {showCreate && (
-        <div className="mb-4 p-4 border border-border rounded-sm bg-muted/40 space-y-3">
+        <div className="my-4 p-4 border border-border rounded-md bg-muted/40 space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-medium text-sm">New Discussion</h4>
+            <h4 className="font-medium text-sm">New {audience === "staff" ? "Staff" : "Client"} Discussion</h4>
             <button
               onClick={() => setShowCreate(false)}
               className="text-muted-foreground hover:text-foreground"
@@ -116,23 +146,23 @@ export default function Discussions({ eventId }: { eventId: string }) {
         </div>
       )}
 
-      <div className="mb-3">
+      <div className="mt-3 mb-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             className="pl-9"
-            placeholder="Search discussions"
+            placeholder={`Search ${audience} discussions`}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="border border-border rounded-sm overflow-hidden">
+      <div className="border border-border rounded-md overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground text-sm">
             <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            No discussions yet
+            No {audience} discussions yet
           </div>
         ) : (
           filtered.map((disc, i) => (
