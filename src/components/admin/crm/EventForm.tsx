@@ -219,7 +219,13 @@ export default function EventForm({ defaultValues = {}, onSubmit, isSubmitting }
             <Input value={form.event_time} onChange={(e) => set("event_time", e.target.value)} placeholder="e.g. 7:00 PM" />
           </Field>
           <Field label="Location">
-            <Select value={form.location} onValueChange={(v) => set("location", v)}>
+            <Select
+              value={form.location}
+              onValueChange={(v) => {
+                set("location", v);
+                set("area", "");
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
@@ -227,6 +233,24 @@ export default function EventForm({ defaultValues = {}, onSubmit, isSubmitting }
                 {LOCATIONS.map((l) => (
                   <SelectItem key={l.value} value={l.value}>
                     {l.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Area">
+            <Select
+              value={form.area}
+              onValueChange={(v) => set("area", v)}
+              disabled={!form.location}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={form.location ? "Select area" : "Pick a location first"} />
+              </SelectTrigger>
+              <SelectContent>
+                {areasFor(form.location).map((a) => (
+                  <SelectItem key={a} value={a}>
+                    {a}
                   </SelectItem>
                 ))}
               </SelectContent>
