@@ -168,6 +168,7 @@ function ContactRow({ contact, eventId, onDelete }: { contact: Contact; eventId:
 export default function ContactsCard({ eventId }: { eventId: string }) {
   const queryClient = useQueryClient();
   const [newContact, setNewContact] = useState<ContactDraft>(EMPTY);
+  const [addingSecond, setAddingSecond] = useState(false);
 
   const { data: contacts = [] } = useQuery({
     queryKey: ["contacts", eventId],
@@ -190,6 +191,7 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts", eventId] });
       setNewContact(EMPTY);
+      setAddingSecond(false);
       toast.success("Contact added");
     },
     onError: (e: Error) => toast.error(e.message),
@@ -202,6 +204,9 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["contacts", eventId] }),
   });
+
+  const hasFirstContact = contacts.length > 0;
+  const hasSecondContact = contacts.length > 1;
 
   return (
     <div className="bg-card border border-border rounded-md p-6">
@@ -216,25 +221,75 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
             )}
             {i === 1 && (
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 mt-4">
-                Additional Contacts
+                Second Contact
+              </div>
+            )}
+            {i >= 2 && (
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 mt-4">
+                Additional Contact
               </div>
             )}
             <ContactRow contact={c} eventId={eventId} onDelete={() => deleteContact.mutate(c.id)} />
           </div>
         ))}
 
-        <div className="border border-border rounded-md p-4 bg-muted/40 space-y-3">
-          <ContactFields contact={newContact} onChange={setNewContact} />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={() => createContact.mutate(newContact)}
-              disabled={createContact.isPending || !newContact.first_name}
-            >
-              Save Contact
-            </Button>
+        {!hasFirstContact && (
+          <div className="border border-border rounded-md p-4 bg-muted/40 space-y-3">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+              Main Contact
+            </div>
+            <ContactFields contact={newContact} onChange={setNewContact} />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => createContact.mutate(newContact)}
+                disabled={createContact.isPending || !newContact.first_name}
+              >
+                Save Contact
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {hasFirstContact && !hasSecondContact && !addingSecond && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setAddingSecond(true)}
+            className="mt-2"
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Add 2nd Contact
+          </Button>
+        )}
+
+        {addingSecond && (
+          <div className="border border-border rounded-md p-4 bg-muted/40 space-y-3 mt-2">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+              Second Contact
+            </div>
+            <ContactFields contact={newContact} onChange={setNewContact} />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => createContact.mutate(newContact)}
+                disabled={createContact.isPending || !newContact.first_name}
+              >
+                Save Contact
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setAddingSecond(false);
+                  setNewContact(EMPTY);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
