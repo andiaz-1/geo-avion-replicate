@@ -524,6 +524,41 @@ export default function EventDetail() {
                       className="w-28 text-right"
                     />
                   </div>
+                  {(() => {
+                    const fnbMinNum = Number(fnbMin) || 0;
+                    if (fnbMinNum <= 0 || fnbMinNum <= subtotal) return null;
+                    const met = subtotal;
+                    const unmet = fnbMinNum - subtotal;
+                    const unmetService = unmet * 0.23;
+                    const unmetTax = unmet * 0.08;
+                    const unmetTotal = unmet + unmetService + unmetTax;
+                    const fmt = (n: number) =>
+                      `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    return (
+                      <div className="mt-2 rounded-md border border-border bg-muted/40 p-3 space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Met</span>
+                          <span>{fmt(met)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Unmet</span>
+                          <span>{fmt(unmet)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Service (23%) on unmet</span>
+                          <span>{fmt(unmetService)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Tax (8%) on unmet</span>
+                          <span>{fmt(unmetTax)}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold border-t border-border pt-1">
+                          <span>Unmet charge total</span>
+                          <span>{fmt(unmetTotal)}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <div className="flex items-center justify-between gap-3">
                     <label className="text-sm text-muted-foreground">
                       Deposit Amount
