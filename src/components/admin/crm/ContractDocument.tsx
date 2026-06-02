@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { MENU_TIERS, BEVERAGE_PACKAGES, ADDONS, displayName } from "@/lib/crm-data";
 
 interface Event {
+  id?: string;
   client_first_name?: string | null;
   client_last_name?: string | null;
   full_name?: string | null;
