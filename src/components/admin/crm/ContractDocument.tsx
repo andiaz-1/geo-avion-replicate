@@ -126,18 +126,8 @@ export default function ContractDocument({ event }: { event: Event }) {
       </div>
 
       {/* ACCOUNT / SALES MANAGER */}
-      <div className="grid grid-cols-2 gap-6 text-xs">
-        <div className="space-y-1">
-          <KV label="Account" value={event.company || event.company_name || displayName(event as never)} />
-          <KV label="Contact" value={displayName(event as never)} />
-          <KV label="Email" value={event.email} />
-          <KV label="Phone" value={event.phone} />
-        </div>
-        <div className="space-y-1">
-          <KV label="Sales Manager" value="Salumeria 104 Events Team" />
-          <KV label="Email" value="events@salumeria104.com" />
-        </div>
-      </div>
+      <ContactsBlock event={event} />
+
 
       {/* EVENT SUMMARY */}
       <SectionTitle>Event Summary</SectionTitle>
