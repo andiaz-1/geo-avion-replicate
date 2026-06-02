@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Settings, Trash2, Phone, Mail } from "lucide-react";
+import { Settings, Trash2, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -167,7 +167,6 @@ function ContactRow({ contact, eventId, onDelete }: { contact: Contact; eventId:
 
 export default function ContactsCard({ eventId }: { eventId: string }) {
   const queryClient = useQueryClient();
-  const [adding, setAdding] = useState(false);
   const [newContact, setNewContact] = useState<ContactDraft>(EMPTY);
 
   const { data: contacts = [] } = useQuery({
@@ -190,7 +189,6 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts", eventId] });
-      setAdding(false);
       setNewContact(EMPTY);
       toast.success("Contact added");
     },
@@ -225,42 +223,18 @@ export default function ContactsCard({ eventId }: { eventId: string }) {
           </div>
         ))}
 
-        {adding && (
-          <div className="border border-border rounded-md p-4 bg-muted/40 space-y-3">
-            <ContactFields contact={newContact} onChange={setNewContact} />
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => createContact.mutate(newContact)}
-                disabled={createContact.isPending || !newContact.first_name}
-              >
-                Save Contact
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setAdding(false);
-                  setNewContact(EMPTY);
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
+        <div className="border border-border rounded-md p-4 bg-muted/40 space-y-3">
+          <ContactFields contact={newContact} onChange={setNewContact} />
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={() => createContact.mutate(newContact)}
+              disabled={createContact.isPending || !newContact.first_name}
+            >
+              Save Contact
+            </Button>
           </div>
-        )}
-
-        {!adding && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAdding(true)}
-            className="w-full border-dashed mt-2"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            {contacts.length === 0 ? "Add Main Contact" : "Add Another Contact"}
-          </Button>
-        )}
+        </div>
       </div>
     </div>
   );
