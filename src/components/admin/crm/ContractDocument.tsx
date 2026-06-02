@@ -390,3 +390,167 @@ export default function ContractDocument({ event }: { event: Event }) {
     </div>
   );
 }
+
+interface ContactRecord {
+  id: string;
+  first_name: string;
+  last_name?: string | null;
+  email_1?: string | null;
+  phone?: string | null;
+  company_name?: string | null;
+  position?: string | null;
+}
+
+function ContactDisplay({ name, company, email, phone, position }: {
+  name: string;
+  company?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  position?: string | null;
+}) {
+  return (
+    <div className="space-y-1">
+      <KV label="Account" value={company || name} />
+      <KV label="Contact" value={position ? `${name} (${position})` : name} />
+      <KV label="Email" value={email} />
+      <KV label="Phone" value={phone} />
+    </div>
+  );
+}
+
+function ContactsBlock({ event }: { event: Event }) {
+  const queryClient = useQueryClient();
+  const [adding, setAdding] = useState(false);
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    email_1: "",
+    phone: "",
+    company_name: "",
+    position: "",
+  });
+
+  const { data: contacts = [] } = useQuery({
+    queryKey: ["contacts", event.id],
+    enabled: !!event.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("event_contacts")
+        .select("*")
+        .eq("event_id", event.id!)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data || []) as ContactRecord[];
+    },
+  });
+
+  const createContact = useMutation({
+    mutationFn: async () => {
+      if (!event.id) throw new Error("Missing event id");
+      const { error } = await supabase
+        .from("event_contacts")
+        .insert({ ...form, event_id: event.id });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contacts", event.id] });
+      setForm({ first_name: "", last_name: "", email_1: "", phone: "", company_name: "", position: "" });
+      setAdding(false);
+      toast.success("Second contact added");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  // Build primary + secondary
+  const primary = contacts[0];
+  const secondary = contacts[1];
+
+  const primaryName = primary
+    ? `${primary.first_name || ""} ${primary.last_name || ""}`.trim()
+    : displayName(event as never);
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-6 text-xs">
+        <ContactDisplay
+          name={primaryName}
+          company={primary?.company_name || event.company || event.company_name}
+          email={primary?.email_1 || event.email}
+          phone={primary?.phone || event.phone}
+          position={primary?.position}
+        />
+        {secondary ? (
+          <ContactDisplay
+            name={`${secondary.first_name || ""} ${secondary.last_name || ""}`.trim()}
+            company={secondary.company_name}
+            email={secondary.email_1}
+            phone={secondary.phone}
+            position={secondary.position}
+          />
+        ) : (
+          <div className="space-y-1">
+            <KV label="Sales Manager" value="Salumeria 104 Events Team" />
+            <KV label="Email" value="events@salumeria104.com" />
+          </div>
+        )}
+      </div>
+
+      {!secondary && event.id && (
+        <div className="print:hidden">
+          {!adding ? (
+            <Button size="sm" variant="outline" onClick={() => setAdding(true)}>
+              <Plus className="w-3.5 h-3.5 mr-1" /> Add Second Contact
+            </Button>
+          ) : (
+            <div className="border border-border rounded-md p-3 bg-muted/40 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide">Second Contact</p>
+                <button
+                  onClick={() => setAdding(false)}
+                  className="p-1 rounded hover:bg-muted text-muted-foreground"
+                  aria-label="Cancel"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label className="text-[10px]">First Name</Label>
+                  <Input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} className="h-8 text-xs" />
+                </div>
+                <div>
+                  <Label className="text-[10px]">Last Name</Label>
+                  <Input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} className="h-8 text-xs" />
+                </div>
+                <div>
+                  <Label className="text-[10px]">Email</Label>
+                  <Input value={form.email_1} onChange={(e) => setForm({ ...form, email_1: e.target.value })} className="h-8 text-xs" />
+                </div>
+                <div>
+                  <Label className="text-[10px]">Phone</Label>
+                  <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-8 text-xs" />
+                </div>
+                <div>
+                  <Label className="text-[10px]">Company</Label>
+                  <Input value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} className="h-8 text-xs" />
+                </div>
+                <div>
+                  <Label className="text-[10px]">Position</Label>
+                  <Input value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} className="h-8 text-xs" />
+                </div>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => createContact.mutate()}
+                disabled={createContact.isPending || !form.first_name}
+              >
+                Save Contact
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
