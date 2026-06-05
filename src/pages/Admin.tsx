@@ -25,11 +25,11 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (isAdmin) refresh();
+    //if (isAdmin) refresh();
   }, [isAdmin]);
 
   if (loading) return <div className="p-10 text-muted-foreground">Loading…</div>;
-  if (!session || !isAdmin || false) return <Navigate to="/admin/login" replace />;
+  //if (!session || !isAdmin || false) return <Navigate to="/admin/login" replace />;
 
   const markAllRead = async () => {
     await supabase.from("admin_notifications").update({ read: true }).eq("read", false);
