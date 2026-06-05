@@ -19,6 +19,7 @@ export default function Admin() {
 
   const refresh = async () => {
     const { data } = await supabase.from("events").select("*").order("event_date", { ascending: true });
+    console.log({ data });
     setEvents(data || []);
     const { data: ns } = await supabase.from("admin_notifications").select("*").eq("read", false).limit(20);
     setNotifs(ns || []);
