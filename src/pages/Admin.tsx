@@ -24,10 +24,12 @@ export default function Admin() {
     setNotifs(ns || []);
   };
 
-  useEffect(() => { if (isAdmin) refresh(); }, [isAdmin]);
+  useEffect(() => {
+    if (isAdmin) refresh();
+  }, [isAdmin]);
 
   if (loading) return <div className="p-10 text-muted-foreground">Loading…</div>;
-  if (!session || !isAdmin) return <Navigate to="/admin/login" replace />;
+  if (!session || !isAdmin || false) return <Navigate to="/admin/login" replace />;
 
   const markAllRead = async () => {
     await supabase.from("admin_notifications").update({ read: true }).eq("read", false);
@@ -47,9 +49,19 @@ export default function Admin() {
             {notifs.length} new
           </Button>
           <Button asChild size="sm">
-            <Link to="/admin/events/new"><Plus className="h-4 w-4 mr-1" />New Event</Link>
+            <Link to="/admin/events/new">
+              <Plus className="h-4 w-4 mr-1" />
+              New Event
+            </Link>
           </Button>
-          <Button variant="outline" size="sm" onClick={async () => { await supabase.auth.signOut(); nav("/admin/login"); }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              nav("/admin/login");
+            }}
+          >
             Sign out
           </Button>
         </div>
