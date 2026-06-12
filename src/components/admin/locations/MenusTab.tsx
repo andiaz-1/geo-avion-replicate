@@ -120,7 +120,15 @@ function CoursesPanel({ tierId, locationId }: { tierId: string; locationId: stri
 
   const load = async () => {
     const { data } = await supabase.from("location_menu_courses").select("*").eq("tier_id", tierId).order("sort_order");
-    setCourses((data as Course[]) || []);
+    let rows = (data as Course[]) || [];
+    if (rows.length === 0) {
+      const defaults = ["Appetizer", "Salad", "Entrée", "Dessert"].map((name, i) => ({
+        tier_id: tierId, location_id: locationId, name, max_selections: 1, sort_order: i,
+      }));
+      const { data: seeded } = await supabase.from("location_menu_courses").insert(defaults).select();
+      rows = (seeded as Course[]) || [];
+    }
+    setCourses(rows);
   };
 
   useEffect(() => { load(); }, [tierId]);
