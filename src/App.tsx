@@ -11,6 +11,8 @@ import AdminLogin from "./pages/AdminLogin.tsx";
 import Portal from "./pages/Portal.tsx";
 import EventDetail from "./pages/EventDetail.tsx";
 import EventFormPage from "./pages/EventFormPage.tsx";
+import LocationsPage from "./pages/admin/Locations.tsx";
+import LocationSettings from "./pages/admin/LocationSettings.tsx";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/admin/events/new" element={<EventFormPage />} />
           <Route path="/admin/events/:eventId" element={<EventDetail />} />
           <Route path="/admin/events/:eventId/edit" element={<EventFormPage />} />
+          <Route path="/admin/locations" element={<LocationsPage />} />
+          <Route path="/admin/locations/:slug" element={<LocationSettings />} />
           <Route path="/portal/:token" element={<Portal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Bell, Plus } from "lucide-react";
+import { Bell, Plus, MapPin } from "lucide-react";
 import StatsBar from "@/components/admin/crm/StatsBar";
 import PipelineBoard from "@/components/admin/crm/PipelineBoard";
 import CalendarBoard from "@/components/admin/crm/CalendarBoard";
@@ -48,6 +48,12 @@ export default function Admin() {
           <Button variant="ghost" size="sm" onClick={markAllRead}>
             <Bell className="h-4 w-4 mr-2" />
             {notifs.length} new
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/locations">
+              <MapPin className="h-4 w-4 mr-1" />
+              Locations
+            </Link>
           </Button>
           <Button asChild size="sm">
             <Link to="/admin/events/new">
