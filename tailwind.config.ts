@@ -104,5 +104,10 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addVariant }: any) {
+      addVariant("crm-dark", ".crm-dark &");
+    },
+  ],
 } satisfies Config;
