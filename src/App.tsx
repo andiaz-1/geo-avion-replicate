@@ -43,6 +43,16 @@ const App = () => (
           <Route path="/admin/locations" element={<LocationsPage />} />
           <Route path="/admin/locations/:slug" element={<LocationSettings />} />
           <Route path="/portal/:token" element={<Portal />} />
+          <Route path="/crm" element={<CrmLayout />}>
+            <Route index element={<CrmDashboard />} />
+            <Route path="leads" element={<CrmLeads />} />
+            <Route path="events" element={<CrmEvents />} />
+            <Route path="events/:id" element={<CrmEventDetail />} />
+            <Route path="calendar" element={<CrmCalendar />} />
+            <Route path="discussions" element={<CrmDiscussions />} />
+            <Route path="contacts" element={<CrmContacts />} />
+            <Route path="settings" element={<CrmSettings />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
