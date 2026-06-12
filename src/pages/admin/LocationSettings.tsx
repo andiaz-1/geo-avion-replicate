@@ -120,12 +120,13 @@ export default function LocationSettings() {
             <TabsTrigger value="identity">Identity</TabsTrigger>
             <TabsTrigger value="branding">Branding</TabsTrigger>
             <TabsTrigger value="pricing">Pricing</TabsTrigger>
+            <TabsTrigger value="capacity">Capacity</TabsTrigger>
             <TabsTrigger value="areas">Areas</TabsTrigger>
             <TabsTrigger value="menus">Menus</TabsTrigger>
             <TabsTrigger value="beverages">Beverages</TabsTrigger>
             <TabsTrigger value="addons">Enhancements</TabsTrigger>
-            <TabsTrigger value="form">Form Builder</TabsTrigger>
             <TabsTrigger value="faq">FAQ</TabsTrigger>
+            <TabsTrigger value="form">Form Builder</TabsTrigger>
             <TabsTrigger value="contracts">Contracts</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
           </TabsList>
@@ -133,12 +134,14 @@ export default function LocationSettings() {
           <TabsContent value="identity" className="mt-6"><IdentityTab loc={loc} save={save} /></TabsContent>
           <TabsContent value="branding" className="mt-6"><BrandingTab loc={loc} save={save} /></TabsContent>
           <TabsContent value="pricing" className="mt-6"><PricingTab loc={loc} save={save} /></TabsContent>
-          <TabsContent value="areas" className="mt-6"><ComingSoonTab name="Areas" /></TabsContent>
-          <TabsContent value="menus" className="mt-6"><ComingSoonTab name="Menu builder" /></TabsContent>
-          <TabsContent value="beverages" className="mt-6"><ComingSoonTab name="Beverage packages" /></TabsContent>
-          <TabsContent value="addons" className="mt-6"><ComingSoonTab name="Enhancements" /></TabsContent>
+          <TabsContent value="capacity" className="mt-6"><CapacityTab loc={loc} save={save} /></TabsContent>
+          <TabsContent value="areas" className="mt-6"><AreasTab locationId={loc.id} /></TabsContent>
+          <TabsContent value="menus" className="mt-6"><MenusTab locationId={loc.id} /></TabsContent>
+          <TabsContent value="beverages" className="mt-6"><BeveragesTab locationId={loc.id} /></TabsContent>
+          <TabsContent value="addons" className="mt-6"><AddonsTab locationId={loc.id} /></TabsContent>
+          <TabsContent value="faq" className="mt-6"><FaqTab locationId={loc.id} /></TabsContent>
           <TabsContent value="form" className="mt-6"><ComingSoonTab name="Form builder" /></TabsContent>
-          <TabsContent value="faq" className="mt-6"><ComingSoonTab name="FAQ" /></TabsContent>
+          <TabsContent value="contracts" className="mt-6"><ComingSoonTab name="Contract templates" /></TabsContent>
           <TabsContent value="contracts" className="mt-6"><ComingSoonTab name="Contract templates" /></TabsContent>
           <TabsContent value="team" className="mt-6"><ComingSoonTab name="Team" /></TabsContent>
         </Tabs>
