@@ -124,11 +124,6 @@ export function CrmStoreProvider({ children }: { children: ReactNode }) {
 
   const notifications: Notification[] = useMemo(() => {
     const items: Notification[] = [];
-    leads.filter((l) => !l.responded).forEach((l) => {
-      const m = minutesSince(l.submittedAt);
-      const ago = m < 60 ? `${m}m ago` : m < 1440 ? `${Math.floor(m / 60)}h ago` : `${Math.floor(m / 1440)}d ago`;
-      items.push({ id: `lead-${l.id}`, kind: "lead", title: `New lead: ${l.contact.name}`, detail: ago, href: "/crm/leads" });
-    });
     events.filter((e) => e.followUpDue && e.followUpDue < MOCK_NOW.toISOString().slice(0, 10)).forEach((e) => {
       items.push({ id: `fu-${e.id}`, kind: "followup", title: `Overdue follow-up: ${e.name}`, detail: e.contact.name, href: `/crm/events/${e.id}` });
     });
@@ -136,7 +131,7 @@ export function CrmStoreProvider({ children }: { children: ReactNode }) {
       items.push({ id: `dz-${d.id}`, kind: "discussion", title: `Needs reply: ${d.contactName}`, detail: d.subject.slice(0, 60), href: "/crm/discussions" });
     });
     return items;
-  }, [leads, events, discussions]);
+  }, [events, discussions]);
 
   const value: CrmStore = {
     events, leads, discussions, venueDefaults, notes,
