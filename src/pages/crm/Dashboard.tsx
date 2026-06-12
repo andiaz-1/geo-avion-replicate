@@ -1,14 +1,58 @@
-import { CrmCard, CrmPageTitle, CrmSelect, CrmTH, CrmTD } from "@/components/crm/CrmPrimitives";
+import { Link } from "react-router-dom";
+import { CrmCard, CrmPageTitle, CrmSelect } from "@/components/crm/CrmPrimitives";
 import {
-  BarChart, Bar, Line, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+  BarChart, Bar, Line, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
 } from "recharts";
-import { leadsConversionData, eventStatusDistribution } from "@/data/crmMock";
+import { leadsConversionData, STATUS_HEX, EventStatus, MOCK_NOW } from "@/data/crmMock";
+import { useCrm } from "@/data/crmStore";
+import { Inbox, AlertTriangle, CalendarCheck, CheckCircle2, InboxIcon } from "lucide-react";
+
+const STATUSES: EventStatus[] = ["Prospect", "Tentative", "Definite", "Closed", "Lost"];
+
+function StatCard({ count, label, accent, href }: { count: number; label: string; accent: string; href: string }) {
+  return (
+    <Link to={href} className="bg-white rounded-xl border border-border p-5 hover:shadow-md transition-shadow crm-dark:bg-[#1a2230] crm-dark:border-white/10 block">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-3xl font-bold" style={{ color: accent }}>{count}</div>
+          <div className="text-xs text-muted-foreground mt-1">{label}</div>
+        </div>
+        <div className="h-10 w-10 rounded-full" style={{ background: `${accent}22` }} />
+      </div>
+    </Link>
+  );
+}
 
 export default function Dashboard() {
+  const { events, unrespondedLeads, overdueFollowUps } = useCrm();
+
+  const todayStr = MOCK_NOW.toISOString().slice(0, 10);
+  const in7 = new Date(MOCK_NOW); in7.setDate(in7.getDate() + 7);
+  const in7Str = in7.toISOString().slice(0, 10);
+  const eventsNext7 = events.filter((e) => e.date >= todayStr && e.date <= in7Str).length;
+
+  const monthKey = MOCK_NOW.toISOString().slice(0, 7);
+  const bookedThisMonth = events.filter((e) => e.date.startsWith(monthKey) && (e.status === "Definite" || e.status === "Closed")).length;
+
+  // Stacked-bar status distribution for Osteria · June 2026 (selected filters)
+  const venueFilter = "Osteria";
+  const filtered = events.filter((e) => e.venue === venueFilter && e.date.startsWith(monthKey));
+  const counts: Record<EventStatus, number> = { Prospect: 0, Tentative: 0, Definite: 0, Closed: 0, Lost: 0 };
+  filtered.forEach((e) => { counts[e.status]++; });
+  const stackedData = [{ name: `${venueFilter} · June 2026`, ...counts }];
+  const hasStackedData = filtered.length > 0;
+
   return (
     <div className="space-y-6">
       <CrmPageTitle>Dashboard</CrmPageTitle>
+
+      {/* Stat row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard count={unrespondedLeads} label="New leads awaiting reply" accent="#ef4444" href="/crm/leads" />
+        <StatCard count={overdueFollowUps} label="Overdue follow-ups" accent="#f59e0b" href="/crm/events?filter=overdue" />
+        <StatCard count={eventsNext7} label="Events next 7 days" accent="#5fa468" href="/crm/events?filter=next7" />
+        <StatCard count={bookedThisMonth} label="Booked this month" accent="#9b7fc7" href="/crm/events" />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <CrmCard>
@@ -41,55 +85,33 @@ export default function Dashboard() {
             <h3 className="font-semibold text-sm">Event Status Distribution</h3>
             <div className="flex gap-2 flex-wrap">
               <CrmSelect value="Osteria" options={["Osteria", "The Leinster", "Kaona Room"]} />
-              <CrmSelect value="Event Date" />
               <CrmSelect value="June" />
               <CrmSelect value="2026" />
             </div>
           </div>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={eventStatusDistribution}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="status" tick={{ fontSize: 11 }} />
-                <PolarRadiusAxis domain={[0, 1]} tick={{ fontSize: 10 }} />
-                <Radar name="Events" dataKey="value" stroke="#9b7fc7" fill="#9b7fc7" fillOpacity={0.4} />
-                <Legend
-                  wrapperStyle={{ fontSize: 11 }}
-                  payload={[
-                    { value: "Prospect", type: "circle", color: "#3aa6a0" },
-                    { value: "Tentative", type: "circle", color: "#e08c7a" },
-                    { value: "Definite", type: "circle", color: "#5fa468" },
-                    { value: "Closed", type: "circle", color: "#c9a44a" },
-                    { value: "Lost", type: "circle", color: "#9aa0aa" },
-                  ]}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
+            {hasStackedData ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart layout="vertical" data={stackedData} margin={{ left: 10, right: 20, top: 20, bottom: 20 }}>
+                  <CartesianGrid stroke="#eee" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={140} />
+                  <Tooltip />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  {STATUSES.map((s) => (
+                    <Bar key={s} dataKey={s} stackId="a" fill={STATUS_HEX[s]} />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground">
+                <InboxIcon className="h-10 w-10 mb-2 opacity-40" />
+                <p className="text-sm">No events match this filter</p>
+              </div>
+            )}
           </div>
         </CrmCard>
       </div>
-
-      <CrmCard>
-        <h3 className="font-semibold text-sm mb-4">New Leads: 0</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <CrmTH>Personal Information</CrmTH>
-                <CrmTH>Event Details</CrmTH>
-                <CrmTH>Description</CrmTH>
-                <CrmTH>Submitted At</CrmTH>
-                <CrmTH>Actions</CrmTH>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><CrmTD className="text-center text-muted-foreground py-8" >No leads found.</CrmTD>
-                <td colSpan={4}></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </CrmCard>
     </div>
   );
 }
