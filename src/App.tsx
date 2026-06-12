@@ -15,7 +15,7 @@ import LocationsPage from "./pages/admin/Locations.tsx";
 import LocationSettings from "./pages/admin/LocationSettings.tsx";
 import CrmLayout from "./components/crm/CrmLayout.tsx";
 import CrmDashboard from "./pages/crm/Dashboard.tsx";
-import CrmLeads from "./pages/crm/Leads.tsx";
+
 import CrmEvents from "./pages/crm/Events.tsx";
 import CrmEventDetail from "./pages/crm/EventDetailCrm.tsx";
 import CrmCalendar from "./pages/crm/CalendarPage.tsx";
@@ -45,7 +45,7 @@ const App = () => (
           <Route path="/portal/:token" element={<Portal />} />
           <Route path="/crm" element={<CrmLayout />}>
             <Route index element={<CrmDashboard />} />
-            <Route path="leads" element={<CrmLeads />} />
+            
             <Route path="events" element={<CrmEvents />} />
             <Route path="events/:id" element={<CrmEventDetail />} />
             <Route path="calendar" element={<CrmCalendar />} />

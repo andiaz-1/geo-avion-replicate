@@ -26,7 +26,7 @@ export default function CrmTopbar() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-border bg-white placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-[#9b7fc7] crm-dark:bg-[#11161f] crm-dark:border-white/10 crm-dark:text-white"
-          placeholder="Search leads, events, contacts..."
+          placeholder="Search events, contacts..."
         />
       </div>
       <div className="ml-auto flex items-center gap-2">
