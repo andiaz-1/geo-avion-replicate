@@ -9,6 +9,12 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import IdentityTab from "@/components/admin/locations/IdentityTab";
 import BrandingTab from "@/components/admin/locations/BrandingTab";
 import PricingTab from "@/components/admin/locations/PricingTab";
+import CapacityTab from "@/components/admin/locations/CapacityTab";
+import AreasTab from "@/components/admin/locations/AreasTab";
+import MenusTab from "@/components/admin/locations/MenusTab";
+import BeveragesTab from "@/components/admin/locations/BeveragesTab";
+import AddonsTab from "@/components/admin/locations/AddonsTab";
+import FaqTab from "@/components/admin/locations/FaqTab";
 import ComingSoonTab from "@/components/admin/locations/ComingSoonTab";
 
 export interface LocationRecord {
