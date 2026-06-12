@@ -1,71 +1,132 @@
-# Port the Base44 CRM
+# Multi-Location White-Label CRM
 
-Goal: bring your Base44 CRM (Dashboard, EventDetail, EventForm, Contacts, Discussions, Contract printout) into this project, wired to Lovable Cloud. Booking funnel and client portal are left alone.
+Turn the current single-tenant Weston build into a platform where each Salumeria location (and future venues) has its own fully configurable booking site and CRM. Weston becomes the first seeded location; nothing existing breaks.
 
-## 1. Database changes (one migration)
+## Phase 1 — Data model & roles
 
-**Extend `events` table** with the Base44 fields it doesn't have yet:
-- `event_name`, `event_type`, `event_time` (already exists), `location` (already exists)
-- `children_attending` (boolean)
-- `antipasti_selections`, `entree_selections`, `dessert_selections` (text[])
-- `beverage_package`, `addons` (already as jsonb — keep), `menu_header_type`, `menu_header_text`, `menu_header_file`
-- `subtotal`, `service_charge`, `tax_amount`, `estimated_total`, `fnb_minimum`, `deposit_amount` (numeric)
-- `contract_status`, `cc_auth_status`, `cc_last_four`, `cc_auth_date`, `signature_name`
-- `notes`
-- Map existing `status` → `booking_status` semantics; keep `status` enum but add `cancelled` if missing.
+### New tables
 
-**New tables:**
-- `event_contacts` (event_id, first_name, last_name, phone, email_1, email_2, company_name, position, is_main)
-- `discussions` (event_id, title, author_name, message_count)
-- `discussion_messages` (discussion_id, event_id, body, author_name)
+- **`locations`** — identity, branding, pricing rules
+  - `slug`, `name`, `address`, `phone`, `email`, `timezone`
+  - `logo_url`, `favicon_url`, `hero_image_url`, `gallery[]`
+  - `color_primary`, `color_secondary`, `color_accent`, `color_bg`, `color_text` (HSL strings)
+  - `font_title`, `font_subtitle`, `font_body` (Google Fonts names)
+  - `tagline`, `about_text`
+  - `service_charge_pct`, `tax_pct`, `deposit_pct`, `min_guests`, `max_guests`, `buyout_threshold`
+  - `is_active`, `published`
 
-All admin-only RLS (using existing `has_role(auth.uid(), 'admin')`). Proper GRANTs for `authenticated` + `service_role`.
+- **`location_areas`** — rooms/spaces (name, min/max guests, base_fee, photo, description, fnb_minimum)
 
-## 2. New CRM screens (under `/admin`)
+- **`location_menu_tiers`** — name, price_per_person, description, photo, order
+- **`location_menu_courses`** — tier_id, name, max_selections, order
+- **`location_menu_items`** — course_id, name, description, allergens[], photo, upcharge, order
 
-Replace the current `/admin` page with a full CRM:
+- **`location_beverage_packages`** — name, type, price_per_person, duration_hours, inclusions[], min_spend
+
+- **`location_addons`** — name, description, photo, price, price_type (`flat`/`per_person`/`per_hour`), category, max_qty
+
+- **`location_form_config`** — JSONB: ordered steps + custom fields (label, type, required, options, step)
+- **`location_faqs`** — question, answer, category, order
+
+- **`location_contract_templates`** — name, body (rich text w/ merge tags), terms, signature_required, deposit_required, is_default, source (`system`/`custom`)
+  - Seeded with 3 system templates: **Casual**, **Corporate**, **Formal** (copyable per location)
+
+### Roles
+
+Extend `app_role` enum: add `super_admin` and `location_admin`.
+
+- `user_roles` already exists; add nullable `location_id` column.
+- `super_admin` → all locations.
+- `location_admin` → only rows scoped to their `location_id`.
+
+New helper: `public.has_location_access(_user_id, _location_id)` SECURITY DEFINER, used by all RLS policies.
+
+### Existing tables
+
+- Add `location_id uuid` (FK → locations) to `events`, `event_contacts`, `discussions`, `contracts`, `payment_authorizations`.
+- Backfill all existing rows to the seeded Weston location.
+- Update RLS so location_admins only see their location's data; super_admin sees all.
+
+### Storage
+
+New public bucket `location-assets/{location_id}/...` for logos, hero, menu photos, addon photos.
+
+## Phase 2 — Super-admin: Locations Management
+
+New route `/admin/locations`:
+- List of locations with status, event count, quick edit
+- "+ New Location" wizard (slug, name, copy settings from existing)
+- Click → `/admin/locations/:slug/settings` with tabs:
+  1. **Identity** (logo, address, contact)
+  2. **Branding** (colors, font pickers w/ live preview, hero image)
+  3. **Areas** (CRUD rooms)
+  4. **Menus** (tier/course/item builder; bulk paste, CSV import, PDF attach)
+  5. **Beverages** (package CRUD)
+  6. **Enhancements** (addon CRUD)
+  7. **Form Builder** (drag step order, add/remove custom fields, toggle allergies/dietary/special-requests)
+  8. **FAQ** (CRUD)
+  9. **Contracts** (pick 3 system templates + create custom; merge-tag editor)
+  10. **Pricing & Policies** (service %, tax %, deposit, min/max guests)
+  11. **Team** (invite location admins)
+
+## Phase 3 — Dynamic booking funnel
+
+- New route `/book/:locationSlug/...` (current `/book/*` becomes `/book/weston/*` via redirect)
+- All booking steps read from `locations` + child tables instead of hardcoded `booking-data.ts`
+- Branding applied at runtime: CSS vars set from location colors, Google Fonts loaded dynamically
+- Form steps render from `location_form_config`
+- Custom fields stored in `events.custom_field_responses` JSONB
+- Pricing math uses location's `service_charge_pct` / `tax_pct`
+
+## Phase 4 — Dynamic admin CRM
+
+- `/admin` dashboard scoped by role:
+  - `super_admin`: location switcher in header, sees all events
+  - `location_admin`: locked to their location
+- Event detail uses the location's contract templates (dropdown to pick which template to send)
+- Quote calculator pulls per-location pricing rules
+- Reminders/notifications use per-location email templates
+
+## Phase 5 — Seed Weston + cleanup
+
+- Migrate all hardcoded Weston data (current `booking-data.ts` + `crm-data.ts`) into the Weston location row + child tables
+- Keep `booking-data.ts` only as the seed payload for new locations
+- Delete dead code paths
+
+## Technical notes
 
 ```text
-/admin                       → Dashboard (4 tabs: Pipeline | Calendar | List | Reminders)
-/admin/events/new            → EventForm (create)
-/admin/events/:id            → EventDetail (cards + contacts + discussions + contract)
-/admin/events/:id/edit       → EventForm (edit)
-/admin/login                 → existing (kept)
+src/
+  pages/
+    admin/
+      Locations.tsx                  (list)
+      LocationSettings.tsx           (tabbed settings shell)
+      LocationDashboard.tsx          (per-location CRM)
+    book/
+      [locationSlug]/...             (dynamic funnel)
+  components/admin/locations/
+    IdentityTab, BrandingTab, AreasTab, MenuBuilder,
+    BeverageBuilder, AddonBuilder, FormBuilder,
+    FaqEditor, ContractTemplateEditor, PricingTab, TeamTab
+  lib/
+    location-context.tsx             (React context: current location config)
+    contract-templates/              (3 system templates as TS modules)
+    merge-tags.ts                    (render {client_name} etc.)
+  hooks/
+    useLocation(slug)                (load + cache location config)
+    useLocationRole()                (super_admin vs location_admin)
 ```
 
-Components added under `src/components/admin/crm/`:
-- `StatsBar`, `PipelineBoard`, `CalendarBoard`, `ListBoard`, `RemindersBoard`
-- `EventCard` (used by Pipeline)
-- `EventForm` (create/edit, with live quote preview)
-- `ContactsCard`, `Discussions`, `ContractDocument`
-- `EventDetailHeader`, `EventDetailCards`
+Migrations run in order: enum + helpers → tables + GRANTs + RLS → backfill Weston → storage bucket.
 
-All using existing shadcn components + design tokens — no raw colors.
+## Rollout order
 
-## 3. Data layer
+1. Migration: roles, locations + all child tables, location_id on existing tables, RLS, storage bucket, seed Weston
+2. Super-admin Locations list + Identity/Branding/Pricing tabs
+3. Menus + Beverages + Addons + Areas builders
+4. Form Builder + FAQ + Contract Templates
+5. Refactor booking funnel to read location config (Weston still works identically)
+6. Scope CRM dashboard by role, add location switcher
+7. Cleanup hardcoded data
 
-- All `base44.entities.X.{list,filter,get,create,update,delete}` calls → typed Supabase queries.
-- `Event.create` auto-generates `portal_token` (DB default already does this — keep).
-- Pipeline drag-drop updates `status` directly via Supabase mutation.
-- Reminders panel "Send Nudge" reuses your existing `send-reminder` edge function.
-- Reuse existing `MENU_TIERS`/addons from `src/lib/booking-data.ts` — no duplication. Add a small `src/lib/crm-data.ts` with `STATUS_COLORS`, `STATUS_LABELS`, `EVENT_TYPES`, `LOCATIONS`, and a `calculateAdminQuote()` helper (Base44's pricing for admin-created events).
-
-## 4. What I'm NOT doing
-
-- Not touching `/`, `/book/*`, `/spaces`, `/portal/:token`
-- Not porting `ClientPortal` (already covered by existing portal)
-- Not porting `QuoteBuilder`/`MenuHeader`/`ContractSign`/`PaymentAuth` portal components
-- Not porting Base44 login/auth — keeping existing admin auth
-
-## 5. Open question
-
-The Base44 `Event` model uses **separate fields** (`antipasti_selections`, etc.) while your booking funnel uses a `menu_selections` JSONB blob. I'll **store both** for now: the new admin form writes both, and the booking funnel keeps writing its blob. We can converge later. Sound good?
-
-## Order of execution
-
-1. Run the migration (you'll approve it)
-2. Add `src/lib/crm-data.ts` + helpers
-3. Build CRM components
-4. Replace `src/pages/Admin.tsx` with the new dashboard
-5. Add `EventDetail` + `EventForm` pages and routes
-6. Smoke-test in preview, confirm RLS works for the admin
+This is multi-turn — I'll ship phase 1 (migration) first for approval, then build the UI in batches so you can review each piece. Sound good?
