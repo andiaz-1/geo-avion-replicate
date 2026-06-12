@@ -882,37 +882,46 @@ export type Database = {
       location_menu_tiers: {
         Row: {
           created_at: string
+          days_of_week: number[]
           description: string | null
           id: string
           is_active: boolean
           location_id: string
+          meal_periods: string[]
           name: string
           photo_url: string | null
           price_per_person: number
+          season_ids: string[]
           sort_order: number
           updated_at: string
         }
         Insert: {
           created_at?: string
+          days_of_week?: number[]
           description?: string | null
           id?: string
           is_active?: boolean
           location_id: string
+          meal_periods?: string[]
           name: string
           photo_url?: string | null
           price_per_person?: number
+          season_ids?: string[]
           sort_order?: number
           updated_at?: string
         }
         Update: {
           created_at?: string
+          days_of_week?: number[]
           description?: string | null
           id?: string
           is_active?: boolean
           location_id?: string
+          meal_periods?: string[]
           name?: string
           photo_url?: string | null
           price_per_person?: number
+          season_ids?: string[]
           sort_order?: number
           updated_at?: string
         }
