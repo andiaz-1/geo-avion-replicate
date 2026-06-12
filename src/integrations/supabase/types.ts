@@ -55,6 +55,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          location_id: string | null
           signature_type: string | null
           signature_value: string | null
           signed_at: string | null
@@ -65,6 +66,7 @@ export type Database = {
           created_at?: string
           event_id: string
           id?: string
+          location_id?: string | null
           signature_type?: string | null
           signature_value?: string | null
           signed_at?: string | null
@@ -75,6 +77,7 @@ export type Database = {
           created_at?: string
           event_id?: string
           id?: string
+          location_id?: string | null
           signature_type?: string | null
           signature_value?: string | null
           signed_at?: string | null
@@ -86,6 +89,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]
@@ -142,6 +152,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          location_id: string | null
           message_count: number
           title: string
           updated_at: string
@@ -152,6 +163,7 @@ export type Database = {
           created_at?: string
           event_id: string
           id?: string
+          location_id?: string | null
           message_count?: number
           title: string
           updated_at?: string
@@ -162,6 +174,7 @@ export type Database = {
           created_at?: string
           event_id?: string
           id?: string
+          location_id?: string | null
           message_count?: number
           title?: string
           updated_at?: string
@@ -172,6 +185,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discussions_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]
@@ -187,6 +207,7 @@ export type Database = {
           id: string
           is_main: boolean | null
           last_name: string | null
+          location_id: string | null
           phone: string | null
           position: string | null
           updated_at: string
@@ -201,6 +222,7 @@ export type Database = {
           id?: string
           is_main?: boolean | null
           last_name?: string | null
+          location_id?: string | null
           phone?: string | null
           position?: string | null
           updated_at?: string
@@ -215,6 +237,7 @@ export type Database = {
           id?: string
           is_main?: boolean | null
           last_name?: string | null
+          location_id?: string | null
           phone?: string | null
           position?: string | null
           updated_at?: string
@@ -225,6 +248,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_contacts_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]
@@ -271,6 +301,7 @@ export type Database = {
           internal_notes: string | null
           is_lunch: boolean | null
           kids_count: number
+          location_id: string | null
           menu_header_at: string | null
           menu_header_file: string | null
           menu_header_text: string | null
@@ -335,6 +366,7 @@ export type Database = {
           internal_notes?: string | null
           is_lunch?: boolean | null
           kids_count?: number
+          location_id?: string | null
           menu_header_at?: string | null
           menu_header_file?: string | null
           menu_header_text?: string | null
@@ -399,6 +431,7 @@ export type Database = {
           internal_notes?: string | null
           is_lunch?: boolean | null
           kids_count?: number
+          location_id?: string | null
           menu_header_at?: string | null
           menu_header_file?: string | null
           menu_header_text?: string | null
@@ -421,6 +454,577 @@ export type Database = {
           venue?: string | null
           venue_fee?: number | null
           wants_private_room?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_addons: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          location_id: string
+          max_qty: number | null
+          name: string
+          photo_url: string | null
+          price: number
+          price_type: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location_id: string
+          max_qty?: number | null
+          name: string
+          photo_url?: string | null
+          price?: number
+          price_type?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location_id?: string
+          max_qty?: number | null
+          name?: string
+          photo_url?: string | null
+          price?: number
+          price_type?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_addons_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_areas: {
+        Row: {
+          base_fee: number | null
+          created_at: string
+          description: string | null
+          fnb_minimum: number | null
+          id: string
+          is_active: boolean
+          location_id: string
+          max_guests: number | null
+          min_guests: number | null
+          name: string
+          photo_url: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          base_fee?: number | null
+          created_at?: string
+          description?: string | null
+          fnb_minimum?: number | null
+          id?: string
+          is_active?: boolean
+          location_id: string
+          max_guests?: number | null
+          min_guests?: number | null
+          name: string
+          photo_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          base_fee?: number | null
+          created_at?: string
+          description?: string | null
+          fnb_minimum?: number | null
+          id?: string
+          is_active?: boolean
+          location_id?: string
+          max_guests?: number | null
+          min_guests?: number | null
+          name?: string
+          photo_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_areas_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_beverage_packages: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_hours: number | null
+          id: string
+          inclusions: string[]
+          is_active: boolean
+          location_id: string
+          min_spend: number | null
+          name: string
+          package_type: string
+          price_per_person: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          inclusions?: string[]
+          is_active?: boolean
+          location_id: string
+          min_spend?: number | null
+          name: string
+          package_type?: string
+          price_per_person?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          inclusions?: string[]
+          is_active?: boolean
+          location_id?: string
+          min_spend?: number | null
+          name?: string
+          package_type?: string
+          price_per_person?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_beverage_packages_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_contract_templates: {
+        Row: {
+          body: string
+          created_at: string
+          deposit_required: boolean
+          id: string
+          is_default: boolean
+          location_id: string | null
+          name: string
+          signature_required: boolean
+          source: string
+          terms: string | null
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          deposit_required?: boolean
+          id?: string
+          is_default?: boolean
+          location_id?: string | null
+          name: string
+          signature_required?: boolean
+          source?: string
+          terms?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          deposit_required?: boolean
+          id?: string
+          is_default?: boolean
+          location_id?: string | null
+          name?: string
+          signature_required?: boolean
+          source?: string
+          terms?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_contract_templates_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_faqs: {
+        Row: {
+          answer: string
+          category: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          location_id: string
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location_id: string
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location_id?: string
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_faqs_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_form_config: {
+        Row: {
+          allergies_enabled: boolean
+          created_at: string
+          custom_fields: Json
+          dietary_enabled: boolean
+          id: string
+          location_id: string
+          special_requests_enabled: boolean
+          steps: Json
+          updated_at: string
+        }
+        Insert: {
+          allergies_enabled?: boolean
+          created_at?: string
+          custom_fields?: Json
+          dietary_enabled?: boolean
+          id?: string
+          location_id: string
+          special_requests_enabled?: boolean
+          steps?: Json
+          updated_at?: string
+        }
+        Update: {
+          allergies_enabled?: boolean
+          created_at?: string
+          custom_fields?: Json
+          dietary_enabled?: boolean
+          id?: string
+          location_id?: string
+          special_requests_enabled?: boolean
+          steps?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_form_config_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: true
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_menu_courses: {
+        Row: {
+          created_at: string
+          id: string
+          location_id: string
+          max_selections: number
+          name: string
+          sort_order: number
+          tier_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_id: string
+          max_selections?: number
+          name: string
+          sort_order?: number
+          tier_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_id?: string
+          max_selections?: number
+          name?: string
+          sort_order?: number
+          tier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_menu_courses_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_menu_courses_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "location_menu_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_menu_items: {
+        Row: {
+          allergens: string[]
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          location_id: string
+          name: string
+          photo_url: string | null
+          sort_order: number
+          upcharge: number
+          updated_at: string
+        }
+        Insert: {
+          allergens?: string[]
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location_id: string
+          name: string
+          photo_url?: string | null
+          sort_order?: number
+          upcharge?: number
+          updated_at?: string
+        }
+        Update: {
+          allergens?: string[]
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location_id?: string
+          name?: string
+          photo_url?: string | null
+          sort_order?: number
+          upcharge?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_menu_items_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "location_menu_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_menu_items_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_menu_tiers: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          location_id: string
+          name: string
+          photo_url: string | null
+          price_per_person: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location_id: string
+          name: string
+          photo_url?: string | null
+          price_per_person?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location_id?: string
+          name?: string
+          photo_url?: string | null
+          price_per_person?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_menu_tiers_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locations: {
+        Row: {
+          about_text: string | null
+          address: string | null
+          buyout_threshold: number | null
+          color_accent: string
+          color_bg: string
+          color_primary: string
+          color_secondary: string
+          color_text: string
+          created_at: string
+          deposit_pct: number
+          email: string | null
+          favicon_url: string | null
+          font_body: string
+          font_subtitle: string
+          font_title: string
+          gallery: Json
+          hero_image_url: string | null
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          max_guests: number
+          min_guests: number
+          name: string
+          phone: string | null
+          published: boolean
+          service_charge_pct: number
+          slug: string
+          tagline: string | null
+          tax_pct: number
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          about_text?: string | null
+          address?: string | null
+          buyout_threshold?: number | null
+          color_accent?: string
+          color_bg?: string
+          color_primary?: string
+          color_secondary?: string
+          color_text?: string
+          created_at?: string
+          deposit_pct?: number
+          email?: string | null
+          favicon_url?: string | null
+          font_body?: string
+          font_subtitle?: string
+          font_title?: string
+          gallery?: Json
+          hero_image_url?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          max_guests?: number
+          min_guests?: number
+          name: string
+          phone?: string | null
+          published?: boolean
+          service_charge_pct?: number
+          slug: string
+          tagline?: string | null
+          tax_pct?: number
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          about_text?: string | null
+          address?: string | null
+          buyout_threshold?: number | null
+          color_accent?: string
+          color_bg?: string
+          color_primary?: string
+          color_secondary?: string
+          color_text?: string
+          created_at?: string
+          deposit_pct?: number
+          email?: string | null
+          favicon_url?: string | null
+          font_body?: string
+          font_subtitle?: string
+          font_title?: string
+          gallery?: Json
+          hero_image_url?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          max_guests?: number
+          min_guests?: number
+          name?: string
+          phone?: string | null
+          published?: boolean
+          service_charge_pct?: number
+          slug?: string
+          tagline?: string | null
+          tax_pct?: number
+          timezone?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -465,6 +1069,7 @@ export type Database = {
           exp_month: string
           exp_year: string
           id: string
+          location_id: string | null
           status: string
         }
         Insert: {
@@ -475,6 +1080,7 @@ export type Database = {
           exp_month: string
           exp_year: string
           id?: string
+          location_id?: string | null
           status?: string
         }
         Update: {
@@ -485,6 +1091,7 @@ export type Database = {
           exp_month?: string
           exp_year?: string
           id?: string
+          location_id?: string | null
           status?: string
         }
         Relationships: [
@@ -495,24 +1102,34 @@ export type Database = {
             referencedRelation: "events"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "payment_authorizations_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
         Row: {
           created_at: string
           id: string
+          location_id: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          location_id?: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          location_id?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -523,6 +1140,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_location_access: {
+        Args: { _location_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -532,7 +1153,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin"
+      app_role: "admin" | "super_admin" | "location_admin"
       event_status:
         | "new_lead"
         | "quote_sent"
@@ -667,7 +1288,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin"],
+      app_role: ["admin", "super_admin", "location_admin"],
       event_status: [
         "new_lead",
         "quote_sent",
