@@ -1,18 +1,20 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { LayoutDashboard, Calendar, MessageSquare, UserPlus, CalendarCheck, Users, Settings as Cog, Settings, Languages } from "lucide-react";
+import { useCrm } from "@/data/crmStore";
 
 const nav = [
-  { to: "/crm", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/crm/calendar", label: "Calendar", icon: Calendar },
-  { to: "/crm/discussions", label: "Discussions", icon: MessageSquare },
-  { to: "/crm/leads", label: "Leads", icon: UserPlus },
-  { to: "/crm/events", label: "Events", icon: CalendarCheck },
-  { to: "/crm/contacts", label: "Contacts", icon: Users },
-  { to: "/crm/settings", label: "Settings", icon: Cog },
+  { to: "/crm", label: "Dashboard", icon: LayoutDashboard, end: true, badgeKey: null as null | "leads" },
+  { to: "/crm/calendar", label: "Calendar", icon: Calendar, end: false, badgeKey: null },
+  { to: "/crm/discussions", label: "Discussions", icon: MessageSquare, end: false, badgeKey: null },
+  { to: "/crm/leads", label: "Leads", icon: UserPlus, end: false, badgeKey: "leads" as const },
+  { to: "/crm/events", label: "Events", icon: CalendarCheck, end: false, badgeKey: null },
+  { to: "/crm/contacts", label: "Contacts", icon: Users, end: false, badgeKey: null },
+  { to: "/crm/settings", label: "Settings", icon: Cog, end: false, badgeKey: null },
 ];
 
 export default function CrmSidebar() {
   const { pathname } = useLocation();
+  const { unrespondedLeads } = useCrm();
   return (
     <aside className="w-[145px] shrink-0 bg-[#161e2b] text-white flex flex-col min-h-screen">
       <div className="px-4 pt-5 pb-6">
@@ -22,6 +24,7 @@ export default function CrmSidebar() {
         {nav.map((item) => {
           const active = item.end ? pathname === item.to : pathname.startsWith(item.to);
           const Icon = item.icon;
+          const badge = item.badgeKey === "leads" ? unrespondedLeads : 0;
           return (
             <NavLink
               key={item.to}
@@ -32,7 +35,12 @@ export default function CrmSidebar() {
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />
-              <span>{item.label}</span>
+              <span className="flex-1">{item.label}</span>
+              {badge > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                  {badge}
+                </span>
+              )}
             </NavLink>
           );
         })}

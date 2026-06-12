@@ -1,8 +1,9 @@
 import { CrmCard, CrmPageTitle, CrmButton, CrmTH, CrmTD, Avatar } from "@/components/crm/CrmPrimitives";
-import { events } from "@/data/crmMock";
+import { useCrm } from "@/data/crmStore";
 import { ChevronDown } from "lucide-react";
 
 export default function Contacts() {
+  const { events } = useCrm();
   return (
     <div className="space-y-5">
       <CrmPageTitle>Contacts</CrmPageTitle>
