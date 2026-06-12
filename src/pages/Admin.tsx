@@ -61,16 +61,6 @@ export default function Admin() {
               New Event
             </Link>
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              nav("/admin/login");
-            }}
-          >
-            Sign out
-          </Button>
         </div>
       </header>
 
