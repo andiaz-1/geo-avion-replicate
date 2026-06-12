@@ -142,7 +142,6 @@ export default function LocationSettings() {
           <TabsContent value="faq" className="mt-6"><FaqTab locationId={loc.id} /></TabsContent>
           <TabsContent value="form" className="mt-6"><ComingSoonTab name="Form builder" /></TabsContent>
           <TabsContent value="contracts" className="mt-6"><ComingSoonTab name="Contract templates" /></TabsContent>
-          <TabsContent value="contracts" className="mt-6"><ComingSoonTab name="Contract templates" /></TabsContent>
           <TabsContent value="team" className="mt-6"><ComingSoonTab name="Team" /></TabsContent>
         </Tabs>
       </main>
