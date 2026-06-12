@@ -926,6 +926,59 @@ export type Database = {
           },
         ]
       }
+      location_seasons: {
+        Row: {
+          color: string | null
+          created_at: string
+          end_day: number
+          end_month: number
+          fnb_minimum: number
+          id: string
+          location_id: string
+          name: string
+          sort_order: number
+          start_day: number
+          start_month: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          end_day: number
+          end_month: number
+          fnb_minimum?: number
+          id?: string
+          location_id: string
+          name: string
+          sort_order?: number
+          start_day: number
+          start_month: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          end_day?: number
+          end_month?: number
+          fnb_minimum?: number
+          id?: string
+          location_id?: string
+          name?: string
+          sort_order?: number
+          start_day?: number
+          start_month?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_seasons_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locations: {
         Row: {
           about_text: string | null
