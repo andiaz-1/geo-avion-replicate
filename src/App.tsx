@@ -22,6 +22,7 @@ import CrmCalendar from "./pages/crm/CalendarPage.tsx";
 import CrmDiscussions from "./pages/crm/Discussions.tsx";
 import CrmContacts from "./pages/crm/Contacts.tsx";
 import CrmSettings from "./pages/crm/Settings.tsx";
+import CrmMenus from "./pages/crm/Menus.tsx";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="calendar" element={<CrmCalendar />} />
             <Route path="discussions" element={<CrmDiscussions />} />
             <Route path="contacts" element={<CrmContacts />} />
+            <Route path="menus" element={<CrmMenus />} />
             <Route path="settings" element={<CrmSettings />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
