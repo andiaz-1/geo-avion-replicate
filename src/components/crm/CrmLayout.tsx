@@ -8,7 +8,7 @@ export default function CrmLayout() {
   return (
     <CrmThemeProvider>
       <CrmStoreProvider>
-        <div className="flex min-h-screen w-full bg-[#f7f7f9] crm-dark:bg-[#0f1420] text-foreground crm-dark:text-white">
+        <div className="flex min-h-screen w-full bg-[#f7f7f9] crm-dark:bg-[#0f1420] text-foreground crm-dark:text-white" style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}>
           <CrmSidebar />
           <div className="flex-1 flex flex-col min-w-0">
             <CrmTopbar />
