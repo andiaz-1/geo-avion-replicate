@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Calendar, MessageSquare, CalendarCheck, Users, Settings as Cog, Settings, Languages } from "lucide-react";
+import { LayoutDashboard, Calendar, MessageSquare, CalendarCheck, Users, UtensilsCrossed, Settings as Cog, Settings, Languages } from "lucide-react";
 
 const nav = [
   { to: "/crm", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -7,6 +7,7 @@ const nav = [
   { to: "/crm/discussions", label: "Discussions", icon: MessageSquare, end: false },
   { to: "/crm/events", label: "Events", icon: CalendarCheck, end: false },
   { to: "/crm/contacts", label: "Contacts", icon: Users, end: false },
+  { to: "/crm/menus", label: "Menus", icon: UtensilsCrossed, end: false },
   { to: "/crm/settings", label: "Settings", icon: Cog, end: false },
 ];
 
