@@ -8,7 +8,20 @@ export type Menu = { id: string; name: string; price: number; hasLunchPrice: boo
 export type BarPkg = { id: string; name: string; mode: "open" | "consumption"; price2hr: number; price3hr: number; priceExtraHour: number; drinks: string[]; active: boolean; description?: string };
 export type Space = { id: string; name: string; photo: string; seatedMin: number; seatedMax: number; cocktailMin: number; cocktailMax: number; privacy: "private" | "semi" | "public"; showLayouts: boolean; layouts: string[]; description?: string };
 export type Venue = Space;
-export type Buyout = { id: string; label: string; kind: "full" | "partial"; spaceIds: string[]; price: number; pricingMode?: "fixed" | "quote"; quoteMessage?: string };
+export type Buyout = {
+  id: string; label: string; kind: "full" | "partial"; spaceIds: string[]; price: number;
+  pricingMode?: "fixed" | "quote"; quoteMessage?: string;
+  minGuests?: number; maxGuests?: number;
+  durationHours?: number;
+  minAdvanceDays?: number;
+  depositAmount?: number;
+  minSpend?: number;
+  availableWeekdays?: number[]; // 0=Sun … 6=Sat, empty/undefined = all
+  availableSeasonIds?: string[]; // empty/undefined = all
+  includes?: string[]; // bullet list shown to guest
+};
+export type Season = { id: string; label: string; months: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat" };
+export type DayOfWeekRule = { id: string; label: string; weekdays: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat" };
 export type Holiday = { id: string; label: string; date: string; state: "available" | "blocked" | "special"; surcharge: number };
 export type BlockedRange = { id: string; from: string; to: string; note: string; surcharge: number };
 export type RecurringRule = { id: string; label: string; weekday: number; surcharge: number };
@@ -61,7 +74,7 @@ export type FunnelData = {
     salesTax: number;
     buyoutUpcharge: number;
   };
-  advanced: { rules: DynRule[]; buyoutEnabled: boolean };
+  advanced: { rules: DynRule[]; buyoutEnabled: boolean; seasons: Season[]; dowRules: DayOfWeekRule[] };
   guests: GuestTier;
 };
 
@@ -158,6 +171,13 @@ export const defaultFunnelData: FunnelData = {
     rules: [
       { id: uid(), label: "Saturday premium", condition: "Day of week = Saturday", effect: "+15%" },
       { id: uid(), label: "High season", condition: "Month in [Dec, Feb]", effect: "Min spend $2,500" },
+    ],
+    seasons: [
+      { id: uid(), label: "High season", months: [11, 12, 1, 2], mode: "surcharge", value: 15, surchargeUnit: "percent" },
+      { id: uid(), label: "Low season", months: [6, 7, 8], mode: "minSpend", value: 1500 },
+    ],
+    dowRules: [
+      { id: uid(), label: "Weekend premium", weekdays: [5, 6], mode: "surcharge", value: 10, surchargeUnit: "percent" },
     ],
   },
   guests: { min: 8, max: 120, mode: "contact", contactPoints: "julie@osteria.com · (954) 555-0123", minAdvanceDays: 3 },
