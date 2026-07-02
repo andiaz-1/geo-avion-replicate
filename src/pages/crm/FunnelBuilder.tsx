@@ -1057,6 +1057,30 @@ function AdvancedTab() {
       <SaveBar/>
     </div>
   );
+
+
+// Applies-to chip picker (Food / Beverage / Add-ons). Empty = all.
+function AppliesToPicker({ value, onChange }: { value?: ("food"|"beverage"|"addons")[]; onChange: (next: ("food"|"beverage"|"addons")[]) => void }) {
+  const options: { id: "food"|"beverage"|"addons"; label: string }[] = [
+    { id: "food", label: "Food" }, { id: "beverage", label: "Beverage" }, { id: "addons", label: "Add-ons" },
+  ];
+  const selected = value ?? [];
+  const isAll = selected.length === 0 || selected.length === 3;
+  const toggle = (id: "food"|"beverage"|"addons") => {
+    const has = selected.includes(id);
+    onChange(has ? selected.filter((x) => x !== id) : [...selected, id]);
+  };
+  return (
+    <div className="mt-3">
+      <p className="text-xs text-stone-500 mb-1.5">Applies to <span className="text-stone-400">{isAll ? "(all — food, beverage & add-ons)" : ""}</span></p>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((o) => {
+          const active = selected.includes(o.id);
+          return <button key={o.id} onClick={() => toggle(o.id)} className={`px-3 py-1 rounded-full text-xs border ${active ? "bg-stone-900 text-white border-stone-900" : "border-stone-200 text-stone-600 bg-white"}`}>{o.label}</button>;
+        })}
+      </div>
+    </div>
+  );
 }
 
 // Per-buyout advanced settings block
