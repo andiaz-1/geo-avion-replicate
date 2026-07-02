@@ -172,6 +172,13 @@ export const defaultFunnelData: FunnelData = {
       { id: uid(), label: "Saturday premium", condition: "Day of week = Saturday", effect: "+15%" },
       { id: uid(), label: "High season", condition: "Month in [Dec, Feb]", effect: "Min spend $2,500" },
     ],
+    seasons: [
+      { id: uid(), label: "High season", months: [11, 12, 1, 2], mode: "surcharge", value: 15, surchargeUnit: "percent" },
+      { id: uid(), label: "Low season", months: [6, 7, 8], mode: "minSpend", value: 1500 },
+    ],
+    dowRules: [
+      { id: uid(), label: "Weekend premium", weekdays: [5, 6], mode: "surcharge", value: 10, surchargeUnit: "percent" },
+    ],
   },
   guests: { min: 8, max: 120, mode: "contact", contactPoints: "julie@osteria.com · (954) 555-0123", minAdvanceDays: 3 },
 };
