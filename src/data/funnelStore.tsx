@@ -153,6 +153,8 @@ export const defaultFunnelData: FunnelData = {
   },
   timeslots: {
     start: "11:30", end: "22:00", interval: 30, lunchDinnerPricing: true, cutoff: "16:00",
+    lunch: { enabled: true, start: "11:30", end: "15:30" },
+    dinner: { enabled: true, start: "17:00", end: "22:00" },
     happyHour: { enabled: false, start: "16:00", end: "18:00", note: "$2 off draft & wine" },
   },
   addons: [
