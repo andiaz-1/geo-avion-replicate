@@ -39,23 +39,27 @@ export type FunnelData = {
   menus: Menu[];
   bar: { active: boolean; packages: BarPkg[] };
   venues: Venue[];
+  buyouts: Buyout[];
   availability: {
     holidays: Holiday[];
     blocked: BlockedRange[];
     recurring: RecurringRule[];
   };
-  timeslots: { start: string; end: string; interval: 15 | 30 | 60; lunchDinnerPricing: boolean; cutoff: string };
+  timeslots: {
+    start: string; end: string; interval: 15 | 30 | 60;
+    lunchDinnerPricing: boolean; cutoff: string;
+    happyHour: { enabled: boolean; start: string; end: string; note: string };
+  };
   addons: Addon[];
   faq: { show: boolean; items: Faq[] };
   pricing: {
-    pricePerPerson: number;
     kidsMode: "same" | "flat" | "notCounted";
     kidsFlat: number;
     serviceCharge: number;
     salesTax: number;
     buyoutUpcharge: number;
   };
-  advanced: { rules: DynRule[] };
+  advanced: { rules: DynRule[]; buyoutEnabled: boolean };
   guests: GuestTier;
 };
 
