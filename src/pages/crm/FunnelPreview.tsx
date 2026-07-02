@@ -16,6 +16,7 @@ export default function FunnelPreview() {
   }, [data]);
 
   const [stepIdx, setStepIdx] = useState(0);
+  const [expandedMenuId, setExpandedMenuId] = useState<string | null>(null);
   const step = steps[stepIdx];
   const [form, setForm] = useState({
     date: "", time: "", guests: 12,
