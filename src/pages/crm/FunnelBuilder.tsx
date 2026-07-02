@@ -564,7 +564,7 @@ function VenuesTab() {
                 </div>
               )}
               <p className="text-xs text-stone-500 mb-2">Includes spaces:</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {data.venues.map((v) => {
                   const active = b.spaceIds.includes(v.id);
                   return (
@@ -574,6 +574,7 @@ function VenuesTab() {
                   );
                 })}
               </div>
+              <BuyoutAdvancedBlock buyout={b} patch={(p) => patchBuyout(b.id, p)} seasons={data.advanced.seasons || []}/>
             </Card>
           ))}
           <Button variant="outline" size="sm" onClick={() => update("buyouts", (prev) => [...prev, { id: newId(), label: "New buyout", kind: "partial", spaceIds: [], price: 1500 }])}><Plus className="h-3.5 w-3.5 mr-1"/>Add buyout option</Button>
