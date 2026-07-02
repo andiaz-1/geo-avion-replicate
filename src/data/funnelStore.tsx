@@ -170,9 +170,22 @@ type Ctx = {
 const FunnelCtx = createContext<Ctx | null>(null);
 
 const STORAGE_KEY = "funnelBuilder:data";
+const mergeFunnelData = (base: any, saved: any): any => {
+  if (!saved || typeof saved !== "object") return base;
+  if (Array.isArray(base)) return Array.isArray(saved) ? saved : base;
+  return Object.keys(base).reduce((acc, key) => {
+    const baseValue = base[key];
+    const savedValue = saved[key];
+    acc[key] = baseValue && typeof baseValue === "object" && !Array.isArray(baseValue)
+      ? mergeFunnelData(baseValue, savedValue)
+      : savedValue ?? baseValue;
+    return acc;
+  }, { ...base });
+};
+
 export function loadFunnelData(): FunnelData {
   if (typeof window === "undefined") return defaultFunnelData;
-  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return JSON.parse(raw); } catch {}
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return mergeFunnelData(defaultFunnelData, JSON.parse(raw)); } catch {}
   return defaultFunnelData;
 }
 
