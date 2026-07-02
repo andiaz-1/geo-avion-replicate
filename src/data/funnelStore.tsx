@@ -172,7 +172,11 @@ const FunnelCtx = createContext<Ctx | null>(null);
 const STORAGE_KEY = "funnelBuilder:data";
 const mergeFunnelData = (base: any, saved: any): any => {
   if (!saved || typeof saved !== "object") return base;
-  if (Array.isArray(base)) return Array.isArray(saved) ? saved : base;
+  if (Array.isArray(base)) {
+    if (!Array.isArray(saved)) return base;
+    if (!base.length || typeof base[0] !== "object") return saved;
+    return saved.map((item, index) => mergeFunnelData(base[index] ?? base[0], item));
+  }
   return Object.keys(base).reduce((acc, key) => {
     const baseValue = base[key];
     const savedValue = saved[key];
