@@ -62,7 +62,7 @@ export type FunnelData = {
 // -----------------------------
 const uid = () => Math.random().toString(36).slice(2, 9);
 
-const defaultData: FunnelData = {
+export const defaultFunnelData: FunnelData = {
   core: {
     name: "Osteria — Private Events",
     slug: "osteria",
