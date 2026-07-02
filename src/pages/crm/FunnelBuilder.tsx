@@ -416,8 +416,8 @@ function BarTab() {
                   <Field label="Extra hour / pp"><Input type="number" value={p.priceExtraHour} onChange={(e) => patch(p.id, { priceExtraHour: +e.target.value })}/></Field>
                 </div>
                 <Field label="Included drinks"><Textarea value={p.drinks.join("\n")} rows={3} onChange={(e) => patch(p.id, { drinks: e.target.value.split("\n") })}/></Field>
-                <Field label="Short caption (optional — e.g. explain what 'on consumption' means; leave blank to hide)">
-                  <Textarea value={p.description || ""} rows={2} placeholder="e.g. Guests order freely — you're billed only for what's consumed." onChange={(e) => patch(p.id, { description: e.target.value })}/>
+                <Field label="Short caption (optional — e.g. explain what 'beer & wine package' means; leave blank to hide)">
+                  <Textarea value={p.description || ""} rows={2} placeholder="e.g. Unlimited beer & wine selection for the duration of your event." onChange={(e) => patch(p.id, { description: e.target.value })}/>
                 </Field>
                 <div className="flex items-center gap-3 mt-3 text-sm">
                   <button onClick={() => patch(p.id, { mode: "open" })} className={`px-3 py-1.5 rounded-full text-xs ${p.mode==="open"?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>Open bar</button>
