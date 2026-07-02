@@ -56,9 +56,12 @@ const App = () => (
             <Route path="contacts" element={<CrmContacts />} />
             <Route path="menus" element={<CrmMenus />} />
             <Route path="settings" element={<CrmSettings />} />
+            <Route path="funnel" element={<FunnelBuilder />} />
           </Route>
+          <Route path="/crm/funnel/preview" element={<FunnelPreview />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
+
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
