@@ -85,11 +85,19 @@ export default function FunnelPreview() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
+      {config.branding.logo && (
+        <div className="flex justify-center pt-8 pb-2">
+          <img src={config.branding.logo} alt="logo" className="h-12 object-contain" />
+        </div>
+      )}
       <ProgressBar currentStep={currentStep} totalSteps={5} />
 
       <main className="px-4 py-12 md:py-20">
         {currentStep === 1 && (
           <section className="max-w-xl mx-auto">
+            {config.branding.hero && (
+              <img src={config.branding.hero} alt="" className="w-full h-56 md:h-72 object-cover rounded-sm mb-10" />
+            )}
             <div className="text-center mb-10">
               <h1 className="font-heading text-3xl md:text-4xl font-medium text-foreground">{config.branding.heroTitle || "Begin Your Italian Celebration"}</h1>
               <p className="mt-3 text-xs tracking-[0.25em] uppercase text-muted-foreground">{config.branding.heroSubtitle || `${config.core.name.replace(/—.*/, "").trim()} · ${config.core.location.replace(/[()]/g, "")}`}</p>
