@@ -470,6 +470,7 @@ function VenuesTab() {
             </div>
             <div className="p-4 space-y-3">
               <Input value={v.name} className="text-base font-medium border-none px-0 h-auto focus-visible:ring-0" style={{ fontFamily: "'Playfair Display', serif" }} onChange={(e) => patch(v.id, { name: e.target.value })}/>
+              <Input value={v.description || ""} placeholder="Short caption (optional; leave blank to hide)" className="h-8 text-xs" onChange={(e) => patch(v.id, { description: e.target.value })}/>
 
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-1">Seated</p>
