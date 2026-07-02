@@ -64,6 +64,8 @@ export type FunnelData = {
   timeslots: {
     start: string; end: string; interval: 15 | 30 | 60;
     lunchDinnerPricing: boolean; cutoff: string;
+    lunch: { enabled: boolean; start: string; end: string };
+    dinner: { enabled: boolean; start: string; end: string };
     happyHour: { enabled: boolean; start: string; end: string; note: string };
   };
   addons: Addon[];
