@@ -104,24 +104,29 @@ export default function FunnelPreview() {
 
       {/* Progress */}
       <div className="max-w-3xl mx-auto px-4 md:px-6 py-8">
-        <div className="flex items-center justify-between mb-10">
-          {steps.map((s, i) => (
-            <div key={s.id} className="flex items-center flex-1 last:flex-none">
-              <div className="flex flex-col items-center">
-                <button onClick={() => i <= stepIdx && setStepIdx(i)}
-                  className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors"
-                  style={{
-                    background: i < stepIdx ? b.accent : i === stepIdx ? b.accent : "transparent",
-                    borderColor: i <= stepIdx ? b.accent : "rgba(0,0,0,0.15)",
-                    color: i <= stepIdx ? "#fff" : "rgba(0,0,0,0.4)",
-                  }}>
-                  {i < stepIdx ? <Check className="h-4 w-4"/> : i + 1}
-                </button>
-                <span className="text-[10px] mt-1.5 uppercase tracking-wider opacity-70 text-center whitespace-nowrap">{s.label}</span>
+        <div className="flex items-start justify-between mb-12 max-w-2xl mx-auto">
+          {steps.map((s, i) => {
+            const done = i < stepIdx;
+            const active = i === stepIdx;
+            return (
+              <div key={s.id} className="flex items-start flex-1 last:flex-none">
+                <div className="flex flex-col items-center min-w-0">
+                  <button onClick={() => i <= stepIdx && setStepIdx(i)}
+                    className="h-7 w-7 rounded-full flex items-center justify-center text-[11px] font-medium border transition-colors"
+                    style={{
+                      background: active ? b.accent : "transparent",
+                      borderColor: active ? b.accent : done ? b.accent : "rgba(0,0,0,0.25)",
+                      color: active ? "#fff" : done ? b.accent : "rgba(0,0,0,0.5)",
+                    }}>
+                    {i + 1}
+                  </button>
+                  <span className="text-[10px] mt-2 uppercase tracking-[0.15em] text-center leading-tight px-1"
+                    style={{ color: active ? b.text : "rgba(0,0,0,0.5)", maxWidth: 80 }}>{s.label}</span>
+                </div>
+                {i < steps.length - 1 && <div className="flex-1 h-px mx-1 mt-[13px]" style={{ background: "rgba(0,0,0,0.15)" }}/>}
               </div>
-              {i < steps.length - 1 && <div className="flex-1 h-px mx-2 mt-[-14px]" style={{ background: i < stepIdx ? b.accent : "rgba(0,0,0,0.15)" }}/>}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-sm border" style={{ borderColor: "rgba(0,0,0,0.06)" }}>
