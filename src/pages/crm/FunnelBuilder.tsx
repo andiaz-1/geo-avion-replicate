@@ -231,6 +231,16 @@ function BrandingTab() {
         </Field>
       </div>
 
+      <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mt-8 mb-3">Step 1 hero copy</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Hero title">
+          <Input value={b.heroTitle} onChange={(e) => update("branding", { heroTitle: e.target.value })} placeholder="Begin Your Italian Celebration" />
+        </Field>
+        <Field label="Hero subtitle">
+          <Input value={b.heroSubtitle} onChange={(e) => update("branding", { heroSubtitle: e.target.value })} placeholder="Osteria · Osteria Weston" />
+        </Field>
+      </div>
+
       <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mt-8 mb-3">Colors</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {(["accent","background","text","button"] as const).map((k) => (
