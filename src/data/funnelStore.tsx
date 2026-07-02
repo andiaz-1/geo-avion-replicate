@@ -158,16 +158,24 @@ type Ctx = {
 };
 const FunnelCtx = createContext<Ctx | null>(null);
 
+const STORAGE_KEY = "funnelBuilder:data";
+export function loadFunnelData(): FunnelData {
+  if (typeof window === "undefined") return defaultFunnelData;
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return JSON.parse(raw); } catch {}
+  return defaultFunnelData;
+}
+
 export function FunnelStoreProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<FunnelData>(defaultData);
+  const [data, setData] = useState<FunnelData>(loadFunnelData);
+  const persist = (d: FunnelData) => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {} return d; };
   const update: Ctx["update"] = (section, value) => {
     setData((prev) => {
       const current = prev[section];
       const next = typeof value === "function" ? (value as any)(current) : { ...(current as any), ...(value as any) };
-      return { ...prev, [section]: next };
+      return persist({ ...prev, [section]: next });
     });
   };
-  return <FunnelCtx.Provider value={{ data, update, set: setData }}>{children}</FunnelCtx.Provider>;
+  return <FunnelCtx.Provider value={{ data, update, set: (d) => setData(persist(d)) }}>{children}</FunnelCtx.Provider>;
 }
 
 export const useFunnel = () => {
@@ -177,3 +185,4 @@ export const useFunnel = () => {
 };
 
 export const newId = uid;
+
