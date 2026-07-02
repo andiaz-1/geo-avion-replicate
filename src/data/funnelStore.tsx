@@ -74,7 +74,7 @@ export type FunnelData = {
     salesTax: number;
     buyoutUpcharge: number;
   };
-  advanced: { rules: DynRule[]; buyoutEnabled: boolean };
+  advanced: { rules: DynRule[]; buyoutEnabled: boolean; seasons: Season[]; dowRules: DayOfWeekRule[] };
   guests: GuestTier;
 };
 
