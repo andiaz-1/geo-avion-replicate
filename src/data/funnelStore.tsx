@@ -4,7 +4,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 // Types
 // -----------------------------
 export type Course = { id: string; name: string; picks: number; items: { id: string; name: string; supplement: number }[] };
-export type Menu = { id: string; name: string; price: number; hasLunchPrice: boolean; lunchPrice: number; image: string; courses: Course[] };
+export type Menu = { id: string; name: string; price: number; hasLunchPrice: boolean; lunchPrice: number; image: string; courses: Course[]; showPhoto?: boolean; showDishes?: boolean };
 export type BarPkg = { id: string; name: string; mode: "open" | "consumption"; price2hr: number; price3hr: number; priceExtraHour: number; drinks: string[]; active: boolean };
 export type Space = { id: string; name: string; photo: string; seatedMin: number; seatedMax: number; cocktailMin: number; cocktailMax: number; privacy: "private" | "semi" | "public"; showLayouts: boolean; layouts: string[] };
 export type Venue = Space;

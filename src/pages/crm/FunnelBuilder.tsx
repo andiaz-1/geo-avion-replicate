@@ -290,7 +290,7 @@ function MenusTab() {
   const { data, update } = useFunnel();
   const [open, setOpen] = useState<string | null>(data.menus[0]?.id ?? null);
 
-  const addMenu = () => update("menus", (prev) => [...prev, { id: newId(), name: "New menu", price: 55, hasLunchPrice: false, lunchPrice: 0, image: "", courses: [] }]);
+  const addMenu = () => update("menus", (prev) => [...prev, { id: newId(), name: "New menu", price: 55, hasLunchPrice: false, lunchPrice: 0, image: "", courses: [], showPhoto: true, showDishes: false }]);
   const dup = (id: string) => update("menus", (prev) => {
     const m = prev.find((x) => x.id === id); if (!m) return prev;
     return [...prev, { ...m, id: newId(), name: m.name + " (copy)" }];
@@ -332,6 +332,10 @@ function MenusTab() {
                     </div>
                   </div>
                   <Field label="Image URL"><Input value={m.image} onChange={(e) => patch(m.id, { image: e.target.value })}/></Field>
+                  <div className="flex flex-wrap gap-6 pt-1">
+                    <label className="flex items-center gap-2 text-sm text-stone-600"><Switch checked={m.showPhoto !== false} onCheckedChange={(v) => patch(m.id, { showPhoto: v })}/>Show photo on card</label>
+                    <label className="flex items-center gap-2 text-sm text-stone-600"><Switch checked={!!m.showDishes} onCheckedChange={(v) => patch(m.id, { showDishes: v })}/>Show individual dishes when expanded</label>
+                  </div>
 
                   <div>
                     <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-2">Courses</p>
