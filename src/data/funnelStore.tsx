@@ -35,6 +35,8 @@ export type FunnelData = {
     button: string;
     titleFont: string;
     bodyFont: string;
+    heroTitle: string;
+    heroSubtitle: string;
   };
   menus: Menu[];
   bar: { active: boolean; packages: BarPkg[] };
@@ -86,6 +88,8 @@ export const defaultFunnelData: FunnelData = {
     button: "#7b3f2f",
     titleFont: "Playfair Display",
     bodyFont: "Montserrat",
+    heroTitle: "Begin Your Italian Celebration",
+    heroSubtitle: "Osteria · Osteria Weston",
   },
   menus: [
     { id: uid(), name: "Classico", price: 60, hasLunchPrice: true, lunchPrice: 48, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=70",

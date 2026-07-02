@@ -91,8 +91,8 @@ export default function FunnelPreview() {
         {currentStep === 1 && (
           <section className="max-w-xl mx-auto">
             <div className="text-center mb-10">
-              <h1 className="font-heading text-3xl md:text-4xl font-medium text-foreground">Begin Your Italian Celebration</h1>
-              <p className="mt-3 text-xs tracking-[0.25em] uppercase text-muted-foreground">{config.core.name.replace(/—.*/, "").trim()} · {config.core.location.replace(/[()]/g, "")}</p>
+              <h1 className="font-heading text-3xl md:text-4xl font-medium text-foreground">{config.branding.heroTitle || "Begin Your Italian Celebration"}</h1>
+              <p className="mt-3 text-xs tracking-[0.25em] uppercase text-muted-foreground">{config.branding.heroSubtitle || `${config.core.name.replace(/—.*/, "").trim()} · ${config.core.location.replace(/[()]/g, "")}`}</p>
             </div>
 
             <div className="space-y-6">
