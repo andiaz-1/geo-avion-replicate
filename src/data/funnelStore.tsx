@@ -4,15 +4,15 @@ import { createContext, useContext, useState, ReactNode } from "react";
 // Types
 // -----------------------------
 export type Course = { id: string; name: string; picks: number; items: { id: string; name: string; supplement: number }[] };
-export type Menu = { id: string; name: string; price: number; hasLunchPrice: boolean; lunchPrice: number; image: string; courses: Course[]; showPhoto?: boolean; showDishes?: boolean };
-export type BarPkg = { id: string; name: string; mode: "open" | "consumption"; price2hr: number; price3hr: number; priceExtraHour: number; drinks: string[]; active: boolean };
-export type Space = { id: string; name: string; photo: string; seatedMin: number; seatedMax: number; cocktailMin: number; cocktailMax: number; privacy: "private" | "semi" | "public"; showLayouts: boolean; layouts: string[] };
+export type Menu = { id: string; name: string; price: number; hasLunchPrice: boolean; lunchPrice: number; image: string; courses: Course[]; showPhoto?: boolean; showDishes?: boolean; description?: string };
+export type BarPkg = { id: string; name: string; mode: "open" | "consumption"; price2hr: number; price3hr: number; priceExtraHour: number; drinks: string[]; active: boolean; description?: string };
+export type Space = { id: string; name: string; photo: string; seatedMin: number; seatedMax: number; cocktailMin: number; cocktailMax: number; privacy: "private" | "semi" | "public"; showLayouts: boolean; layouts: string[]; description?: string };
 export type Venue = Space;
 export type Buyout = { id: string; label: string; kind: "full" | "partial"; spaceIds: string[]; price: number };
 export type Holiday = { id: string; label: string; date: string; state: "available" | "blocked" | "special"; surcharge: number };
 export type BlockedRange = { id: string; from: string; to: string; note: string; surcharge: number };
 export type RecurringRule = { id: string; label: string; weekday: number; surcharge: number };
-export type Addon = { id: string; name: string; price: number; unit: "fixed" | "per-person"; qty: number; active: boolean; taxable: boolean; serviceable: boolean; otherFeePct: number };
+export type Addon = { id: string; name: string; price: number; unit: "fixed" | "per-person"; qty: number; active: boolean; taxable: boolean; serviceable: boolean; otherFeePct: number; description?: string };
 export type Faq = { id: string; q: string; a: string };
 export type DynRule = { id: string; label: string; condition: string; effect: string };
 export type GuestTier = { min: number; max: number; mode: "contact" | "exception" | "info"; contactPoints: string; minAdvanceDays: number };
