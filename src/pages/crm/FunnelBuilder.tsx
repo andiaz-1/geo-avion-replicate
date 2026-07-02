@@ -97,7 +97,7 @@ function Inner() {
           {tab === "advanced" && <AdvancedTab />}
         </Card>
 
-        <GuestTiersCard />
+        
       </div>
     </div>
   );
