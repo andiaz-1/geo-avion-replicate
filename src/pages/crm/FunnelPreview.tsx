@@ -85,11 +85,19 @@ export default function FunnelPreview() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
+      {config.branding.logo && (
+        <div className="flex justify-center pt-8 pb-2">
+          <img src={config.branding.logo} alt="logo" className="h-12 object-contain" />
+        </div>
+      )}
       <ProgressBar currentStep={currentStep} totalSteps={5} />
 
       <main className="px-4 py-12 md:py-20">
         {currentStep === 1 && (
           <section className="max-w-xl mx-auto">
+            {config.branding.hero && (
+              <img src={config.branding.hero} alt="" className="w-full h-56 md:h-72 object-cover rounded-sm mb-10" />
+            )}
             <div className="text-center mb-10">
               <h1 className="font-heading text-3xl md:text-4xl font-medium text-foreground">{config.branding.heroTitle || "Begin Your Italian Celebration"}</h1>
               <p className="mt-3 text-xs tracking-[0.25em] uppercase text-muted-foreground">{config.branding.heroSubtitle || `${config.core.name.replace(/—.*/, "").trim()} · ${config.core.location.replace(/[()]/g, "")}`}</p>
@@ -169,7 +177,7 @@ export default function FunnelPreview() {
                     <button disabled={!available} onClick={() => setForm({ ...form, spaceId: space.id, layout: "" })} className="w-full p-6 text-left">
                       <h2 className="font-heading text-lg font-medium text-foreground">{space.name}</h2>
                       <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">{space.seatedMin}–{space.seatedMax} seated · {space.cocktailMin}–{space.cocktailMax} cocktail</p>
-                      <p className="mt-3 text-sm text-muted-foreground leading-relaxed capitalize">{space.privacy === "semi" ? "Semi-private" : space.privacy} space for private events.</p>
+                      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{space.description || `${space.privacy === "semi" ? "Semi-private" : space.privacy.charAt(0).toUpperCase() + space.privacy.slice(1)} space for private events.`}</p>
                       {!available && <p className="mt-3 text-xs text-destructive italic">Exceeds capacity for your party</p>}
                     </button>
                     {space.showLayouts && space.layouts.length > 0 && selected && (
@@ -213,6 +221,7 @@ export default function FunnelPreview() {
                     <div className="p-5">
                       <h2 className="font-heading text-xl font-medium text-foreground">{menu.name}</h2>
                       <p className="text-xs tracking-[0.15em] uppercase text-accent mt-1">{menu.courses.length} courses · {dishCount} dishes</p>
+                      {menu.description && <p className="text-xs text-muted-foreground italic mt-2 leading-relaxed">{menu.description}</p>}
                       <p className="text-sm font-semibold text-foreground mt-2">{displayPrice}</p>
                       <button onClick={() => setExpandedMenuId(expanded ? null : menu.id)} className="mt-4 inline-flex items-center gap-1 text-xs tracking-widest uppercase text-muted-foreground hover:text-foreground">
                         {expanded ? "Hide details" : "View details"}<ChevronDown className={cn("h-3 w-3 transition-transform", expanded && "rotate-180")} />
@@ -249,6 +258,7 @@ export default function FunnelPreview() {
                     <button key={pkg.id} onClick={() => setForm({ ...form, barId: pkg.id })} className={cn("border rounded-sm p-5 text-left transition-all duration-300", form.barId === pkg.id ? "border-primary bg-primary/5" : "border-border bg-card hover:border-foreground/30")}>
                       <h3 className="font-heading text-lg font-medium text-foreground">{pkg.name}</h3>
                       <p className="mt-1 text-xs uppercase tracking-[0.15em] text-accent">{pkg.mode === "open" ? `$${pkg.price2hr}/pp · 2 hr` : "On consumption"}</p>
+                      {pkg.description && <p className="mt-2 text-xs text-muted-foreground italic leading-relaxed">{pkg.description}</p>}
                       {pkg.priceExtraHour > 0 && <p className="mt-1 text-xs text-muted-foreground">Extra hour: ${pkg.priceExtraHour}/pp</p>}
                     </button>
                   ))}
@@ -271,8 +281,11 @@ export default function FunnelPreview() {
                 return (
                   <button key={addon.id} onClick={() => setForm({ ...form, addonIds: selected ? form.addonIds.filter((id) => id !== addon.id) : [...form.addonIds, addon.id] })} className={cn("w-full border rounded-sm p-5 text-left transition-all duration-300 flex items-center justify-between", selected ? "border-primary bg-primary/5" : "border-border bg-card hover:border-foreground/30")}>
                     <div className="flex items-center gap-4">
-                      <span className={cn("w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors", selected ? "border-primary bg-primary" : "border-muted-foreground/40")}>{selected && <Check className="h-3 w-3 text-primary-foreground" />}</span>
-                      <span className="text-sm font-medium text-foreground">{addon.name}</span>
+                      <span className={cn("w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors shrink-0", selected ? "border-primary bg-primary" : "border-muted-foreground/40")}>{selected && <Check className="h-3 w-3 text-primary-foreground" />}</span>
+                      <div>
+                        <span className="text-sm font-medium text-foreground block">{addon.name}</span>
+                        {addon.description && <span className="text-xs text-muted-foreground italic">{addon.description}</span>}
+                      </div>
                     </div>
                     <span className="text-xs text-muted-foreground">{addon.unit === "per-person" ? `$${addon.price}/pp` : `$${addon.price}${addon.qty > 1 ? ` × ${addon.qty}` : ""}`}</span>
                   </button>

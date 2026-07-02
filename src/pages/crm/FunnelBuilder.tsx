@@ -342,6 +342,9 @@ function MenusTab() {
                     </div>
                   </div>
                   <Field label="Image URL"><Input value={m.image} onChange={(e) => patch(m.id, { image: e.target.value })}/></Field>
+                  <Field label="Short caption (optional — shown under the menu name; leave blank to hide)">
+                    <Input value={m.description || ""} placeholder="e.g. A refined three-course tasting inspired by coastal Sicily" onChange={(e) => patch(m.id, { description: e.target.value })}/>
+                  </Field>
                   <div className="flex flex-wrap gap-6 pt-1">
                     <label className="flex items-center gap-2 text-sm text-stone-600"><Switch checked={m.showPhoto !== false} onCheckedChange={(v) => patch(m.id, { showPhoto: v })}/>Show photo on card</label>
                     <label className="flex items-center gap-2 text-sm text-stone-600"><Switch checked={!!m.showDishes} onCheckedChange={(v) => patch(m.id, { showDishes: v })}/>Show individual dishes when expanded</label>
@@ -413,6 +416,9 @@ function BarTab() {
                   <Field label="Extra hour / pp"><Input type="number" value={p.priceExtraHour} onChange={(e) => patch(p.id, { priceExtraHour: +e.target.value })}/></Field>
                 </div>
                 <Field label="Included drinks"><Textarea value={p.drinks.join("\n")} rows={3} onChange={(e) => patch(p.id, { drinks: e.target.value.split("\n") })}/></Field>
+                <Field label="Short caption (optional — e.g. explain what 'on consumption' means; leave blank to hide)">
+                  <Textarea value={p.description || ""} rows={2} placeholder="e.g. Guests order freely — you're billed only for what's consumed." onChange={(e) => patch(p.id, { description: e.target.value })}/>
+                </Field>
                 <div className="flex items-center gap-3 mt-3 text-sm">
                   <button onClick={() => patch(p.id, { mode: "open" })} className={`px-3 py-1.5 rounded-full text-xs ${p.mode==="open"?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>Open bar</button>
                   <button onClick={() => patch(p.id, { mode: "consumption" })} className={`px-3 py-1.5 rounded-full text-xs ${p.mode==="consumption"?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>On consumption</button>
@@ -464,6 +470,7 @@ function VenuesTab() {
             </div>
             <div className="p-4 space-y-3">
               <Input value={v.name} className="text-base font-medium border-none px-0 h-auto focus-visible:ring-0" style={{ fontFamily: "'Playfair Display', serif" }} onChange={(e) => patch(v.id, { name: e.target.value })}/>
+              <Input value={v.description || ""} placeholder="Short caption (optional; leave blank to hide)" className="h-8 text-xs" onChange={(e) => patch(v.id, { description: e.target.value })}/>
 
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-1">Seated</p>
@@ -747,19 +754,22 @@ function AddonsTab() {
       </div>
       <div className="space-y-2">
         {data.addons.map((a) => (
-          <div key={a.id} className="grid grid-cols-12 gap-2 items-center border border-stone-200 rounded-md p-3 bg-white">
-            <Input value={a.name} className="col-span-3 h-9" onChange={(e) => patch(a.id, { name: e.target.value })}/>
-            <Input type="number" value={a.price} className="col-span-1 h-9" onChange={(e) => patch(a.id, { price: +e.target.value })}/>
-            <Select value={a.unit} onValueChange={(v) => patch(a.id, { unit: v as any })}>
-              <SelectTrigger className="col-span-2 h-9"><SelectValue/></SelectTrigger>
-              <SelectContent><SelectItem value="fixed">Fixed</SelectItem><SelectItem value="per-person">Per person</SelectItem></SelectContent>
-            </Select>
-            <Input type="number" value={a.qty} className="col-span-1 h-9" placeholder="Qty" onChange={(e) => patch(a.id, { qty: +e.target.value })}/>
-            <div className="col-span-1 flex justify-center"><Switch checked={a.taxable} onCheckedChange={(v) => patch(a.id, { taxable: v })}/></div>
-            <div className="col-span-1 flex justify-center"><Switch checked={a.serviceable} onCheckedChange={(v) => patch(a.id, { serviceable: v })}/></div>
-            <Input type="number" value={a.otherFeePct} className="col-span-1 h-9" placeholder="0" onChange={(e) => patch(a.id, { otherFeePct: +e.target.value })}/>
-            <div className="col-span-1 flex justify-center"><Switch checked={a.active} onCheckedChange={(v) => patch(a.id, { active: v })}/></div>
-            <Button variant="ghost" size="sm" className="col-span-1" onClick={() => update("addons", (prev) => prev.filter((x) => x.id !== a.id))}><Trash2 className="h-4 w-4 text-red-500"/></Button>
+          <div key={a.id} className="border border-stone-200 rounded-md p-3 bg-white space-y-2">
+            <div className="grid grid-cols-12 gap-2 items-center">
+              <Input value={a.name} className="col-span-3 h-9" onChange={(e) => patch(a.id, { name: e.target.value })}/>
+              <Input type="number" value={a.price} className="col-span-1 h-9" onChange={(e) => patch(a.id, { price: +e.target.value })}/>
+              <Select value={a.unit} onValueChange={(v) => patch(a.id, { unit: v as any })}>
+                <SelectTrigger className="col-span-2 h-9"><SelectValue/></SelectTrigger>
+                <SelectContent><SelectItem value="fixed">Fixed</SelectItem><SelectItem value="per-person">Per person</SelectItem></SelectContent>
+              </Select>
+              <Input type="number" value={a.qty} className="col-span-1 h-9" placeholder="Qty" onChange={(e) => patch(a.id, { qty: +e.target.value })}/>
+              <div className="col-span-1 flex justify-center"><Switch checked={a.taxable} onCheckedChange={(v) => patch(a.id, { taxable: v })}/></div>
+              <div className="col-span-1 flex justify-center"><Switch checked={a.serviceable} onCheckedChange={(v) => patch(a.id, { serviceable: v })}/></div>
+              <Input type="number" value={a.otherFeePct} className="col-span-1 h-9" placeholder="0" onChange={(e) => patch(a.id, { otherFeePct: +e.target.value })}/>
+              <div className="col-span-1 flex justify-center"><Switch checked={a.active} onCheckedChange={(v) => patch(a.id, { active: v })}/></div>
+              <Button variant="ghost" size="sm" className="col-span-1" onClick={() => update("addons", (prev) => prev.filter((x) => x.id !== a.id))}><Trash2 className="h-4 w-4 text-red-500"/></Button>
+            </div>
+            <Input value={a.description || ""} placeholder="Short caption (optional — shown under the addon name; leave blank to hide)" className="h-8 text-xs" onChange={(e) => patch(a.id, { description: e.target.value })}/>
           </div>
         ))}
       </div>
