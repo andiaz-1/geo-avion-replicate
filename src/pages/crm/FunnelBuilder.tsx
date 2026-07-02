@@ -708,20 +708,54 @@ function TimeSlotsTab() {
         </Field>
       </div>
 
-      {/* Lunch / dinner */}
+      {/* Lunch */}
       <div className="mt-6 border border-stone-200 rounded-lg p-5 bg-white">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium">Do you want to determine your lunch & dinner hours?</p>
+            <p className="text-sm font-medium">Lunch service</p>
+            <p className="text-xs text-stone-500 mt-0.5">Set the window guests can book for lunch.</p>
+          </div>
+          <Switch checked={t.lunch.enabled} onCheckedChange={(v) => update("timeslots", { lunch: { ...t.lunch, enabled: v } })}/>
+        </div>
+        {t.lunch.enabled && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label="Lunch from"><Input type="time" value={t.lunch.start} onChange={(e) => update("timeslots", { lunch: { ...t.lunch, start: e.target.value } })}/></Field>
+            <Field label="Lunch to"><Input type="time" value={t.lunch.end} onChange={(e) => update("timeslots", { lunch: { ...t.lunch, end: e.target.value } })}/></Field>
+          </div>
+        )}
+      </div>
+
+      {/* Dinner */}
+      <div className="mt-4 border border-stone-200 rounded-lg p-5 bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Dinner service</p>
+            <p className="text-xs text-stone-500 mt-0.5">Set the window guests can book for dinner.</p>
+          </div>
+          <Switch checked={t.dinner.enabled} onCheckedChange={(v) => update("timeslots", { dinner: { ...t.dinner, enabled: v } })}/>
+        </div>
+        {t.dinner.enabled && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label="Dinner from"><Input type="time" value={t.dinner.start} onChange={(e) => update("timeslots", { dinner: { ...t.dinner, start: e.target.value } })}/></Field>
+            <Field label="Dinner to"><Input type="time" value={t.dinner.end} onChange={(e) => update("timeslots", { dinner: { ...t.dinner, end: e.target.value } })}/></Field>
+          </div>
+        )}
+      </div>
+
+      {/* Legacy lunch-vs-dinner pricing cutoff */}
+      <div className="mt-4 border border-stone-200 rounded-lg p-5 bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Different menu pricing at lunch vs dinner?</p>
             <p className="text-xs text-stone-500 mt-0.5">Applies different menu pricing before / after the cutoff.</p>
           </div>
           <Switch checked={t.lunchDinnerPricing} onCheckedChange={(v) => update("timeslots", { lunchDinnerPricing: v })}/>
         </div>
         {t.lunchDinnerPricing && (
           <div className="mt-4 flex items-center gap-3 text-sm">
-            <span className="text-stone-500">Lunch until</span>
+            <span className="text-stone-500">Lunch pricing until</span>
             <Input type="time" value={t.cutoff} onChange={(e) => update("timeslots", { cutoff: e.target.value })} className="h-9 w-40"/>
-            <span className="text-stone-500">then dinner begins</span>
+            <span className="text-stone-500">then dinner pricing begins</span>
           </div>
         )}
       </div>
