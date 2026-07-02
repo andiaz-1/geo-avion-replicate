@@ -542,11 +542,27 @@ function VenuesTab() {
                   ))}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
-                  <Label className="text-xs text-stone-500">Price $</Label>
-                  <Input type="number" value={b.price} className="h-8 w-28" onChange={(e) => patchBuyout(b.id, { price: +e.target.value })}/>
+                  <div className="flex gap-1">
+                    {(["fixed","quote"] as const).map((m) => (
+                      <button key={m} onClick={() => patchBuyout(b.id, { pricingMode: m })} className={`px-3 py-1 rounded-full text-xs ${(b.pricingMode ?? "fixed")===m?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>{m === "fixed" ? "Fixed price" : "Quote on request"}</button>
+                    ))}
+                  </div>
+                  {(b.pricingMode ?? "fixed") === "fixed" ? (
+                    <>
+                      <Label className="text-xs text-stone-500">Price $</Label>
+                      <Input type="number" value={b.price} className="h-8 w-28" onChange={(e) => patchBuyout(b.id, { price: +e.target.value })}/>
+                    </>
+                  ) : null}
                   <Button variant="ghost" size="sm" onClick={() => update("buyouts", (prev) => prev.filter((x) => x.id !== b.id))}><Trash2 className="h-4 w-4 text-red-500"/></Button>
                 </div>
               </div>
+              {(b.pricingMode ?? "fixed") === "quote" && (
+                <div className="mb-3">
+                  <Field label="Message shown to guest instead of a price">
+                    <Textarea rows={2} value={b.quoteMessage || ""} placeholder="For a buyout pricing calculation, please fill out the entire form and our team will send you a custom quote." onChange={(e) => patchBuyout(b.id, { quoteMessage: e.target.value })}/>
+                  </Field>
+                </div>
+              )}
               <p className="text-xs text-stone-500 mb-2">Includes spaces:</p>
               <div className="flex flex-wrap gap-2">
                 {data.venues.map((v) => {
