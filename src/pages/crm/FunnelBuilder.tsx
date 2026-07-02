@@ -974,6 +974,9 @@ function AdvancedTab() {
                   <div><Label className="text-xs text-stone-500">F&B min spend $</Label><Input type="number" value={s.value} className="h-9 w-32" onChange={(e) => patchSeason(s.id, { value: +e.target.value })}/></div>
                 )}
               </div>
+              {s.mode === "surcharge" && (
+                <AppliesToPicker value={s.appliesTo} onChange={(next) => patchSeason(s.id, { appliesTo: next })}/>
+              )}
             </Card>
           ))}
           {!seasons.length && <p className="text-xs text-stone-400 italic">No seasons yet — add one to charge more (or require a higher minimum) during specific months.</p>}
