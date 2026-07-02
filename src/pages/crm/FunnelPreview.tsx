@@ -182,14 +182,14 @@ export default function FunnelPreview() {
               <h2 className="text-3xl mb-1" style={{ fontFamily: `'${b.titleFont}', serif` }}>Choose your space</h2>
               <p className="text-sm opacity-70 mb-6">Every room tells a different story.</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {data.venues.filter(v => form.guests >= v.min && form.guests <= v.max).map((v) => (
+                {data.venues.filter(v => form.guests >= v.seatedMin && form.guests <= v.seatedMax).map((v) => (
                   <button key={v.id} onClick={() => setForm({ ...form, venueId: v.id })}
                     className="text-left rounded-xl overflow-hidden border-2 transition-all"
                     style={{ borderColor: form.venueId === v.id ? b.accent : "rgba(0,0,0,0.08)", background: form.venueId === v.id ? "rgba(0,0,0,0.02)" : "white" }}>
                     <img src={v.photo} className="w-full h-36 object-cover" alt=""/>
                     <div className="p-4">
                       <p className="font-medium" style={{ fontFamily: `'${b.titleFont}', serif`, fontSize: 18 }}>{v.name}</p>
-                      <p className="text-xs opacity-60 mt-1">{v.min}–{v.max} guests {v.private && "· Private"}</p>
+                      <p className="text-xs opacity-60 mt-1">{v.seatedMin}–{v.seatedMax} seated {v.privacy !== "public" && `· ${v.privacy === "private" ? "Private" : "Semi-private"}`}</p>
                     </div>
                   </button>
                 ))}

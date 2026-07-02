@@ -20,12 +20,12 @@ const TABS = [
   { id: "branding", label: "Branding", icon: Palette },
   { id: "menus", label: "Menus", icon: UtensilsCrossed },
   { id: "bar", label: "Bar", icon: Wine },
-  { id: "venues", label: "Venues", icon: Home },
+  { id: "venues", label: "Spaces", icon: Home },
   { id: "availability", label: "Availability", icon: CalendarDays },
   { id: "timeslots", label: "Time slots", icon: Clock },
   { id: "addons", label: "Addons", icon: Sparkles },
   { id: "faq", label: "FAQ", icon: HelpCircle },
-  { id: "pricing", label: "Pricing", icon: DollarSign },
+  { id: "pricing", label: "Buyout", icon: DollarSign },
   { id: "advanced", label: "Advanced", icon: Wand2 },
 ] as const;
 
@@ -97,7 +97,7 @@ function Inner() {
           {tab === "advanced" && <AdvancedTab />}
         </Card>
 
-        <GuestTiersCard />
+        
       </div>
     </div>
   );
@@ -393,9 +393,10 @@ function BarTab() {
                   <Input value={p.name} className="text-lg font-medium border-none px-0 h-auto focus-visible:ring-0" style={{ fontFamily: "'Playfair Display', serif" }} onChange={(e) => patch(p.id, { name: e.target.value })}/>
                   <Button variant="ghost" size="sm" onClick={() => update("bar", { packages: b.packages.filter((x) => x.id !== p.id) })}><Trash2 className="h-4 w-4 text-red-500"/></Button>
                 </div>
-                <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="grid grid-cols-3 gap-2 mb-3">
                   <Field label="2 hr price"><Input type="number" value={p.price2hr} onChange={(e) => patch(p.id, { price2hr: +e.target.value })}/></Field>
                   <Field label="3 hr price"><Input type="number" value={p.price3hr} onChange={(e) => patch(p.id, { price3hr: +e.target.value })}/></Field>
+                  <Field label="Extra hour / pp"><Input type="number" value={p.priceExtraHour} onChange={(e) => patch(p.id, { priceExtraHour: +e.target.value })}/></Field>
                 </div>
                 <Field label="Included drinks"><Textarea value={p.drinks.join("\n")} rows={3} onChange={(e) => patch(p.id, { drinks: e.target.value.split("\n") })}/></Field>
                 <div className="flex items-center gap-3 mt-3 text-sm">
@@ -406,7 +407,7 @@ function BarTab() {
               </Card>
             ))}
           </div>
-          <Button variant="outline" className="mt-4 gap-2" onClick={() => update("bar", { packages: [...b.packages, { id: newId(), name: "New package", mode: "open", price2hr: 30, price3hr: 40, drinks: [], active: true }] })}><Plus className="h-4 w-4"/>Add package</Button>
+          <Button variant="outline" className="mt-4 gap-2" onClick={() => update("bar", { packages: [...b.packages, { id: newId(), name: "New package", mode: "open", price2hr: 30, price3hr: 40, priceExtraHour: 10, drinks: [], active: true }] })}><Plus className="h-4 w-4"/>Add package</Button>
         </>
       ) : <p className="text-stone-500 italic text-sm">Bar section is disabled — it will not appear in the guest funnel.</p>}
       <SaveBar/>
@@ -415,38 +416,136 @@ function BarTab() {
 }
 
 // ─────────────────────────────────────────────
-// Venues
+// Spaces (was Venues) + Buyout builder + Guest tiers
 // ─────────────────────────────────────────────
 function VenuesTab() {
   const { data, update } = useFunnel();
   const patch = (id: string, p: any) => update("venues", (prev) => prev.map((v) => v.id === id ? { ...v, ...p } : v));
+  const privacyLabel = (p: string) => p === "private" ? "Private" : p === "semi" ? "Semi-private" : "Public";
+  const privacyColor = (p: string) => p === "private" ? "bg-stone-900 text-white" : p === "semi" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800";
+
+  const buyouts = data.buyouts || [];
+  const patchBuyout = (id: string, p: any) => update("buyouts", (prev) => prev.map((b) => b.id === id ? { ...b, ...p } : b));
+  const toggleSpace = (id: string, sid: string) => {
+    const b = buyouts.find((x) => x.id === id); if (!b) return;
+    const has = b.spaceIds.includes(sid);
+    patchBuyout(id, { spaceIds: has ? b.spaceIds.filter((x) => x !== sid) : [...b.spaceIds, sid] });
+  };
+
   return (
     <div>
-      <SectionHead title="Venues" hint="Rooms and spaces available for booking"/>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <SectionHead title="Spaces" hint="Rooms and areas guests can book — with separate seated & cocktail capacities"/>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data.venues.map((v) => (
           <Card key={v.id} className="overflow-hidden border-stone-200">
-            <div className="relative h-36">
+            <div className="relative h-40 group">
               <img src={v.photo} className="w-full h-full object-cover" alt=""/>
-              <Badge className="absolute top-2 left-2 bg-white/90 text-stone-800 border-0">{v.min}–{v.max} guests</Badge>
-              {v.private && <Badge className="absolute top-2 right-2 bg-stone-900 text-white border-0">Private</Badge>}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Button size="sm" variant="secondary" className="gap-1" onClick={() => {
+                  const url = prompt("Paste image URL", v.photo); if (url) patch(v.id, { photo: url });
+                }}><ImageIcon className="h-3.5 w-3.5"/>Change photo</Button>
+              </div>
+              <Badge className={`absolute top-2 right-2 border-0 ${privacyColor(v.privacy)}`}>{privacyLabel(v.privacy)}</Badge>
             </div>
             <div className="p-4 space-y-3">
               <Input value={v.name} className="text-base font-medium border-none px-0 h-auto focus-visible:ring-0" style={{ fontFamily: "'Playfair Display', serif" }} onChange={(e) => patch(v.id, { name: e.target.value })}/>
-              <div className="grid grid-cols-2 gap-2">
-                <Field label="Min"><Input type="number" value={v.min} onChange={(e) => patch(v.id, { min: +e.target.value })} className="h-8"/></Field>
-                <Field label="Max"><Input type="number" value={v.max} onChange={(e) => patch(v.id, { max: +e.target.value })} className="h-8"/></Field>
+
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-1">Seated</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input type="number" value={v.seatedMin} onChange={(e) => patch(v.id, { seatedMin: +e.target.value })} className="h-8" placeholder="Min"/>
+                  <Input type="number" value={v.seatedMax} onChange={(e) => patch(v.id, { seatedMax: +e.target.value })} className="h-8" placeholder="Max"/>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-stone-500">Private / buyout</span><Switch checked={v.private} onCheckedChange={(x) => patch(v.id, { private: x })}/>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-1">Cocktail / standing</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input type="number" value={v.cocktailMin} onChange={(e) => patch(v.id, { cocktailMin: +e.target.value })} className="h-8" placeholder="Min"/>
+                  <Input type="number" value={v.cocktailMax} onChange={(e) => patch(v.id, { cocktailMax: +e.target.value })} className="h-8" placeholder="Max"/>
+                </div>
               </div>
-              <Field label="Layouts"><Input value={v.layouts.join(", ")} onChange={(e) => patch(v.id, { layouts: e.target.value.split(",").map(s => s.trim()) })}/></Field>
+
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-1">Privacy</p>
+                <div className="flex gap-1">
+                  {(["private","semi","public"] as const).map((k) => (
+                    <button key={k} onClick={() => patch(v.id, { privacy: k })} className={`px-2.5 py-1 rounded-full text-[11px] border transition-colors ${v.privacy===k ? privacyColor(k) + " border-transparent" : "border-stone-200 text-stone-500 bg-white"}`}>{privacyLabel(k)}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-[10px] uppercase tracking-wider text-stone-500 font-medium">Show layouts to guest</p>
+                  <Switch checked={v.showLayouts} onCheckedChange={(x) => patch(v.id, { showLayouts: x })}/>
+                </div>
+                {v.showLayouts && (
+                  <div>
+                    <div className="flex flex-wrap gap-1 mb-1">
+                      {v.layouts.map((l, i) => (
+                        <Badge key={i} variant="secondary" className="gap-1 pr-1">
+                          {l}
+                          <button onClick={() => patch(v.id, { layouts: v.layouts.filter((_, j) => j !== i) })}><Trash2 className="h-3 w-3"/></button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <Select value="" onValueChange={(val) => { if (val && !v.layouts.includes(val)) patch(v.id, { layouts: [...v.layouts, val] }); }}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="+ Add layout"/></SelectTrigger>
+                      <SelectContent>
+                        {["Rounds","Long table","U-shape","Theater","Classroom","Cocktail","Mixed seating","Boardroom"].map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+
               <Button variant="ghost" size="sm" className="w-full text-red-500" onClick={() => update("venues", (prev) => prev.filter((x) => x.id !== v.id))}><Trash2 className="h-4 w-4 mr-1"/>Remove</Button>
             </div>
           </Card>
         ))}
       </div>
-      <Button variant="outline" className="mt-4 gap-2" onClick={() => update("venues", (prev) => [...prev, { id: newId(), name: "New venue", photo: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&q=70", min: 8, max: 30, private: false, layouts: [] }])}><Plus className="h-4 w-4"/>Add venue</Button>
+      <Button variant="outline" className="mt-4 gap-2" onClick={() => update("venues", (prev) => [...prev, { id: newId(), name: "New space", photo: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&q=70", seatedMin: 8, seatedMax: 30, cocktailMin: 12, cocktailMax: 45, privacy: "semi", showLayouts: true, layouts: [] }])}><Plus className="h-4 w-4"/>Add space</Button>
+
+      {/* Buyout options */}
+      <div className="mt-10">
+        <SectionHead title="Buyout options" hint="Bundle spaces into full or partial buyout packages guests can pick"/>
+        <div className="space-y-3">
+          {buyouts.map((b) => (
+            <Card key={b.id} className="p-4 border-stone-200">
+              <div className="flex items-center gap-3 mb-3">
+                <Input value={b.label} className="font-medium border-none px-0 focus-visible:ring-0" style={{ fontFamily: "'Playfair Display', serif" }} onChange={(e) => patchBuyout(b.id, { label: e.target.value })}/>
+                <div className="flex gap-1">
+                  {(["full","partial"] as const).map((k) => (
+                    <button key={k} onClick={() => patchBuyout(b.id, { kind: k })} className={`px-3 py-1 rounded-full text-xs ${b.kind===k?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>{k === "full" ? "Full buyout" : "Partial buyout"}</button>
+                  ))}
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                  <Label className="text-xs text-stone-500">Price $</Label>
+                  <Input type="number" value={b.price} className="h-8 w-28" onChange={(e) => patchBuyout(b.id, { price: +e.target.value })}/>
+                  <Button variant="ghost" size="sm" onClick={() => update("buyouts", (prev) => prev.filter((x) => x.id !== b.id))}><Trash2 className="h-4 w-4 text-red-500"/></Button>
+                </div>
+              </div>
+              <p className="text-xs text-stone-500 mb-2">Includes spaces:</p>
+              <div className="flex flex-wrap gap-2">
+                {data.venues.map((v) => {
+                  const active = b.spaceIds.includes(v.id);
+                  return (
+                    <button key={v.id} onClick={() => toggleSpace(b.id, v.id)} className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${active ? "bg-stone-900 text-white border-stone-900" : "border-stone-200 text-stone-600 bg-white"}`}>
+                      {v.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </Card>
+          ))}
+          <Button variant="outline" size="sm" onClick={() => update("buyouts", (prev) => [...prev, { id: newId(), label: "New buyout", kind: "partial", spaceIds: [], price: 1500 }])}><Plus className="h-3.5 w-3.5 mr-1"/>Add buyout option</Button>
+        </div>
+      </div>
+
+      {/* Guest tiers & booking constraints (moved from bottom) */}
+      <GuestTiersCard />
+
       <SaveBar/>
     </div>
   );
@@ -460,32 +559,18 @@ function AvailabilityTab() {
   const a = data.availability;
   const stateColor = (s: string) => s === "available" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : s === "blocked" ? "bg-red-100 text-red-700 border-red-200" : "bg-amber-100 text-amber-700 border-amber-200";
 
-  // Mini calendar preview (next 35 days)
-  const today = new Date();
-  const days = Array.from({ length: 35 }, (_, i) => {
-    const d = new Date(today); d.setDate(today.getDate() + i); return d;
-  });
-  const dayState = (d: Date): "available" | "blocked" | "special" => {
-    const iso = d.toISOString().slice(0, 10);
-    const h = a.holidays.find((x) => x.date === iso);
-    if (h) return h.state;
-    if (a.blocked.some((b) => iso >= b.from && iso <= b.to)) return "blocked";
-    if (a.recurring.some((r) => d.getDay() === r.weekday)) return "blocked";
-    return "available";
-  };
-
   return (
     <div>
-      <SectionHead title="Availability" hint="Block dates, set holiday behavior, and recurring closures"/>
+      <SectionHead title="Availability" hint="Block dates, set holiday behavior, and add surcharges for special days"/>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Holidays */}
         <div>
           <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">US holidays</p>
           <div className="space-y-2">
             {a.holidays.map((h) => (
-              <div key={h.id} className="flex items-center gap-3 p-3 border border-stone-200 rounded-md bg-white">
-                <div className="flex-1">
+              <div key={h.id} className="flex items-center gap-3 p-3 border border-stone-200 rounded-md bg-white flex-wrap">
+                <div className="flex-1 min-w-[140px]">
                   <p className="text-sm font-medium">{h.label}</p>
                   <p className="text-xs text-stone-500">{h.date}</p>
                 </div>
@@ -493,53 +578,45 @@ function AvailabilityTab() {
                   {(["available","blocked","special"] as const).map((s) => (
                     <button key={s} onClick={() => update("availability", { holidays: a.holidays.map((x) => x.id === h.id ? { ...x, state: s } : x) })}
                       className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors capitalize ${h.state===s ? stateColor(s) : "border-stone-200 text-stone-400 bg-white"}`}>
-                      {s === "special" ? "Special +$" : s}
+                      {s}
                     </button>
                   ))}
                 </div>
+                {h.state !== "blocked" && (
+                  <div className="flex items-center gap-1">
+                    <Label className="text-[10px] uppercase text-stone-500">Surcharge</Label>
+                    <span className="text-stone-500 text-sm">$</span>
+                    <Input type="number" value={h.surcharge} className="h-8 w-24" placeholder="0"
+                      onChange={(e) => update("availability", { holidays: a.holidays.map((x) => x.id === h.id ? { ...x, surcharge: +e.target.value } : x) })}/>
+                    <span className="text-xs text-stone-500">/pp</span>
+                  </div>
+                )}
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Calendar preview */}
-        <div>
-          <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Calendar preview (next 5 weeks)</p>
-          <div className="border border-stone-200 rounded-lg p-4 bg-white">
-            <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-stone-500 mb-1">
-              {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {days.map((d, i) => {
-                const s = dayState(d);
-                const color = s === "blocked" ? "bg-red-500" : s === "special" ? "bg-amber-400" : "bg-emerald-400";
-                return <div key={i} className="aspect-square rounded flex items-center justify-center text-[11px] text-white font-medium" style={{ background: "" }}>
-                  <div className={`w-full h-full rounded flex items-center justify-center ${color}`}>{d.getDate()}</div>
-                </div>;
-              })}
-            </div>
-            <div className="flex gap-4 mt-3 text-xs">
-              <span className="flex items-center gap-1"><span className="h-3 w-3 rounded bg-emerald-400"/>Available</span>
-              <span className="flex items-center gap-1"><span className="h-3 w-3 rounded bg-amber-400"/>Special</span>
-              <span className="flex items-center gap-1"><span className="h-3 w-3 rounded bg-red-500"/>Blocked</span>
-            </div>
           </div>
         </div>
 
         {/* Blocked ranges */}
         <div>
-          <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Block specific days / ranges</p>
+          <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Block or upcharge specific ranges</p>
           <div className="space-y-2">
             {a.blocked.map((r) => (
-              <div key={r.id} className="flex items-center gap-2 p-3 border border-stone-200 rounded-md bg-white">
-                <Input type="date" value={r.from} className="h-8" onChange={(e) => update("availability", { blocked: a.blocked.map((x) => x.id===r.id ? {...x, from: e.target.value} : x) })}/>
+              <div key={r.id} className="flex items-center gap-2 p-3 border border-stone-200 rounded-md bg-white flex-wrap">
+                <Input type="date" value={r.from} className="h-8 w-40" onChange={(e) => update("availability", { blocked: a.blocked.map((x) => x.id===r.id ? {...x, from: e.target.value} : x) })}/>
                 <span className="text-stone-400">→</span>
-                <Input type="date" value={r.to} className="h-8" onChange={(e) => update("availability", { blocked: a.blocked.map((x) => x.id===r.id ? {...x, to: e.target.value} : x) })}/>
-                <Input placeholder="Note" value={r.note} className="h-8 flex-1" onChange={(e) => update("availability", { blocked: a.blocked.map((x) => x.id===r.id ? {...x, note: e.target.value} : x) })}/>
+                <Input type="date" value={r.to} className="h-8 w-40" onChange={(e) => update("availability", { blocked: a.blocked.map((x) => x.id===r.id ? {...x, to: e.target.value} : x) })}/>
+                <Input placeholder="Note (e.g. Restaurant Week +$)" value={r.note} className="h-8 flex-1 min-w-[160px]" onChange={(e) => update("availability", { blocked: a.blocked.map((x) => x.id===r.id ? {...x, note: e.target.value} : x) })}/>
+                <div className="flex items-center gap-1">
+                  <span className="text-stone-500 text-sm">$</span>
+                  <Input type="number" value={r.surcharge} className="h-8 w-24" placeholder="0 = blocked"
+                    onChange={(e) => update("availability", { blocked: a.blocked.map((x) => x.id===r.id ? {...x, surcharge: +e.target.value} : x) })}/>
+                  <span className="text-xs text-stone-500">/pp</span>
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => update("availability", { blocked: a.blocked.filter((x) => x.id !== r.id) })}><Trash2 className="h-4 w-4 text-red-500"/></Button>
               </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => update("availability", { blocked: [...a.blocked, { id: newId(), from: "", to: "", note: "" }] })}><Plus className="h-3.5 w-3.5 mr-1"/>Add block</Button>
+            <p className="text-xs text-stone-500 italic">Leave surcharge at $0 to block the range entirely; enter a value to keep it bookable with an upcharge.</p>
+            <Button variant="outline" size="sm" onClick={() => update("availability", { blocked: [...a.blocked, { id: newId(), from: "", to: "", note: "", surcharge: 0 }] })}><Plus className="h-3.5 w-3.5 mr-1"/>Add range</Button>
           </div>
         </div>
 
@@ -554,10 +631,16 @@ function AvailabilityTab() {
                   <SelectTrigger className="h-8 w-32"><SelectValue/></SelectTrigger>
                   <SelectContent>{["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d,i) => <SelectItem key={i} value={String(i)}>{d}</SelectItem>)}</SelectContent>
                 </Select>
+                <div className="flex items-center gap-1">
+                  <span className="text-stone-500 text-sm">$</span>
+                  <Input type="number" value={r.surcharge} className="h-8 w-20" placeholder="0"
+                    onChange={(e) => update("availability", { recurring: a.recurring.map((x) => x.id===r.id ? {...x, surcharge: +e.target.value} : x) })}/>
+                  <span className="text-xs text-stone-500">/pp</span>
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => update("availability", { recurring: a.recurring.filter((x) => x.id !== r.id) })}><Trash2 className="h-4 w-4 text-red-500"/></Button>
               </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => update("availability", { recurring: [...a.recurring, { id: newId(), label: "Closed every…", weekday: 1 }] })}><Plus className="h-3.5 w-3.5 mr-1"/>Add rule</Button>
+            <Button variant="outline" size="sm" onClick={() => update("availability", { recurring: [...a.recurring, { id: newId(), label: "Closed every…", weekday: 1, surcharge: 0 }] })}><Plus className="h-3.5 w-3.5 mr-1"/>Add rule</Button>
           </div>
         </div>
       </div>
@@ -572,21 +655,11 @@ function AvailabilityTab() {
 function TimeSlotsTab() {
   const { data, update } = useFunnel();
   const t = data.timeslots;
-  // Generate slot chips
-  const slots: { time: string; isLunch: boolean }[] = [];
-  const [sh, sm] = t.start.split(":").map(Number);
-  const [eh, em] = t.end.split(":").map(Number);
-  const [ch, cm] = t.cutoff.split(":").map(Number);
-  let cur = sh * 60 + sm; const end = eh * 60 + em; const cutoff = ch * 60 + cm;
-  while (cur <= end && slots.length < 60) {
-    const h = Math.floor(cur / 60), m = cur % 60;
-    slots.push({ time: `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`, isLunch: cur < cutoff });
-    cur += t.interval;
-  }
+  const hh = t.happyHour;
   return (
     <div>
-      <SectionHead title="Time slots" hint="When guests can book, and how slots are generated"/>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <SectionHead title="Time slots" hint="When guests can book"/>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Field label="Start"><Input type="time" value={t.start} onChange={(e) => update("timeslots", { start: e.target.value })}/></Field>
         <Field label="End"><Input type="time" value={t.end} onChange={(e) => update("timeslots", { end: e.target.value })}/></Field>
         <Field label="Interval">
@@ -595,23 +668,44 @@ function TimeSlotsTab() {
             <SelectContent><SelectItem value="15">15 min</SelectItem><SelectItem value="30">30 min</SelectItem><SelectItem value="60">60 min</SelectItem></SelectContent>
           </Select>
         </Field>
-        <div>
-          <Label className="text-xs uppercase tracking-wider text-stone-500 font-medium">Lunch / Dinner pricing</Label>
-          <div className="flex items-center gap-2 mt-1.5 h-10">
-            <Switch checked={t.lunchDinnerPricing} onCheckedChange={(v) => update("timeslots", { lunchDinnerPricing: v })}/>
-            {t.lunchDinnerPricing && <Input type="time" value={t.cutoff} onChange={(e) => update("timeslots", { cutoff: e.target.value })} className="h-9 w-32"/>}
-          </div>
-        </div>
       </div>
 
-      <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mt-6 mb-3">Generated slots ({slots.length})</p>
-      <div className="flex flex-wrap gap-2">
-        {slots.map((s) => (
-          <span key={s.time} className={`px-3 py-1.5 rounded-full text-xs border ${t.lunchDinnerPricing && s.isLunch ? "bg-amber-50 border-amber-200 text-amber-700" : "bg-stone-100 border-stone-200 text-stone-700"}`}>
-            {s.time} {t.lunchDinnerPricing && (s.isLunch ? "· Lunch" : "· Dinner")}
-          </span>
-        ))}
+      {/* Lunch / dinner */}
+      <div className="mt-6 border border-stone-200 rounded-lg p-5 bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Do you want to determine your lunch & dinner hours?</p>
+            <p className="text-xs text-stone-500 mt-0.5">Applies different menu pricing before / after the cutoff.</p>
+          </div>
+          <Switch checked={t.lunchDinnerPricing} onCheckedChange={(v) => update("timeslots", { lunchDinnerPricing: v })}/>
+        </div>
+        {t.lunchDinnerPricing && (
+          <div className="mt-4 flex items-center gap-3 text-sm">
+            <span className="text-stone-500">Lunch until</span>
+            <Input type="time" value={t.cutoff} onChange={(e) => update("timeslots", { cutoff: e.target.value })} className="h-9 w-40"/>
+            <span className="text-stone-500">then dinner begins</span>
+          </div>
+        )}
       </div>
+
+      {/* Happy hour */}
+      <div className="mt-4 border border-stone-200 rounded-lg p-5 bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Add Happy Hour window?</p>
+            <p className="text-xs text-stone-500 mt-0.5">Show a HH badge on eligible slots, with an optional note.</p>
+          </div>
+          <Switch checked={hh.enabled} onCheckedChange={(v) => update("timeslots", { happyHour: { ...hh, enabled: v } })}/>
+        </div>
+        {hh.enabled && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Field label="Start"><Input type="time" value={hh.start} onChange={(e) => update("timeslots", { happyHour: { ...hh, start: e.target.value } })}/></Field>
+            <Field label="End"><Input type="time" value={hh.end} onChange={(e) => update("timeslots", { happyHour: { ...hh, end: e.target.value } })}/></Field>
+            <Field label="Note (shown to guest)"><Input value={hh.note} onChange={(e) => update("timeslots", { happyHour: { ...hh, note: e.target.value } })}/></Field>
+          </div>
+        )}
+      </div>
+
       <SaveBar/>
     </div>
   );
@@ -625,23 +719,38 @@ function AddonsTab() {
   const patch = (id: string, p: any) => update("addons", (prev) => prev.map((a) => a.id === id ? { ...a, ...p } : a));
   return (
     <div>
-      <SectionHead title="Addons" hint="Optional extras guests can add à la carte"/>
+      <SectionHead title="Addons" hint="Optional extras — control which fees apply per item"/>
+      <div className="grid grid-cols-12 gap-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 font-medium mb-2">
+        <div className="col-span-3">Name</div>
+        <div className="col-span-1">Price $</div>
+        <div className="col-span-2">Unit</div>
+        <div className="col-span-1">Qty</div>
+        <div className="col-span-1 text-center">Tax</div>
+        <div className="col-span-1 text-center">S.C.</div>
+        <div className="col-span-1">Other %</div>
+        <div className="col-span-1 text-center">Active</div>
+        <div className="col-span-1"></div>
+      </div>
       <div className="space-y-2">
         {data.addons.map((a) => (
           <div key={a.id} className="grid grid-cols-12 gap-2 items-center border border-stone-200 rounded-md p-3 bg-white">
-            <Input value={a.name} className="col-span-4 h-9" onChange={(e) => patch(a.id, { name: e.target.value })}/>
-            <Input type="number" value={a.price} className="col-span-2 h-9" onChange={(e) => patch(a.id, { price: +e.target.value })}/>
+            <Input value={a.name} className="col-span-3 h-9" onChange={(e) => patch(a.id, { name: e.target.value })}/>
+            <Input type="number" value={a.price} className="col-span-1 h-9" onChange={(e) => patch(a.id, { price: +e.target.value })}/>
             <Select value={a.unit} onValueChange={(v) => patch(a.id, { unit: v as any })}>
               <SelectTrigger className="col-span-2 h-9"><SelectValue/></SelectTrigger>
               <SelectContent><SelectItem value="fixed">Fixed</SelectItem><SelectItem value="per-person">Per person</SelectItem></SelectContent>
             </Select>
-            <Input type="number" value={a.qty} className="col-span-2 h-9" placeholder="Qty" onChange={(e) => patch(a.id, { qty: +e.target.value })}/>
+            <Input type="number" value={a.qty} className="col-span-1 h-9" placeholder="Qty" onChange={(e) => patch(a.id, { qty: +e.target.value })}/>
+            <div className="col-span-1 flex justify-center"><Switch checked={a.taxable} onCheckedChange={(v) => patch(a.id, { taxable: v })}/></div>
+            <div className="col-span-1 flex justify-center"><Switch checked={a.serviceable} onCheckedChange={(v) => patch(a.id, { serviceable: v })}/></div>
+            <Input type="number" value={a.otherFeePct} className="col-span-1 h-9" placeholder="0" onChange={(e) => patch(a.id, { otherFeePct: +e.target.value })}/>
             <div className="col-span-1 flex justify-center"><Switch checked={a.active} onCheckedChange={(v) => patch(a.id, { active: v })}/></div>
             <Button variant="ghost" size="sm" className="col-span-1" onClick={() => update("addons", (prev) => prev.filter((x) => x.id !== a.id))}><Trash2 className="h-4 w-4 text-red-500"/></Button>
           </div>
         ))}
       </div>
-      <Button variant="outline" className="mt-4 gap-2" onClick={() => update("addons", (prev) => [...prev, { id: newId(), name: "New addon", price: 0, unit: "fixed", qty: 1, active: true }])}><Plus className="h-4 w-4"/>Add addon</Button>
+      <p className="text-xs text-stone-500 mt-3 italic">Toggle whether each addon should have sales tax, service charge, or an "other" fee (e.g. resort / venue fee %) applied on top.</p>
+      <Button variant="outline" className="mt-4 gap-2" onClick={() => update("addons", (prev) => [...prev, { id: newId(), name: "New addon", price: 0, unit: "fixed", qty: 1, active: true, taxable: true, serviceable: false, otherFeePct: 0 }])}><Plus className="h-4 w-4"/>Add addon</Button>
       <SaveBar/>
     </div>
   );
@@ -697,25 +806,33 @@ function FaqTab() {
 }
 
 // ─────────────────────────────────────────────
-// Pricing
+// Buyout pricing (was Pricing)
 // ─────────────────────────────────────────────
 function PricingTab() {
   const { data, update } = useFunnel();
   const p = data.pricing;
-  const [sim, setSim] = useState({ guests: 20, menuId: data.menus[0]?.id, barId: data.bar.packages[0]?.id, duration: 2 });
-  const menu = data.menus.find((m) => m.id === sim.menuId);
-  const bar = data.bar.packages.find((b) => b.id === sim.barId);
-  const menuTotal = (menu?.price ?? 0) * sim.guests;
-  const barTotal = bar ? (sim.duration === 2 ? bar.price2hr : bar.price3hr) * sim.guests : 0;
-  const subtotal = menuTotal + barTotal;
-  const service = subtotal * (p.serviceCharge / 100);
-  const tax = (subtotal + service) * (p.salesTax / 100);
-  const total = subtotal + service + tax;
+  const enabled = data.advanced.buyoutEnabled;
+
+  if (!enabled) {
+    return (
+      <div>
+        <SectionHead title="Buyout pricing" hint="Full-venue buyouts and their upcharges"/>
+        <div className="border border-dashed border-stone-300 rounded-lg p-8 text-center bg-stone-50">
+          <p className="text-sm text-stone-600">Buyout pricing is currently <strong>disabled</strong>.</p>
+          <p className="text-xs text-stone-500 mt-1">Menu, bar, and add-on pricing are configured on their own tabs. To offer a full or partial venue buyout, enable the module in <strong>Advanced</strong>.</p>
+        </div>
+        <SaveBar/>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <SectionHead title="Pricing" hint="Fixed rates applied at checkout"/>
+      <SectionHead title="Buyout pricing" hint="Applied when a guest selects a full or partial buyout in Spaces"/>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Field label="Price / person"><Input type="number" value={p.pricePerPerson} onChange={(e) => update("pricing", { pricePerPerson: +e.target.value })}/></Field>
+        <Field label="Base buyout upcharge $"><Input type="number" value={p.buyoutUpcharge} onChange={(e) => update("pricing", { buyoutUpcharge: +e.target.value })}/></Field>
+        <Field label="Service charge %"><Input type="number" value={p.serviceCharge} onChange={(e) => update("pricing", { serviceCharge: +e.target.value })}/></Field>
+        <Field label="Sales tax %"><Input type="number" value={p.salesTax} onChange={(e) => update("pricing", { salesTax: +e.target.value })}/></Field>
         <div>
           <Label className="text-xs uppercase tracking-wider text-stone-500 font-medium">Kids pricing</Label>
           <div className="flex gap-1 mt-1.5">
@@ -726,41 +843,8 @@ function PricingTab() {
           </div>
           {p.kidsMode === "flat" && <Input type="number" value={p.kidsFlat} className="mt-2 h-9" onChange={(e) => update("pricing", { kidsFlat: +e.target.value })}/>}
         </div>
-        <Field label="Buyout upcharge"><Input type="number" value={p.buyoutUpcharge} onChange={(e) => update("pricing", { buyoutUpcharge: +e.target.value })}/></Field>
-        <Field label="Service charge %"><Input type="number" value={p.serviceCharge} onChange={(e) => update("pricing", { serviceCharge: +e.target.value })}/></Field>
-        <Field label="Sales tax %"><Input type="number" value={p.salesTax} onChange={(e) => update("pricing", { salesTax: +e.target.value })}/></Field>
       </div>
-
-      <div className="mt-8 border border-stone-200 rounded-lg p-5 bg-stone-50">
-        <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Live quote simulator</p>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-          <Field label="Guests"><Input type="number" value={sim.guests} onChange={(e) => setSim({ ...sim, guests: +e.target.value })}/></Field>
-          <Field label="Menu">
-            <Select value={sim.menuId} onValueChange={(v) => setSim({ ...sim, menuId: v })}>
-              <SelectTrigger><SelectValue/></SelectTrigger>
-              <SelectContent>{data.menus.map((m) => <SelectItem key={m.id} value={m.id}>{m.name} — ${m.price}</SelectItem>)}</SelectContent>
-            </Select>
-          </Field>
-          <Field label="Bar">
-            <Select value={sim.barId} onValueChange={(v) => setSim({ ...sim, barId: v })}>
-              <SelectTrigger><SelectValue/></SelectTrigger>
-              <SelectContent>{data.bar.packages.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-            </Select>
-          </Field>
-          <Field label="Duration">
-            <Select value={String(sim.duration)} onValueChange={(v) => setSim({ ...sim, duration: +v })}>
-              <SelectTrigger><SelectValue/></SelectTrigger>
-              <SelectContent><SelectItem value="2">2 hr</SelectItem><SelectItem value="3">3 hr</SelectItem></SelectContent>
-            </Select>
-          </Field>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm bg-white rounded p-4 border border-stone-200">
-          <div><p className="text-xs text-stone-500">Subtotal</p><p className="font-medium text-lg">${subtotal.toFixed(0)}</p></div>
-          <div><p className="text-xs text-stone-500">Service ({p.serviceCharge}%)</p><p className="font-medium text-lg">${service.toFixed(0)}</p></div>
-          <div><p className="text-xs text-stone-500">Tax ({p.salesTax}%)</p><p className="font-medium text-lg">${tax.toFixed(0)}</p></div>
-          <div><p className="text-xs text-stone-500">Grand total</p><p className="font-semibold text-xl" style={{ color: data.branding.accent }}>${total.toFixed(0)}</p></div>
-        </div>
-      </div>
+      <p className="text-xs text-stone-500 mt-4 italic">Per-person menu prices come from the Menus tab; bar packages from Bar; extras from Addons. This tab only controls the buyout upcharge and site-wide tax/service defaults.</p>
       <SaveBar/>
     </div>
   );
@@ -771,11 +855,21 @@ function PricingTab() {
 // ─────────────────────────────────────────────
 function AdvancedTab() {
   const { data, update } = useFunnel();
-  const [sim, setSim] = useState({ date: "2026-12-24", time: "19:00", guests: 30 });
-  const basePrice = data.pricing.pricePerPerson * sim.guests;
   return (
     <div>
-      <SectionHead title="Advanced — Dynamic pricing" hint="Apply surcharges, discounts, or minimums based on conditions"/>
+      <SectionHead title="Advanced" hint="Dynamic rules and optional modules"/>
+
+      <Card className="p-4 border-stone-200 bg-stone-50 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Enable buyout module</p>
+            <p className="text-xs text-stone-500 mt-0.5">Unlocks the Buyout tab and shows buyout options guests can select.</p>
+          </div>
+          <Switch checked={data.advanced.buyoutEnabled} onCheckedChange={(v) => update("advanced", { buyoutEnabled: v })}/>
+        </div>
+      </Card>
+
+      <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Dynamic pricing rules</p>
       <div className="space-y-2">
         {data.advanced.rules.map((r) => (
           <Card key={r.id} className="p-4 border-stone-200">
@@ -791,35 +885,19 @@ function AdvancedTab() {
         ))}
       </div>
       <Button variant="outline" className="mt-4 gap-2" onClick={() => update("advanced", { rules: [...data.advanced.rules, { id: newId(), label: "New rule", condition: "When …", effect: "+10%" }] })}><Plus className="h-4 w-4"/>Add rule</Button>
-
-      <div className="mt-8 border border-stone-200 rounded-lg p-5 bg-stone-50">
-        <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Dynamic pricing simulator</p>
-        <div className="grid grid-cols-3 gap-3 mb-3">
-          <Field label="Date"><Input type="date" value={sim.date} onChange={(e) => setSim({ ...sim, date: e.target.value })}/></Field>
-          <Field label="Time"><Input type="time" value={sim.time} onChange={(e) => setSim({ ...sim, time: e.target.value })}/></Field>
-          <Field label="Guests"><Input type="number" value={sim.guests} onChange={(e) => setSim({ ...sim, guests: +e.target.value })}/></Field>
-        </div>
-        <div className="bg-white rounded p-4 border border-stone-200 text-sm space-y-1">
-          <div className="flex justify-between"><span className="text-stone-500">Base</span><span>${basePrice}</span></div>
-          {data.advanced.rules.map((r) => (
-            <div key={r.id} className="flex justify-between text-stone-600"><span>{r.label} — <span className="text-stone-400">{r.condition}</span></span><span className="font-medium">{r.effect}</span></div>
-          ))}
-          <div className="flex justify-between pt-2 border-t border-stone-200 font-semibold text-base"><span>Estimated total</span><span style={{ color: data.branding.accent }}>${(basePrice * 1.15).toFixed(0)}</span></div>
-        </div>
-      </div>
       <SaveBar/>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────
-// Guest tiers & constraints
+// Guest tiers & constraints (rendered inside Spaces tab)
 // ─────────────────────────────────────────────
 function GuestTiersCard() {
   const { data, update } = useFunnel();
   const g = data.guests;
   return (
-    <Card className="p-6 border-stone-200 bg-white/70 rounded-xl shadow-sm">
+    <Card className="p-5 border-stone-200 bg-stone-50 rounded-xl mt-10">
       <div className="flex items-center gap-2 mb-4"><Users className="h-4 w-4 text-stone-500"/><p className="text-[11px] uppercase tracking-[0.2em] text-stone-500">Guest tiers & booking constraints</p></div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Field label="Min guests"><Input type="number" value={g.min} onChange={(e) => update("guests", { min: +e.target.value })}/></Field>
@@ -836,3 +914,4 @@ function GuestTiersCard() {
     </Card>
   );
 }
+
