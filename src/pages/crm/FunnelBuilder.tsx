@@ -342,6 +342,9 @@ function MenusTab() {
                     </div>
                   </div>
                   <Field label="Image URL"><Input value={m.image} onChange={(e) => patch(m.id, { image: e.target.value })}/></Field>
+                  <Field label="Short caption (optional — shown under the menu name; leave blank to hide)">
+                    <Input value={m.description || ""} placeholder="e.g. A refined three-course tasting inspired by coastal Sicily" onChange={(e) => patch(m.id, { description: e.target.value })}/>
+                  </Field>
                   <div className="flex flex-wrap gap-6 pt-1">
                     <label className="flex items-center gap-2 text-sm text-stone-600"><Switch checked={m.showPhoto !== false} onCheckedChange={(v) => patch(m.id, { showPhoto: v })}/>Show photo on card</label>
                     <label className="flex items-center gap-2 text-sm text-stone-600"><Switch checked={!!m.showDishes} onCheckedChange={(v) => patch(m.id, { showDishes: v })}/>Show individual dishes when expanded</label>
@@ -413,6 +416,9 @@ function BarTab() {
                   <Field label="Extra hour / pp"><Input type="number" value={p.priceExtraHour} onChange={(e) => patch(p.id, { priceExtraHour: +e.target.value })}/></Field>
                 </div>
                 <Field label="Included drinks"><Textarea value={p.drinks.join("\n")} rows={3} onChange={(e) => patch(p.id, { drinks: e.target.value.split("\n") })}/></Field>
+                <Field label="Short caption (optional — e.g. explain what 'on consumption' means; leave blank to hide)">
+                  <Textarea value={p.description || ""} rows={2} placeholder="e.g. Guests order freely — you're billed only for what's consumed." onChange={(e) => patch(p.id, { description: e.target.value })}/>
+                </Field>
                 <div className="flex items-center gap-3 mt-3 text-sm">
                   <button onClick={() => patch(p.id, { mode: "open" })} className={`px-3 py-1.5 rounded-full text-xs ${p.mode==="open"?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>Open bar</button>
                   <button onClick={() => patch(p.id, { mode: "consumption" })} className={`px-3 py-1.5 rounded-full text-xs ${p.mode==="consumption"?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>On consumption</button>
