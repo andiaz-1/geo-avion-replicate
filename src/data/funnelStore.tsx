@@ -20,8 +20,9 @@ export type Buyout = {
   availableSeasonIds?: string[]; // empty/undefined = all
   includes?: string[]; // bullet list shown to guest
 };
-export type Season = { id: string; label: string; months: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat" };
-export type DayOfWeekRule = { id: string; label: string; weekdays: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat" };
+export type SurchargeTarget = "food" | "beverage" | "addons";
+export type Season = { id: string; label: string; months: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat"; appliesTo?: SurchargeTarget[] };
+export type DayOfWeekRule = { id: string; label: string; weekdays: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat"; appliesTo?: SurchargeTarget[] };
 export type Holiday = { id: string; label: string; date: string; state: "available" | "blocked" | "special"; surcharge: number };
 export type BlockedRange = { id: string; from: string; to: string; note: string; surcharge: number };
 export type RecurringRule = { id: string; label: string; weekday: number; surcharge: number };
