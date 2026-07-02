@@ -20,12 +20,12 @@ const TABS = [
   { id: "branding", label: "Branding", icon: Palette },
   { id: "menus", label: "Menus", icon: UtensilsCrossed },
   { id: "bar", label: "Bar", icon: Wine },
-  { id: "venues", label: "Venues", icon: Home },
+  { id: "venues", label: "Spaces", icon: Home },
   { id: "availability", label: "Availability", icon: CalendarDays },
   { id: "timeslots", label: "Time slots", icon: Clock },
   { id: "addons", label: "Addons", icon: Sparkles },
   { id: "faq", label: "FAQ", icon: HelpCircle },
-  { id: "pricing", label: "Pricing", icon: DollarSign },
+  { id: "pricing", label: "Buyout", icon: DollarSign },
   { id: "advanced", label: "Advanced", icon: Wand2 },
 ] as const;
 
