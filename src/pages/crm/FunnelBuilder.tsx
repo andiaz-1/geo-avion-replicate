@@ -1028,6 +1028,9 @@ function AdvancedTab() {
                   <div><Label className="text-xs text-stone-500">F&B min spend $</Label><Input type="number" value={d.value} className="h-9 w-32" onChange={(e) => patchDow(d.id, { value: +e.target.value })}/></div>
                 )}
               </div>
+              {d.mode === "surcharge" && (
+                <AppliesToPicker value={d.appliesTo} onChange={(next) => patchDow(d.id, { appliesTo: next })}/>
+              )}
             </Card>
           ))}
           {!dow.length && <p className="text-xs text-stone-400 italic">No weekday rules yet.</p>}
