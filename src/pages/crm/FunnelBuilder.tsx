@@ -1057,6 +1057,9 @@ function AdvancedTab() {
       <SaveBar/>
     </div>
   );
+}
+
+
 
 
 // Applies-to chip picker (Food / Beverage / Add-ons). Empty = all.
