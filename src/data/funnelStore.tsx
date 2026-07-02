@@ -20,8 +20,9 @@ export type Buyout = {
   availableSeasonIds?: string[]; // empty/undefined = all
   includes?: string[]; // bullet list shown to guest
 };
-export type Season = { id: string; label: string; months: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat" };
-export type DayOfWeekRule = { id: string; label: string; weekdays: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat" };
+export type SurchargeTarget = "food" | "beverage" | "addons";
+export type Season = { id: string; label: string; months: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat"; appliesTo?: SurchargeTarget[] };
+export type DayOfWeekRule = { id: string; label: string; weekdays: number[]; mode: "surcharge" | "minSpend"; value: number; surchargeUnit?: "percent" | "flat"; appliesTo?: SurchargeTarget[] };
 export type Holiday = { id: string; label: string; date: string; state: "available" | "blocked" | "special"; surcharge: number };
 export type BlockedRange = { id: string; from: string; to: string; note: string; surcharge: number };
 export type RecurringRule = { id: string; label: string; weekday: number; surcharge: number };
@@ -63,6 +64,8 @@ export type FunnelData = {
   timeslots: {
     start: string; end: string; interval: 15 | 30 | 60;
     lunchDinnerPricing: boolean; cutoff: string;
+    lunch: { enabled: boolean; start: string; end: string };
+    dinner: { enabled: boolean; start: string; end: string };
     happyHour: { enabled: boolean; start: string; end: string; note: string };
   };
   addons: Addon[];
@@ -150,6 +153,8 @@ export const defaultFunnelData: FunnelData = {
   },
   timeslots: {
     start: "11:30", end: "22:00", interval: 30, lunchDinnerPricing: true, cutoff: "16:00",
+    lunch: { enabled: true, start: "11:30", end: "15:30" },
+    dinner: { enabled: true, start: "17:00", end: "22:00" },
     happyHour: { enabled: false, start: "16:00", end: "18:00", note: "$2 off draft & wine" },
   },
   addons: [

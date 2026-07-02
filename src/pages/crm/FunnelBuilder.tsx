@@ -708,20 +708,54 @@ function TimeSlotsTab() {
         </Field>
       </div>
 
-      {/* Lunch / dinner */}
+      {/* Lunch */}
       <div className="mt-6 border border-stone-200 rounded-lg p-5 bg-white">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium">Do you want to determine your lunch & dinner hours?</p>
+            <p className="text-sm font-medium">Lunch service</p>
+            <p className="text-xs text-stone-500 mt-0.5">Set the window guests can book for lunch.</p>
+          </div>
+          <Switch checked={t.lunch.enabled} onCheckedChange={(v) => update("timeslots", { lunch: { ...t.lunch, enabled: v } })}/>
+        </div>
+        {t.lunch.enabled && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label="Lunch from"><Input type="time" value={t.lunch.start} onChange={(e) => update("timeslots", { lunch: { ...t.lunch, start: e.target.value } })}/></Field>
+            <Field label="Lunch to"><Input type="time" value={t.lunch.end} onChange={(e) => update("timeslots", { lunch: { ...t.lunch, end: e.target.value } })}/></Field>
+          </div>
+        )}
+      </div>
+
+      {/* Dinner */}
+      <div className="mt-4 border border-stone-200 rounded-lg p-5 bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Dinner service</p>
+            <p className="text-xs text-stone-500 mt-0.5">Set the window guests can book for dinner.</p>
+          </div>
+          <Switch checked={t.dinner.enabled} onCheckedChange={(v) => update("timeslots", { dinner: { ...t.dinner, enabled: v } })}/>
+        </div>
+        {t.dinner.enabled && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label="Dinner from"><Input type="time" value={t.dinner.start} onChange={(e) => update("timeslots", { dinner: { ...t.dinner, start: e.target.value } })}/></Field>
+            <Field label="Dinner to"><Input type="time" value={t.dinner.end} onChange={(e) => update("timeslots", { dinner: { ...t.dinner, end: e.target.value } })}/></Field>
+          </div>
+        )}
+      </div>
+
+      {/* Legacy lunch-vs-dinner pricing cutoff */}
+      <div className="mt-4 border border-stone-200 rounded-lg p-5 bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Different menu pricing at lunch vs dinner?</p>
             <p className="text-xs text-stone-500 mt-0.5">Applies different menu pricing before / after the cutoff.</p>
           </div>
           <Switch checked={t.lunchDinnerPricing} onCheckedChange={(v) => update("timeslots", { lunchDinnerPricing: v })}/>
         </div>
         {t.lunchDinnerPricing && (
           <div className="mt-4 flex items-center gap-3 text-sm">
-            <span className="text-stone-500">Lunch until</span>
+            <span className="text-stone-500">Lunch pricing until</span>
             <Input type="time" value={t.cutoff} onChange={(e) => update("timeslots", { cutoff: e.target.value })} className="h-9 w-40"/>
-            <span className="text-stone-500">then dinner begins</span>
+            <span className="text-stone-500">then dinner pricing begins</span>
           </div>
         )}
       </div>
@@ -974,6 +1008,9 @@ function AdvancedTab() {
                   <div><Label className="text-xs text-stone-500">F&B min spend $</Label><Input type="number" value={s.value} className="h-9 w-32" onChange={(e) => patchSeason(s.id, { value: +e.target.value })}/></div>
                 )}
               </div>
+              {s.mode === "surcharge" && (
+                <AppliesToPicker value={s.appliesTo} onChange={(next) => patchSeason(s.id, { appliesTo: next })}/>
+              )}
             </Card>
           ))}
           {!seasons.length && <p className="text-xs text-stone-400 italic">No seasons yet — add one to charge more (or require a higher minimum) during specific months.</p>}
@@ -1025,6 +1062,9 @@ function AdvancedTab() {
                   <div><Label className="text-xs text-stone-500">F&B min spend $</Label><Input type="number" value={d.value} className="h-9 w-32" onChange={(e) => patchDow(d.id, { value: +e.target.value })}/></div>
                 )}
               </div>
+              {d.mode === "surcharge" && (
+                <AppliesToPicker value={d.appliesTo} onChange={(next) => patchDow(d.id, { appliesTo: next })}/>
+              )}
             </Card>
           ))}
           {!dow.length && <p className="text-xs text-stone-400 italic">No weekday rules yet.</p>}
@@ -1049,6 +1089,33 @@ function AdvancedTab() {
       </div>
       <Button variant="outline" className="mt-4 gap-2" onClick={() => update("advanced", { rules: [...data.advanced.rules, { id: newId(), label: "New rule", condition: "When …", effect: "+10%" }] })}><Plus className="h-4 w-4"/>Add rule</Button>
       <SaveBar/>
+    </div>
+  );
+}
+
+
+
+
+// Applies-to chip picker (Food / Beverage / Add-ons). Empty = all.
+function AppliesToPicker({ value, onChange }: { value?: ("food"|"beverage"|"addons")[]; onChange: (next: ("food"|"beverage"|"addons")[]) => void }) {
+  const options: { id: "food"|"beverage"|"addons"; label: string }[] = [
+    { id: "food", label: "Food" }, { id: "beverage", label: "Beverage" }, { id: "addons", label: "Add-ons" },
+  ];
+  const selected = value ?? [];
+  const isAll = selected.length === 0 || selected.length === 3;
+  const toggle = (id: "food"|"beverage"|"addons") => {
+    const has = selected.includes(id);
+    onChange(has ? selected.filter((x) => x !== id) : [...selected, id]);
+  };
+  return (
+    <div className="mt-3">
+      <p className="text-xs text-stone-500 mb-1.5">Applies to <span className="text-stone-400">{isAll ? "(all — food, beverage & add-ons)" : ""}</span></p>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((o) => {
+          const active = selected.includes(o.id);
+          return <button key={o.id} onClick={() => toggle(o.id)} className={`px-3 py-1 rounded-full text-xs border ${active ? "bg-stone-900 text-white border-stone-900" : "border-stone-200 text-stone-600 bg-white"}`}>{o.label}</button>;
+        })}
+      </div>
     </div>
   );
 }
