@@ -896,11 +896,30 @@ function PricingTab() {
 // ─────────────────────────────────────────────
 function AdvancedTab() {
   const { data, update } = useFunnel();
+  const seasons = data.advanced.seasons || [];
+  const dow = data.advanced.dowRules || [];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  const patchSeason = (id: string, p: any) => update("advanced", { seasons: seasons.map((s) => s.id === id ? { ...s, ...p } : s) });
+  const patchDow = (id: string, p: any) => update("advanced", { dowRules: dow.map((d) => d.id === id ? { ...d, ...p } : d) });
+
+  const toggleMonth = (id: string, m: number) => {
+    const s = seasons.find((x) => x.id === id); if (!s) return;
+    const has = s.months.includes(m);
+    patchSeason(id, { months: has ? s.months.filter((x) => x !== m) : [...s.months, m].sort((a,b) => a-b) });
+  };
+  const toggleWeekday = (id: string, w: number) => {
+    const d = dow.find((x) => x.id === id); if (!d) return;
+    const has = d.weekdays.includes(w);
+    patchDow(id, { weekdays: has ? d.weekdays.filter((x) => x !== w) : [...d.weekdays, w].sort((a,b) => a-b) });
+  };
+
   return (
     <div>
-      <SectionHead title="Advanced" hint="Dynamic rules and optional modules"/>
+      <SectionHead title="Advanced" hint="Seasonal / day-of-week pricing and optional modules"/>
 
-      <Card className="p-4 border-stone-200 bg-stone-50 mb-6">
+      <Card className="p-4 border-stone-200 bg-stone-50 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">Enable buyout module</p>
@@ -910,7 +929,110 @@ function AdvancedTab() {
         </div>
       </Card>
 
-      <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Dynamic pricing rules</p>
+      {/* Seasons */}
+      <div className="mb-10">
+        <div className="flex items-baseline justify-between mb-3">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-stone-500 font-medium">Seasons</p>
+            <p className="text-xs text-stone-500 mt-1">Choose the months in each season, then apply either a surcharge or a food-&-beverage minimum spend.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => update("advanced", { seasons: [...seasons, { id: newId(), label: "New season", months: [], mode: "surcharge", value: 10, surchargeUnit: "percent" }] })}><Plus className="h-3.5 w-3.5 mr-1"/>Add season</Button>
+        </div>
+        <div className="space-y-3">
+          {seasons.map((s) => (
+            <Card key={s.id} className="p-4 border-stone-200">
+              <div className="flex items-center gap-3 mb-3">
+                <Input value={s.label} className="font-medium border-none px-0 focus-visible:ring-0" onChange={(e) => patchSeason(s.id, { label: e.target.value })}/>
+                <Button variant="ghost" size="sm" onClick={() => update("advanced", { seasons: seasons.filter((x) => x.id !== s.id) })}><Trash2 className="h-4 w-4 text-red-500"/></Button>
+              </div>
+              <p className="text-xs text-stone-500 mb-2">Months</p>
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {MONTHS.map((m, i) => {
+                  const active = s.months.includes(i+1);
+                  return <button key={m} onClick={() => toggleMonth(s.id, i+1)} className={`px-3 py-1 rounded-full text-xs border ${active ? "bg-stone-900 text-white border-stone-900" : "border-stone-200 text-stone-600 bg-white"}`}>{m}</button>;
+                })}
+              </div>
+              <div className="flex flex-wrap items-end gap-3">
+                <div>
+                  <Label className="text-xs text-stone-500">Rule type</Label>
+                  <div className="flex gap-1 mt-1">
+                    {(["surcharge","minSpend"] as const).map((m) => (
+                      <button key={m} onClick={() => patchSeason(s.id, { mode: m })} className={`px-3 py-1 rounded-full text-xs ${s.mode===m?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>{m==="surcharge"?"Surcharge":"Min spend"}</button>
+                    ))}
+                  </div>
+                </div>
+                {s.mode === "surcharge" ? (
+                  <>
+                    <div className="flex gap-1">
+                      {(["percent","flat"] as const).map((u) => (
+                        <button key={u} onClick={() => patchSeason(s.id, { surchargeUnit: u })} className={`px-3 py-1 rounded-full text-xs ${(s.surchargeUnit ?? "percent")===u?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>{u==="percent"?"%":"$"}</button>
+                      ))}
+                    </div>
+                    <div><Label className="text-xs text-stone-500">Amount</Label><Input type="number" value={s.value} className="h-9 w-28" onChange={(e) => patchSeason(s.id, { value: +e.target.value })}/></div>
+                  </>
+                ) : (
+                  <div><Label className="text-xs text-stone-500">F&B min spend $</Label><Input type="number" value={s.value} className="h-9 w-32" onChange={(e) => patchSeason(s.id, { value: +e.target.value })}/></div>
+                )}
+              </div>
+            </Card>
+          ))}
+          {!seasons.length && <p className="text-xs text-stone-400 italic">No seasons yet — add one to charge more (or require a higher minimum) during specific months.</p>}
+        </div>
+      </div>
+
+      {/* Days of week */}
+      <div className="mb-10">
+        <div className="flex items-baseline justify-between mb-3">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-stone-500 font-medium">Days of the week</p>
+            <p className="text-xs text-stone-500 mt-1">Same idea, but by weekday — e.g. Fri/Sat surcharge, or a Sunday minimum.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => update("advanced", { dowRules: [...dow, { id: newId(), label: "New rule", weekdays: [], mode: "surcharge", value: 10, surchargeUnit: "percent" }] })}><Plus className="h-3.5 w-3.5 mr-1"/>Add rule</Button>
+        </div>
+        <div className="space-y-3">
+          {dow.map((d) => (
+            <Card key={d.id} className="p-4 border-stone-200">
+              <div className="flex items-center gap-3 mb-3">
+                <Input value={d.label} className="font-medium border-none px-0 focus-visible:ring-0" onChange={(e) => patchDow(d.id, { label: e.target.value })}/>
+                <Button variant="ghost" size="sm" onClick={() => update("advanced", { dowRules: dow.filter((x) => x.id !== d.id) })}><Trash2 className="h-4 w-4 text-red-500"/></Button>
+              </div>
+              <p className="text-xs text-stone-500 mb-2">Days</p>
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {DAYS.map((dl, i) => {
+                  const active = d.weekdays.includes(i);
+                  return <button key={dl} onClick={() => toggleWeekday(d.id, i)} className={`px-3 py-1 rounded-full text-xs border ${active ? "bg-stone-900 text-white border-stone-900" : "border-stone-200 text-stone-600 bg-white"}`}>{dl}</button>;
+                })}
+              </div>
+              <div className="flex flex-wrap items-end gap-3">
+                <div>
+                  <Label className="text-xs text-stone-500">Rule type</Label>
+                  <div className="flex gap-1 mt-1">
+                    {(["surcharge","minSpend"] as const).map((m) => (
+                      <button key={m} onClick={() => patchDow(d.id, { mode: m })} className={`px-3 py-1 rounded-full text-xs ${d.mode===m?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>{m==="surcharge"?"Surcharge":"Min spend"}</button>
+                    ))}
+                  </div>
+                </div>
+                {d.mode === "surcharge" ? (
+                  <>
+                    <div className="flex gap-1">
+                      {(["percent","flat"] as const).map((u) => (
+                        <button key={u} onClick={() => patchDow(d.id, { surchargeUnit: u })} className={`px-3 py-1 rounded-full text-xs ${(d.surchargeUnit ?? "percent")===u?"bg-stone-900 text-white":"bg-stone-100 text-stone-600"}`}>{u==="percent"?"%":"$"}</button>
+                      ))}
+                    </div>
+                    <div><Label className="text-xs text-stone-500">Amount</Label><Input type="number" value={d.value} className="h-9 w-28" onChange={(e) => patchDow(d.id, { value: +e.target.value })}/></div>
+                  </>
+                ) : (
+                  <div><Label className="text-xs text-stone-500">F&B min spend $</Label><Input type="number" value={d.value} className="h-9 w-32" onChange={(e) => patchDow(d.id, { value: +e.target.value })}/></div>
+                )}
+              </div>
+            </Card>
+          ))}
+          {!dow.length && <p className="text-xs text-stone-400 italic">No weekday rules yet.</p>}
+        </div>
+      </div>
+
+      {/* Legacy freeform rules */}
+      <p className="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3">Custom rules (free-form notes)</p>
       <div className="space-y-2">
         {data.advanced.rules.map((r) => (
           <Card key={r.id} className="p-4 border-stone-200">
@@ -927,6 +1049,72 @@ function AdvancedTab() {
       </div>
       <Button variant="outline" className="mt-4 gap-2" onClick={() => update("advanced", { rules: [...data.advanced.rules, { id: newId(), label: "New rule", condition: "When …", effect: "+10%" }] })}><Plus className="h-4 w-4"/>Add rule</Button>
       <SaveBar/>
+    </div>
+  );
+}
+
+// Per-buyout advanced settings block
+function BuyoutAdvancedBlock({ buyout, patch, seasons }: { buyout: any; patch: (p: any) => void; seasons: any[] }) {
+  const [open, setOpen] = useState(false);
+  const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const weekdays: number[] = buyout.availableWeekdays ?? [];
+  const seasonIds: string[] = buyout.availableSeasonIds ?? [];
+  const includes: string[] = buyout.includes ?? [];
+
+  const toggleWeekday = (w: number) => {
+    const has = weekdays.includes(w);
+    patch({ availableWeekdays: has ? weekdays.filter((x) => x !== w) : [...weekdays, w].sort((a,b) => a-b) });
+  };
+  const toggleSeason = (id: string) => {
+    const has = seasonIds.includes(id);
+    patch({ availableSeasonIds: has ? seasonIds.filter((x) => x !== id) : [...seasonIds, id] });
+  };
+
+  return (
+    <div className="border-t border-stone-100 pt-3 mt-2">
+      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 text-xs text-stone-500 hover:text-stone-800">
+        {open ? <ChevronDown className="h-3.5 w-3.5"/> : <ChevronRight className="h-3.5 w-3.5"/>}
+        Advanced buyout settings
+      </button>
+      {open && (
+        <div className="mt-4 space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div><Label className="text-xs text-stone-500">Min guests</Label><Input type="number" value={buyout.minGuests ?? ""} className="h-9" onChange={(e) => patch({ minGuests: e.target.value === "" ? undefined : +e.target.value })}/></div>
+            <div><Label className="text-xs text-stone-500">Max guests</Label><Input type="number" value={buyout.maxGuests ?? ""} className="h-9" onChange={(e) => patch({ maxGuests: e.target.value === "" ? undefined : +e.target.value })}/></div>
+            <div><Label className="text-xs text-stone-500">Duration (hrs)</Label><Input type="number" value={buyout.durationHours ?? ""} className="h-9" onChange={(e) => patch({ durationHours: e.target.value === "" ? undefined : +e.target.value })}/></div>
+            <div><Label className="text-xs text-stone-500">Min advance (days)</Label><Input type="number" value={buyout.minAdvanceDays ?? ""} className="h-9" onChange={(e) => patch({ minAdvanceDays: e.target.value === "" ? undefined : +e.target.value })}/></div>
+            <div><Label className="text-xs text-stone-500">Deposit $</Label><Input type="number" value={buyout.depositAmount ?? ""} className="h-9" onChange={(e) => patch({ depositAmount: e.target.value === "" ? undefined : +e.target.value })}/></div>
+            <div><Label className="text-xs text-stone-500">F&B min spend $</Label><Input type="number" value={buyout.minSpend ?? ""} className="h-9" onChange={(e) => patch({ minSpend: e.target.value === "" ? undefined : +e.target.value })}/></div>
+          </div>
+
+          <div>
+            <p className="text-xs text-stone-500 mb-1.5">Available on <span className="text-stone-400">(leave all off for every day)</span></p>
+            <div className="flex flex-wrap gap-1.5">
+              {DAYS.map((d, i) => {
+                const active = weekdays.includes(i);
+                return <button key={d} onClick={() => toggleWeekday(i)} className={`px-3 py-1 rounded-full text-xs border ${active ? "bg-stone-900 text-white border-stone-900" : "border-stone-200 text-stone-600 bg-white"}`}>{d}</button>;
+              })}
+            </div>
+          </div>
+
+          {seasons.length > 0 && (
+            <div>
+              <p className="text-xs text-stone-500 mb-1.5">Available seasons <span className="text-stone-400">(leave all off for every season)</span></p>
+              <div className="flex flex-wrap gap-1.5">
+                {seasons.map((s: any) => {
+                  const active = seasonIds.includes(s.id);
+                  return <button key={s.id} onClick={() => toggleSeason(s.id)} className={`px-3 py-1 rounded-full text-xs border ${active ? "bg-stone-900 text-white border-stone-900" : "border-stone-200 text-stone-600 bg-white"}`}>{s.label}</button>;
+                })}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <Label className="text-xs text-stone-500">What's included (one per line — shown to guest)</Label>
+            <Textarea rows={3} value={includes.join("\n")} placeholder={"3-hour venue rental\nSetup & breakdown\nDedicated coordinator"} onChange={(e) => patch({ includes: e.target.value.split("\n") })}/>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
