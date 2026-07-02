@@ -223,7 +223,7 @@ export default function FunnelPreview() {
                             <div key={course.id}>
                               <p className="text-xs tracking-[0.15em] uppercase text-accent font-medium">{course.name}</p>
                               <p className="text-[10px] text-muted-foreground italic mb-1">Includes {course.items.length} option{course.items.length === 1 ? "" : "s"}{course.picks > 1 ? ` · select ${course.picks}` : ""}</p>
-                              {menu.showDishes && (
+                              {menu.showDishes !== false && (
                                 <ul className="space-y-1 mt-1">
                                   {course.items.map((item) => (
                                     <li key={item.id} className="text-xs text-foreground/80 flex items-start gap-2"><span className="w-1 h-1 rounded-full bg-accent mt-1.5 shrink-0" /><span>{item.name}{item.supplement ? <span className="ml-1 inline-flex px-1.5 py-0.5 rounded-sm bg-accent/20 text-accent text-[10px] font-semibold">+${item.supplement}</span> : null}</span></li>
