@@ -104,13 +104,13 @@ export default function FunnelPreview() {
 
       {/* Progress */}
       <div className="max-w-3xl mx-auto px-4 md:px-6 py-8">
-        <div className="flex items-start justify-between mb-12 max-w-2xl mx-auto">
+        <div className="flex items-start justify-between mb-12 gap-1">
           {steps.map((s, i) => {
             const done = i < stepIdx;
             const active = i === stepIdx;
             return (
-              <div key={s.id} className="flex items-start flex-1 last:flex-none">
-                <div className="flex flex-col items-center min-w-0">
+              <div key={s.id} className="flex items-start flex-1 last:flex-none min-w-0">
+                <div className="flex flex-col items-center flex-shrink-0">
                   <button onClick={() => i <= stepIdx && setStepIdx(i)}
                     className="h-7 w-7 rounded-full flex items-center justify-center text-[11px] font-medium border transition-colors"
                     style={{
@@ -120,10 +120,10 @@ export default function FunnelPreview() {
                     }}>
                     {i + 1}
                   </button>
-                  <span className="text-[10px] mt-2 uppercase tracking-[0.15em] text-center leading-tight px-1"
-                    style={{ color: active ? b.text : "rgba(0,0,0,0.5)", maxWidth: 80 }}>{s.label}</span>
+                  <span className="text-[10px] mt-2 uppercase tracking-[0.15em] whitespace-nowrap"
+                    style={{ color: active ? b.text : "rgba(0,0,0,0.5)" }}>{s.label}</span>
                 </div>
-                {i < steps.length - 1 && <div className="flex-1 h-px mx-1 mt-[13px]" style={{ background: "rgba(0,0,0,0.15)" }}/>}
+                {i < steps.length - 1 && <div className="flex-1 h-px mt-[13px] mx-2" style={{ background: "rgba(0,0,0,0.15)", minWidth: 12 }}/>}
               </div>
             );
           })}
