@@ -23,6 +23,8 @@ import CrmDiscussions from "./pages/crm/Discussions.tsx";
 import CrmContacts from "./pages/crm/Contacts.tsx";
 import CrmSettings from "./pages/crm/Settings.tsx";
 import CrmMenus from "./pages/crm/Menus.tsx";
+import FunnelBuilder from "./pages/crm/FunnelBuilder.tsx";
+import FunnelPreview from "./pages/crm/FunnelPreview.tsx";
 
 const queryClient = new QueryClient();
 
