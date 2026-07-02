@@ -202,20 +202,45 @@ export default function FunnelPreview() {
               <h2 className="text-3xl mb-1" style={{ fontFamily: `'${b.titleFont}', serif` }}>Choose a menu</h2>
               <p className="text-sm opacity-70 mb-6">All menus are prix-fixe, served family-style unless noted.</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {data.menus.map((m) => (
-                  <button key={m.id} onClick={() => setForm({ ...form, menuId: m.id })}
-                    className="text-left rounded-xl overflow-hidden border-2 transition-all"
-                    style={{ borderColor: form.menuId === m.id ? b.accent : "rgba(0,0,0,0.08)", background: form.menuId === m.id ? "rgba(0,0,0,0.02)" : "white" }}>
-                    <img src={m.image} className="w-full h-36 object-cover" alt=""/>
-                    <div className="p-4">
-                      <div className="flex items-baseline justify-between">
-                        <p className="font-medium" style={{ fontFamily: `'${b.titleFont}', serif`, fontSize: 18 }}>{m.name}</p>
-                        <p className="text-sm" style={accentStyle}>${m.price}/pp</p>
-                      </div>
-                      <p className="text-xs opacity-60 mt-1">{m.courses.length} courses · {m.courses.reduce((s, c) => s + c.items.length, 0)} dishes</p>
+                {data.menus.map((m) => {
+                  const selected = form.menuId === m.id;
+                  const expanded = expandedMenuId === m.id;
+                  const dishCount = m.courses.reduce((s, c) => s + c.items.length, 0);
+                  return (
+                    <div key={m.id} className="rounded-xl overflow-hidden border-2 transition-all bg-white"
+                      style={{ borderColor: selected ? b.accent : "rgba(0,0,0,0.08)", background: selected ? "rgba(0,0,0,0.02)" : "white" }}>
+                      <button onClick={() => setForm({ ...form, menuId: m.id })} className="w-full text-left">
+                        {m.showPhoto !== false && <img src={m.image} className="w-full h-36 object-cover" alt=""/>}
+                        <div className="p-4 pb-2">
+                          <div className="flex items-baseline justify-between">
+                            <p className="font-medium" style={{ fontFamily: `'${b.titleFont}', serif`, fontSize: 18 }}>{m.name}</p>
+                            <p className="text-sm" style={accentStyle}>${m.price}/pp</p>
+                          </div>
+                          <p className="text-xs opacity-60 mt-1">{m.courses.length} courses · {dishCount} dishes</p>
+                        </div>
+                      </button>
+                      <button onClick={() => setExpandedMenuId(expanded ? null : m.id)}
+                        className="w-full px-4 pb-3 pt-1 text-[11px] uppercase tracking-wider flex items-center gap-1 opacity-70 hover:opacity-100"
+                        style={{ color: b.accent }}>
+                        {expanded ? "Hide details" : "View details"} <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`}/>
+                      </button>
+                      {expanded && (
+                        <div className="px-4 pb-4 border-t pt-3 space-y-2" style={{ borderColor: "rgba(0,0,0,0.06)" }}>
+                          {m.courses.map((c) => (
+                            <div key={c.id}>
+                              <p className="text-xs font-medium uppercase tracking-wider opacity-70">{c.name}{c.picks > 1 && <span className="opacity-50 normal-case ml-1">· pick {c.picks}</span>}</p>
+                              {m.showDishes && c.items.length > 0 && (
+                                <ul className="text-xs opacity-80 mt-1 space-y-0.5">
+                                  {c.items.map((it) => <li key={it.id}>· {it.name}{it.supplement ? <span className="opacity-60"> (+${it.supplement})</span> : null}</li>)}
+                                </ul>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
