@@ -1,13 +1,12 @@
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, ChevronDown, Check, Info, Minus, Phone, Plus } from "lucide-react";
+import { CalendarIcon, ChevronDown, Check, Minus, Plus } from "lucide-react";
+import ProgressBar from "@/components/booking/ProgressBar";
 import { loadFunnelData } from "@/data/funnelStore";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
-const STEP_DOTS = ["Your Date", "Your Space", "Your Menu", "Your Proposal"];
 
 export default function FunnelPreview() {
   const config = useMemo(() => loadFunnelData(), []);
@@ -58,7 +57,6 @@ export default function FunnelPreview() {
   const serviceCharge = subtotal * (config.pricing.serviceCharge / 100);
   const salesTax = (subtotal + serviceCharge) * (config.pricing.salesTax / 100);
   const grandTotal = subtotal + serviceCharge + salesTax;
-  const activeDot = currentStep >= 4 ? 4 : currentStep;
 
   const dateStatus = (date: Date) => {
     const minDate = new Date();
@@ -87,25 +85,7 @@ export default function FunnelPreview() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
-      <div className="w-full px-4 pt-10 pb-4">
-        <div className="max-w-lg mx-auto flex items-start justify-between relative">
-          {STEP_DOTS.map((label, index) => {
-            const filled = index + 1 <= activeDot;
-            return (
-              <div key={label} className="flex-1 flex flex-col items-center relative min-w-0">
-                {index < STEP_DOTS.length - 1 && <div className="absolute top-[9px] left-[calc(50%+10px)] right-[calc(-50%+10px)] h-px bg-border" />}
-                <button
-                  type="button"
-                  onClick={() => index + 1 <= activeDot && setCurrentStep(index + 1)}
-                  className={cn("relative z-10 w-5 h-5 rounded-full border-2 transition-colors", filled ? "bg-foreground border-foreground" : "bg-background border-border")}
-                  aria-label={label}
-                />
-                <span className={cn("mt-3 text-[10px] md:text-[11px] tracking-[0.18em] uppercase text-center whitespace-nowrap transition-colors", filled ? "text-foreground" : "text-muted-foreground")}>{label}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <ProgressBar currentStep={currentStep} totalSteps={5} />
 
       <main className="px-4 py-12 md:py-20">
         {currentStep === 1 && (
